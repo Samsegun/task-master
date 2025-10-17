@@ -32,9 +32,6 @@ importers:
       nodemailer:
         specifier: ^7.0.9
         version: 7.0.9
-      prisma:
-        specifier: ^6.17.1
-        version: 6.17.1(typescript@5.9.3)
       uuid:
         specifier: ^13.0.0
         version: 13.0.0
@@ -63,6 +60,9 @@ importers:
       nodemon:
         specifier: ^3.1.10
         version: 3.1.10
+      prisma:
+        specifier: ^6.17.1
+        version: 6.17.1(typescript@5.9.3)
       ts-node:
         specifier: ^10.9.2
         version: 10.9.2(@types/node@24.7.2)(typescript@5.9.3)
