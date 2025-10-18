@@ -7,7 +7,7 @@ build/
 
 
 
-# keep environment variables out of version control
+# keep environment variables, excluding .env.sample, out of version control
 .env
 .env.local
 .env.production
