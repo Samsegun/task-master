@@ -5,20 +5,29 @@ import {
     validateData,
 } from "../validators/auth.validator";
 
+type validatedRequest = {
+    email: string;
+    password: string;
+};
+
 const authRouter = Router();
 
-authRouter.get(
+authRouter.post(
     "/register",
     validateData(UserRegistrationSchema),
     (req, res) => {
-        console.log(req.body);
+        const { email, password } = req.body as validatedRequest;
+
+        console.log(email, password);
 
         res.send("hello from register");
     }
 );
 
-authRouter.get("/login", validateData(UserLoginSchema), (req, res) => {
-    console.log(req.body);
+authRouter.post("/login", validateData(UserLoginSchema), (req, res) => {
+    const { email, password } = req.body as validatedRequest;
+
+    console.log(email, password);
 
     res.send("hello from login");
 });

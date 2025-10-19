@@ -32,4 +32,32 @@ app.use(cookieParser());
 
 app.use("/api", appRouter);
 
+// app.use(
+//     (
+//         err: ErrorWithStatusCode,
+//         req: express.Request,
+//         res: express.Response,
+//         next: express.NextFunction
+//     ) => {
+//         if (process.env.NODE_ENV === "production") {
+//             console.error("❌ Internal error occurred:", err.name);
+//         } else {
+//             console.error("❌ Error:", err);
+//         }
+
+//         let code = err.statusCode || 500;
+//         let message = err.message;
+//         const data = err.data || null;
+
+//         // db specific handling
+//         const DBErrorHandled = handlePrismaError(err);
+//         if (DBErrorHandled) {
+//             code = DBErrorHandled.code;
+//             message = DBErrorHandled.message;
+//         }
+
+//         res.status(code).json({ message, data });
+//     }
+// );
+
 export default app;
