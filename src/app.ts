@@ -2,12 +2,14 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import express from "express";
 import morgan from "morgan";
+import errorHandler from "./middleware/errorHandler";
 import appRouter from "./routes";
 
 const app = express();
 
 const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(",") || [];
 
+app.disable("x-powered-by");
 app.use(
     cors({
         origin: (origin, callback) => {
@@ -31,6 +33,8 @@ app.use(morgan("combined"));
 app.use(cookieParser());
 
 app.use("/api", appRouter);
+
+app.use(errorHandler);
 
 // app.use(
 //     (

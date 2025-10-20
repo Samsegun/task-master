@@ -1,35 +1,23 @@
 import { Router } from "express";
+import AuthController from "../controllers/auth.controller";
 import {
     UserLoginSchema,
     UserRegistrationSchema,
     validateData,
 } from "../validators/auth.validator";
 
-type validatedRequest = {
-    email: string;
-    password: string;
-};
-
 const authRouter = Router();
 
 authRouter.post(
     "/register",
     validateData(UserRegistrationSchema),
-    (req, res) => {
-        const { email, password } = req.body as validatedRequest;
-
-        console.log(email, password);
-
-        res.send("hello from register");
-    }
+    AuthController.createUser
 );
 
-authRouter.post("/login", validateData(UserLoginSchema), (req, res) => {
-    const { email, password } = req.body as validatedRequest;
-
-    console.log(email, password);
-
-    res.send("hello from login");
-});
+authRouter.post(
+    "/login",
+    validateData(UserLoginSchema),
+    AuthController.loginUser
+);
 
 export default authRouter;
