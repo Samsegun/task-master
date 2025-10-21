@@ -9,6 +9,8 @@ export default function errorHandler(
     res: Response,
     next: NextFunction
 ) {
+    console.error(error);
+
     if (res.headersSent || config.debug) {
         next(error);
         return;
@@ -24,11 +26,15 @@ export default function errorHandler(
         return;
     }
 
+    // server error handling
+    let responseMessage =
+        "An internal server error occurred. Please try again later.";
+    if (process.env.NODE_ENV !== "production")
+        responseMessage = getErrorMessage(error);
+
     res.status(500).json({
         error: {
-            message:
-                getErrorMessage(error) ||
-                "An error occurred. Please view logs for more details",
+            message: responseMessage,
         },
     });
 }

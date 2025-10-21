@@ -8,4 +8,20 @@ type ValidatedAuthRequest = {
     password: string;
 };
 
-export { ValidatedAuthRequest, ValidationError };
+interface JwtPayload {
+    userId: string;
+    role: string;
+    isVerified: boolean;
+}
+
+interface RefreshTokenPayload {
+    userId: string;
+    tokenId: string;
+}
+
+export {
+    JwtPayload,
+    RefreshTokenPayload,
+    ValidatedAuthRequest,
+    ValidationError,
+};
