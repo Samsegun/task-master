@@ -12,6 +12,12 @@ export class ValidationError extends CustomError<ErrorCode> {
     }
 }
 
+export class UnproccessableEntity extends CustomError<ErrorCode> {
+    constructor(message: string, code: ErrorCode = "ERR_UNPROCCESSABLE") {
+        super({ message, statusCode: 422, code });
+    }
+}
+
 export class UnauthorizedError extends CustomError<ErrorCode> {
     constructor(message: string, code: ErrorCode = "ERR_UNAUTH") {
         super({ message, statusCode: 401, code });

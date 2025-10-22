@@ -43,6 +43,18 @@ class AuthController {
         });
     });
 
+    static logoutUser = asyncHandler(async (req: Request, res: Response) => {});
+
+    static refreshAccessToken = asyncHandler(
+        async (req: Request, res: Response) => {
+            const userId = (req as any).userId;
+
+            console.log(userId);
+
+            res.send("hey from refresh access token");
+        }
+    );
+
     static verifyUserMail = asyncHandler(
         async (req: Request, res: Response) => {
             const { token } = req.query;

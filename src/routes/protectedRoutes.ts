@@ -9,7 +9,9 @@ protectedRouter.get("/profile", (req, res) => {
 });
 
 protectedRouter.get("/user", (req, res) => {
-    console.log(req.body);
+    const userId = (req as any).userId;
+
+    console.log(userId);
 
     res.send("hello from user");
 });
