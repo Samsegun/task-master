@@ -16,7 +16,10 @@ class AuthMiddleware {
         const accessToken = req.cookies.accessToken;
 
         if (!accessToken) {
-            throw new UnauthorizedError("No token provided", "TOKEN_MISSING");
+            throw new UnauthorizedError(
+                "Authentication required",
+                "TOKEN_MISSING"
+            );
         }
 
         try {
@@ -25,22 +28,22 @@ class AuthMiddleware {
             (req as any).userId = userId;
             next();
         } catch (error) {
-            console.error("Authentication failed: ", error);
-
-            // specific signal for frontend to indicate expired token
-            if (error instanceof jwt.TokenExpiredError)
+            if (error instanceof jwt.TokenExpiredError) {
+                // specific signal for frontend to indicate expired token
                 throw new UnauthorizedError("Token expired", "TOKEN_EXPIRED");
-
-            if (error instanceof jwt.JsonWebTokenError) {
+            } else if (error instanceof jwt.JsonWebTokenError) {
                 throw new UnauthorizedError("Invalid token", "TOKEN_INVALID");
+            } else {
+                // fallback for other errors
+                throw new UnauthorizedError(
+                    "Authentication failed",
+                    "AUTH_FAILED"
+                );
             }
-
-            // fallback for other errors
-            throw new UnauthorizedError("Authentication failed", "AUTH_FAILED");
         }
     };
 
-    static refreshTokenValidation = (
+    static refreshTokenValidation = async (
         req: Request,
         res: Response,
         next: NextFunction
@@ -52,33 +55,29 @@ class AuthMiddleware {
         }
 
         try {
-            const { userId } = verifyRefreshToken(
+            const { userId, tokenId } = verifyRefreshToken(
                 refreshToken
             ) as RefreshTokenPayload;
 
-            (req as any).userId = userId;
+            (req as any).userInfo = { userId, tokenId };
             next();
         } catch (error) {
-            console.error("Authentication failed:", error);
-
-            if (error instanceof jwt.TokenExpiredError)
+            if (error instanceof jwt.TokenExpiredError) {
                 throw new UnauthorizedError(
                     "Token expired",
                     "REFRESH_TOKEN_EXPIRED"
                 );
-
-            if (error instanceof jwt.JsonWebTokenError) {
+            } else if (error instanceof jwt.JsonWebTokenError) {
                 throw new UnauthorizedError(
                     "Invalid token",
                     "REFRESH_TOKEN_INVALID"
                 );
+            } else {
+                throw new UnauthorizedError(
+                    "Authentication failed",
+                    "REFRESH_AUTH_FAILED"
+                );
             }
-
-            // fallback for other errors
-            throw new UnauthorizedError(
-                "Authentication failed",
-                "REFRESH_AUTH_FAILED"
-            );
         }
     };
 }

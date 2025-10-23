@@ -1,6 +1,11 @@
 import { Response } from "express";
 import { v4 as uuidv4 } from "uuid";
-import { authConfig } from "../config/auth.config";
+import {
+    accessTokenCookieOptions,
+    authConfig,
+    baseCookieOptions,
+    refreshTokenCookieOptions,
+} from "../config/auth.config";
 import prisma from "../utils/prisma";
 import {
     generateAccessToken,
@@ -47,9 +52,28 @@ class TokenService {
         });
     }
 
+    async setAuthCookies(
+        res: Response,
+        accessToken: string,
+        refreshToken: string
+    ) {
+        res.cookie("accessToken", accessToken, accessTokenCookieOptions);
+        res.cookie("refreshToken", refreshToken, refreshTokenCookieOptions);
+    }
+
     async clearAuthCookies(res: Response) {
-        res.clearCookie("accessToken");
-        res.clearCookie("refreshToken");
+        res.clearCookie("accessToken", { ...baseCookieOptions, maxAge: 0 });
+        res.clearCookie("refreshToken", {
+            ...baseCookieOptions,
+            path: "/api/auth",
+            maxAge: 0,
+        });
+    }
+
+    async deleteRefreshToken(refreshToken: string) {
+        await prisma.refreshToken.deleteMany({
+            where: { token: refreshToken },
+        });
     }
 }
 

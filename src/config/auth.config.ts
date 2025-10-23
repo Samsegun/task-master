@@ -39,7 +39,7 @@ export const accessTokenCookieOptions = {
  */
 export const refreshTokenCookieOptions = {
     ...baseCookieOptions,
-    path: "/api/auth/refresh-token",
+    path: "/api/auth",
     maxAge: MAX_AGE,
 };
 

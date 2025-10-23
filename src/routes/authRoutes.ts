@@ -22,11 +22,7 @@ authRouter.post(
     AuthController.loginUser
 );
 
-authRouter.post("/logout", (req, res) => {
-    console.log(req.body);
-
-    res.send("hello from logout");
-});
+authRouter.post("/logout", AuthController.logoutUser);
 
 authRouter.post(
     "/refresh-token",
@@ -46,36 +42,3 @@ authRouter.get("/reset-password", (req, res) => {
 });
 
 export default authRouter;
-
-// async function unifiedLogout(req: Request, res: Response, next: NextFunction) {
-//     try {
-//         let tokensCleared = false;
-
-//         if (req.cookies.accessToken && (req as JWTAuthenticatedRequest).user) {
-//             const { userId } = (req as JWTAuthenticatedRequest).user!;
-
-//             await prisma.refreshToken.deleteMany({
-//                 where: { userId },
-//             });
-
-//             tokensCleared = true;
-//         }
-
-//         // clear custom auth tokens
-//         res.clearCookie("accessToken", { ...baseCookieOptions, maxAge: 0 });
-//         res.clearCookie("refreshToken", {
-//             ...baseCookieOptions,
-//             path: "/api/auth/refresh",
-//             maxAge: 0,
-//         });
-
-//         return res.status(200).json({
-//             success: true,
-//             message: "logged out successfully",
-//             details: { tokensCleared },
-//         });
-//     } catch (error) {
-//         console.error("logout error:", error);
-//         next(error);
-//     }
-// }

@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from "uuid";
-import { ValidationError } from "../errors";
+import { ForbiddenError, ValidationError } from "../errors";
 import { comparePassword, hashPassword } from "../utils/passwordUtils";
 import prisma from "../utils/prisma";
 import EmailService from "./email.service";
@@ -82,6 +82,47 @@ class AuthService {
             );
 
         return { accessToken, refreshToken, user };
+    };
+
+    static refreshToken = async (userInfo: any) => {
+        const { tokenId, userId } = userInfo as {
+            userId: string;
+            tokenId: string;
+        };
+
+        // find refresh token in database
+        const storedToken = await prisma.refreshToken.findFirst({
+            where: {
+                id: tokenId,
+                userId: userId,
+                isRevoked: false,
+                expiresAt: { gt: new Date() },
+            },
+            include: {
+                user: {
+                    select: {
+                        id: true,
+                        role: true,
+                        isVerified: true,
+                    },
+                },
+            },
+        });
+        if (!storedToken)
+            throw new ForbiddenError("You can not perform this operation");
+
+        // delete old refresh token (rotation)
+        await prisma.refreshToken.delete({
+            where: { id: storedToken.id },
+        });
+
+        const {
+            user: { id, isVerified, role },
+        } = storedToken;
+        const { accessToken, refreshToken } =
+            await tokenService.createAuthTokens(id, role, isVerified);
+
+        return { accessToken, refreshToken };
     };
 
     static verifyUserMail = async (token: string) => {

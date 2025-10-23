@@ -8,6 +8,7 @@ type ErrorCode =
     | "REFRESH_TOKEN_EXPIRED"
     | "REFRESH_TOKEN_INVALID"
     | "REFRESH_AUTH_FAILED"
+    | "ACCESS_REVOKED"
     | "AUTH_FAILED"
     | "ERR_UNAUTH"
     | "ERR_FORBIDDEN"

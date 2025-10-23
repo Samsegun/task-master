@@ -1,10 +1,7 @@
 import { Request, Response } from "express";
-import {
-    accessTokenCookieOptions,
-    refreshTokenCookieOptions,
-} from "../config/auth.config";
 import { ValidationError } from "../errors";
 import AuthService from "../services/auth.service";
+import { tokenService } from "../services/token.service";
 import asyncHandler from "../utils/asyncRequestHandler";
 import { ValidatedAuthRequest } from "../utils/types";
 
@@ -30,9 +27,7 @@ class AuthController {
         );
 
         // set cookies
-        res.cookie("accessToken", accessToken, accessTokenCookieOptions);
-        res.cookie("refreshToken", refreshToken, refreshTokenCookieOptions);
-
+        await tokenService.setAuthCookies(res, accessToken, refreshToken);
         res.status(200).json({
             success: true,
             user: {
@@ -43,15 +38,33 @@ class AuthController {
         });
     });
 
-    static logoutUser = asyncHandler(async (req: Request, res: Response) => {});
+    static logoutUser = asyncHandler(async (req: Request, res: Response) => {
+        const refreshToken = req.cookies.refreshToken;
+
+        await tokenService.deleteRefreshToken(refreshToken);
+
+        // always clear cookies (even if token didn't exist)
+        tokenService.clearAuthCookies(res);
+        res.status(200).json({
+            success: true,
+            message: "Logged out successfully",
+        });
+    });
 
     static refreshAccessToken = asyncHandler(
         async (req: Request, res: Response) => {
-            const userId = (req as any).userId;
+            const userInfo = (req as any).userInfo;
 
-            console.log(userId);
+            const { accessToken, refreshToken } =
+                await AuthService.refreshToken(userInfo);
 
-            res.send("hey from refresh access token");
+            // // set cookies
+            await tokenService.setAuthCookies(res, accessToken, refreshToken);
+
+            res.status(200).json({
+                success: true,
+                message: "Tokens refreshed successfully",
+            });
         }
     );
 
@@ -67,8 +80,7 @@ class AuthController {
                 await AuthService.verifyUserMail(token);
 
             // set cookies
-            res.cookie("accessToken", accessToken, accessTokenCookieOptions);
-            res.cookie("refreshToken", refreshToken, refreshTokenCookieOptions);
+            await tokenService.setAuthCookies(res, accessToken, refreshToken);
 
             res.status(200).json({
                 success: true,

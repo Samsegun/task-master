@@ -1,3 +1,5 @@
+import { User as PrismaUser, Role } from "../generated/prisma";
+
 interface ValidationError extends Error {
     statusCode?: number;
     data?: { field: string; message: string }[];
@@ -19,9 +21,32 @@ interface RefreshTokenPayload {
     tokenId: string;
 }
 
+type User = Omit<PrismaUser, "password">;
+type RefreshTokenUser = {
+    id: string;
+    role: Role;
+    isVerified: boolean;
+    refreshTokens: {
+        id: string;
+        isRevoked: boolean;
+    }[];
+};
+
+type refreshToken = {
+    id: string;
+    createdAt: Date;
+    token: string;
+    userId: string;
+    isRevoked: boolean;
+    expiresAt: Date;
+};
+
 export {
     JwtPayload,
+    refreshToken,
     RefreshTokenPayload,
+    RefreshTokenUser,
+    User,
     ValidatedAuthRequest,
     ValidationError,
 };
