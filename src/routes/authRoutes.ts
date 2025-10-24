@@ -1,8 +1,9 @@
 import { Router } from "express";
 import AuthController from "../controllers/auth.controller";
-import { ValidationError } from "../errors";
 import AuthMiddleware from "../middleware/AuthMiddleware";
 import {
+    ForgotPasswordSchema,
+    ResetPasswordSchema,
     UserLoginSchema,
     UserRegistrationSchema,
     validateData,
@@ -31,14 +32,17 @@ authRouter.post(
 );
 
 authRouter.get("/verify-email", AuthController.verifyUserMail);
-authRouter.get("/reset-password", (req, res) => {
-    const { token, email } = req.query;
 
-    if (!token || typeof token !== "string") {
-        throw new ValidationError("Invalid token");
-    }
+authRouter.post(
+    "/forgot-password",
+    validateData(ForgotPasswordSchema),
+    AuthController.forgotPassword
+);
 
-    res.send(token + email + " reset password");
-});
+authRouter.post(
+    "/reset-password",
+    validateData(ResetPasswordSchema),
+    AuthController.resetPassword
+);
 
 export default authRouter;

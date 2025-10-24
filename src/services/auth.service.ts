@@ -1,4 +1,5 @@
 import { v4 as uuidv4 } from "uuid";
+import { authConfig } from "../config/auth.config";
 import { ForbiddenError, ValidationError } from "../errors";
 import { comparePassword, hashPassword } from "../utils/passwordUtils";
 import prisma from "../utils/prisma";
@@ -116,6 +117,7 @@ class AuthService {
             where: { id: storedToken.id },
         });
 
+        // generate new access and refresh tokens
         const {
             user: { id, isVerified, role },
         } = storedToken;
@@ -162,7 +164,71 @@ class AuthService {
                 authTokensArgs.isVerified
             );
 
-        return { accessToken, refreshToken };
+        const userDetails = {
+            id: updatedUser.id,
+            email: updatedUser.email,
+            role: updatedUser.role,
+        };
+
+        return { accessToken, refreshToken, userDetails };
+    };
+
+    static forgotPassword = async (email: string) => {
+        const user = await prisma.user.findUnique({
+            where: { email },
+            select: { id: true, email: true, isVerified: true },
+        });
+        if (!user || !user.isVerified) return { success: false };
+
+        const resetPasswordToken = uuidv4();
+        const resetPasswordTokenExpiry = new Date(
+            Date.now() + authConfig.refreshPasswordTokenTime * 60 * 1000
+        );
+
+        // update user with reset token
+        await prisma.user.update({
+            where: { id: user.id },
+            data: {
+                passwordResetToken: resetPasswordToken,
+                passwordResetExpiry: resetPasswordTokenExpiry,
+            },
+        });
+
+        await EmailService.sendPasswordResetEmail(email, resetPasswordToken);
+
+        return { success: true };
+    };
+
+    static resetPassword = async (token: string, password: string) => {
+        const user = await prisma.user.findFirst({
+            where: {
+                passwordResetToken: token,
+                passwordResetExpiry: { gt: new Date() },
+                isVerified: true,
+            },
+        });
+        if (!user) throw new ValidationError("Invalid or expired reset token");
+
+        // hashpassword
+        const hashedPassword = await hashPassword(password);
+        if (!hashedPassword) throw Error("Server error");
+
+        // update password, clear resetToken and resetExpiry values
+        await prisma.user.update({
+            where: { id: user.id },
+            data: {
+                password: hashedPassword,
+                passwordResetToken: null,
+                passwordResetExpiry: null,
+            },
+        });
+
+        // invalidate all existing refresh tokens for security
+        await prisma.refreshToken.deleteMany({
+            where: { userId: user.id },
+        });
+
+        return { success: true };
     };
 }
 

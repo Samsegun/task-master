@@ -76,7 +76,7 @@ class AuthController {
                 throw new ValidationError("Invalid token");
             }
 
-            const { accessToken, refreshToken } =
+            const { accessToken, refreshToken, userDetails } =
                 await AuthService.verifyUserMail(token);
 
             // set cookies
@@ -85,9 +85,58 @@ class AuthController {
             res.status(200).json({
                 success: true,
                 message: "Email verified successfully. You can now sign in.",
+                user: {
+                    ...userDetails,
+                },
             });
         }
     );
+
+    static forgotPassword = asyncHandler(
+        async (req: Request, res: Response) => {
+            const { email } = req.body as { email: string };
+
+            const resetEmailSent = await AuthService.forgotPassword(email);
+
+            // trying not to reveal if email exists or not because of attackers
+            if (!resetEmailSent.success) {
+                res.status(200).json({
+                    success: true,
+                    message:
+                        "If an account with this email exists, a password reset link has been sent.",
+                });
+            }
+
+            res.status(200).json({
+                success: resetEmailSent.success,
+                message:
+                    "If an account with this email exists, a password reset link has been sent.",
+            });
+        }
+    );
+
+    static resetPassword = asyncHandler(async (req: Request, res: Response) => {
+        const { token, password } = req.body as {
+            token: string;
+            password: string;
+        };
+
+        if (!token || !password)
+            throw new ValidationError("Invalid reset details");
+
+        const passwordUpdated = await AuthService.resetPassword(
+            token,
+            password
+        );
+
+        await tokenService.clearAuthCookies(res);
+
+        res.status(200).json({
+            success: passwordUpdated.success,
+            message:
+                "Password reset successful. Please log in with your new password",
+        });
+    });
 }
 
 export default AuthController;
