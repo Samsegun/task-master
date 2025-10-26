@@ -23,9 +23,8 @@ export const baseCookieOptions: CookieOptions = {
 /**
  * The accessToken cookie maxAge is same as the refreshToken.
  * If accessToken cookie maxAge is short-lived(e.g 5mins),
- * the browser deletes the cookie once it expired. That would cause the
- * auth middleware to incorrectly report "Access token not found" instead of
- * properly detecting and handling an expired token.
+ * the browser deletes the cookie once it expires and will not be sent to the server.
+ *  This prevents the auth-middleware from handling valid or invalid tokens.
  */
 export const accessTokenCookieOptions = {
     ...baseCookieOptions,
@@ -33,9 +32,8 @@ export const accessTokenCookieOptions = {
 };
 
 /**
- * refreshToken cookie is scoped to /api/auth/refresh
- * so it’s only sent when requesting new access tokens.
- * This reduces exposure by keeping it off normal API calls.
+ * refreshToken cookie is scoped to /api/auth.
+ * This reduces exposure by keeping it off non-auth API calls.
  */
 export const refreshTokenCookieOptions = {
     ...baseCookieOptions,

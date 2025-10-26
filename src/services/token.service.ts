@@ -52,16 +52,12 @@ class TokenService {
         });
     }
 
-    async setAuthCookies(
-        res: Response,
-        accessToken: string,
-        refreshToken: string
-    ) {
+    setAuthCookies(res: Response, accessToken: string, refreshToken: string) {
         res.cookie("accessToken", accessToken, accessTokenCookieOptions);
         res.cookie("refreshToken", refreshToken, refreshTokenCookieOptions);
     }
 
-    async clearAuthCookies(res: Response) {
+    clearAuthCookies(res: Response) {
         res.clearCookie("accessToken", { ...baseCookieOptions, maxAge: 0 });
         res.clearCookie("refreshToken", {
             ...baseCookieOptions,

@@ -27,7 +27,8 @@ class AuthController {
         );
 
         // set cookies
-        await tokenService.setAuthCookies(res, accessToken, refreshToken);
+        tokenService.setAuthCookies(res, accessToken, refreshToken);
+
         res.status(200).json({
             success: true,
             user: {
@@ -41,7 +42,7 @@ class AuthController {
     static logoutUser = asyncHandler(async (req: Request, res: Response) => {
         const refreshToken = req.cookies.refreshToken;
 
-        await tokenService.deleteRefreshToken(refreshToken);
+        if (refreshToken) await tokenService.deleteRefreshToken(refreshToken);
 
         // always clear cookies (even if token didn't exist)
         tokenService.clearAuthCookies(res);
@@ -58,8 +59,8 @@ class AuthController {
             const { accessToken, refreshToken } =
                 await AuthService.refreshToken(userInfo);
 
-            // // set cookies
-            await tokenService.setAuthCookies(res, accessToken, refreshToken);
+            // set cookies
+            tokenService.setAuthCookies(res, accessToken, refreshToken);
 
             res.status(200).json({
                 success: true,
@@ -80,7 +81,7 @@ class AuthController {
                 await AuthService.verifyUserMail(token);
 
             // set cookies
-            await tokenService.setAuthCookies(res, accessToken, refreshToken);
+            tokenService.setAuthCookies(res, accessToken, refreshToken);
 
             res.status(200).json({
                 success: true,
@@ -96,10 +97,12 @@ class AuthController {
         async (req: Request, res: Response) => {
             const { email } = req.body as { email: string };
 
-            const resetEmailSent = await AuthService.forgotPassword(email);
+            const resetPasswordMailSent = await AuthService.forgotPassword(
+                email
+            );
 
             // trying not to reveal if email exists or not because of attackers
-            if (!resetEmailSent.success) {
+            if (!resetPasswordMailSent.success) {
                 res.status(200).json({
                     success: true,
                     message:
@@ -108,7 +111,7 @@ class AuthController {
             }
 
             res.status(200).json({
-                success: resetEmailSent.success,
+                success: resetPasswordMailSent.success,
                 message:
                     "If an account with this email exists, a password reset link has been sent.",
             });
@@ -129,7 +132,7 @@ class AuthController {
             password
         );
 
-        await tokenService.clearAuthCookies(res);
+        tokenService.clearAuthCookies(res);
 
         res.status(200).json({
             success: passwordUpdated.success,
