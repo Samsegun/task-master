@@ -10,6 +10,8 @@ build/
 # keep environment variables, excluding .env.sample, out of version control
 .env
 .env.local
+.env.test
+.env.development
 .env.production
 
 # Prisma
@@ -28,4 +30,4 @@ Thumbs.db
 
 /src/generated/prisma
 
-/src/generated/prisma
+/src/generated

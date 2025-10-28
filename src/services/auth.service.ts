@@ -4,7 +4,7 @@ import { ForbiddenError, ValidationError } from "../errors";
 import { comparePassword, hashPassword } from "../utils/passwordUtils";
 import prisma from "../utils/prisma";
 import EmailService from "./email.service";
-import { tokenService } from "./token.service";
+import TokenService from "./token.service";
 
 class AuthService {
     static createUser = async (email: string, password: string) => {
@@ -76,7 +76,7 @@ class AuthService {
         };
 
         const { accessToken, refreshToken } =
-            await tokenService.createAuthTokens(
+            await TokenService.createAuthTokens(
                 authTokensArgs.userId,
                 authTokensArgs.role,
                 authTokensArgs.isVerified
@@ -122,13 +122,13 @@ class AuthService {
             user: { id, isVerified, role },
         } = storedToken;
         const { accessToken, refreshToken } =
-            await tokenService.createAuthTokens(id, role, isVerified);
+            await TokenService.createAuthTokens(id, role, isVerified);
 
         return { accessToken, refreshToken };
     };
 
     static verifyUserMail = async (token: string) => {
-        // find user with this verification token
+        // find user with the verification token
         const user = await prisma.user.findFirst({
             where: {
                 verificationToken: token,
@@ -158,7 +158,7 @@ class AuthService {
         };
 
         const { accessToken, refreshToken } =
-            await tokenService.createAuthTokens(
+            await TokenService.createAuthTokens(
                 authTokensArgs.userId,
                 authTokensArgs.role,
                 authTokensArgs.isVerified

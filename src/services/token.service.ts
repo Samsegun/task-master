@@ -13,7 +13,11 @@ import {
 } from "../utils/tokenManagement";
 
 class TokenService {
-    async createAuthTokens(userId: string, role: string, isVerified: boolean) {
+    static async createAuthTokens(
+        userId: string,
+        role: string,
+        isVerified: boolean
+    ) {
         // 1. Generate tokens
         const accessToken = generateAccessToken({
             userId,
@@ -45,19 +49,23 @@ class TokenService {
         return { accessToken, refreshToken };
     }
 
-    async revokeRefreshToken(tokenId: string) {
+    static async revokeRefreshToken(tokenId: string) {
         await prisma.refreshToken.update({
             where: { id: tokenId },
             data: { isRevoked: true },
         });
     }
 
-    setAuthCookies(res: Response, accessToken: string, refreshToken: string) {
+    static setAuthCookies(
+        res: Response,
+        accessToken: string,
+        refreshToken: string
+    ) {
         res.cookie("accessToken", accessToken, accessTokenCookieOptions);
         res.cookie("refreshToken", refreshToken, refreshTokenCookieOptions);
     }
 
-    clearAuthCookies(res: Response) {
+    static clearAuthCookies(res: Response) {
         res.clearCookie("accessToken", { ...baseCookieOptions, maxAge: 0 });
         res.clearCookie("refreshToken", {
             ...baseCookieOptions,
@@ -66,11 +74,11 @@ class TokenService {
         });
     }
 
-    async deleteRefreshToken(refreshToken: string) {
+    static async deleteRefreshToken(refreshToken: string) {
         await prisma.refreshToken.deleteMany({
             where: { token: refreshToken },
         });
     }
 }
 
-export const tokenService = new TokenService();
+export default TokenService;

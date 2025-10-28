@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { ValidationError } from "../errors";
 import AuthService from "../services/auth.service";
-import { tokenService } from "../services/token.service";
+import TokenService from "../services/token.service";
 import asyncHandler from "../utils/asyncRequestHandler";
 import { ValidatedAuthRequest } from "../utils/types";
 
@@ -27,7 +27,7 @@ class AuthController {
         );
 
         // set cookies
-        tokenService.setAuthCookies(res, accessToken, refreshToken);
+        TokenService.setAuthCookies(res, accessToken, refreshToken);
 
         res.status(200).json({
             success: true,
@@ -42,10 +42,10 @@ class AuthController {
     static logoutUser = asyncHandler(async (req: Request, res: Response) => {
         const refreshToken = req.cookies.refreshToken;
 
-        if (refreshToken) await tokenService.deleteRefreshToken(refreshToken);
+        if (refreshToken) await TokenService.deleteRefreshToken(refreshToken);
 
         // always clear cookies (even if token didn't exist)
-        tokenService.clearAuthCookies(res);
+        TokenService.clearAuthCookies(res);
         res.status(200).json({
             success: true,
             message: "Logged out successfully",
@@ -60,7 +60,7 @@ class AuthController {
                 await AuthService.refreshToken(userInfo);
 
             // set cookies
-            tokenService.setAuthCookies(res, accessToken, refreshToken);
+            TokenService.setAuthCookies(res, accessToken, refreshToken);
 
             res.status(200).json({
                 success: true,
@@ -81,7 +81,7 @@ class AuthController {
                 await AuthService.verifyUserMail(token);
 
             // set cookies
-            tokenService.setAuthCookies(res, accessToken, refreshToken);
+            TokenService.setAuthCookies(res, accessToken, refreshToken);
 
             res.status(200).json({
                 success: true,
@@ -132,7 +132,7 @@ class AuthController {
             password
         );
 
-        tokenService.clearAuthCookies(res);
+        TokenService.clearAuthCookies(res);
 
         res.status(200).json({
             success: passwordUpdated.success,

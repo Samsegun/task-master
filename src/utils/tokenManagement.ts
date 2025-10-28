@@ -37,6 +37,7 @@ function verifyRefreshToken(token: string) {
 export {
     generateAccessToken,
     generateRefreshToken,
+    getEnvVariable,
     verifyAccessToken,
     verifyRefreshToken,
 };

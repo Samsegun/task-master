@@ -16,6 +16,7 @@ class AuthMiddleware {
         const accessToken = req.cookies.accessToken;
 
         if (!accessToken) {
+            // user should be logged out!!!
             throw new UnauthorizedError(
                 "Authentication required",
                 "TOKEN_MISSING"
@@ -32,9 +33,11 @@ class AuthMiddleware {
                 // specific signal for frontend to indicate expired token
                 throw new UnauthorizedError("Token expired", "TOKEN_EXPIRED");
             } else if (error instanceof jwt.JsonWebTokenError) {
+                // user should be logged out!!!
                 throw new UnauthorizedError("Invalid token", "TOKEN_INVALID");
             } else {
                 // fallback for other errors
+                // user can retry
                 throw new UnauthorizedError(
                     "Authentication failed",
                     "AUTH_FAILED"
@@ -51,6 +54,7 @@ class AuthMiddleware {
         const refreshToken = req.cookies.refreshToken;
 
         if (!refreshToken) {
+            // user should be logged out!!!
             throw new UnauthorizedError("No token provided");
         }
 
@@ -63,16 +67,20 @@ class AuthMiddleware {
             next();
         } catch (error) {
             if (error instanceof jwt.TokenExpiredError) {
+                // user should be logged out!!!
                 throw new UnauthorizedError(
                     "Token expired",
                     "REFRESH_TOKEN_EXPIRED"
                 );
             } else if (error instanceof jwt.JsonWebTokenError) {
+                // user should be logged out!!!
                 throw new UnauthorizedError(
                     "Invalid token",
                     "REFRESH_TOKEN_INVALID"
                 );
             } else {
+                // user should be logged out!!!
+                // user can retry
                 throw new UnauthorizedError(
                     "Authentication failed",
                     "REFRESH_AUTH_FAILED"
