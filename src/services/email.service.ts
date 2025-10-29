@@ -2,13 +2,7 @@ import nodemailer, { SentMessageInfo } from "nodemailer";
 import emailConfig from "../config/email.config";
 
 class EmailService {
-    // static #transporter = nodemailer.createTransport({
-    //     service: "gmail",
-    //     auth: {
-    //         user: emailConfig.SMTP_USER,
-    //         pass: emailConfig.GOOGLE_APP_PASSWORD,
-    //     },
-    // });
+ 
     static #transporter = nodemailer.createTransport(
         emailConfig.transportOptions
     );
