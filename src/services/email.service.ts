@@ -2,7 +2,6 @@ import nodemailer, { SentMessageInfo } from "nodemailer";
 import emailConfig from "../config/email.config";
 
 class EmailService {
- 
     static #transporter = nodemailer.createTransport(
         emailConfig.transportOptions
     );
@@ -77,10 +76,15 @@ class EmailService {
 
         try {
             console.log("Sending email...");
-
-            await this.#transporter.sendMail(mailOptions);
+            const info: SentMessageInfo = await this.#transporter.sendMail(
+                mailOptions
+            );
 
             console.log("Email sent");
+            console.log(
+                "Ethereal message sent! Preview URL: ",
+                nodemailer.getTestMessageUrl(info)
+            );
         } catch (error) {
             console.error("Error sending email:", error);
             throw error;

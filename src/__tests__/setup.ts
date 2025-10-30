@@ -1,7 +1,9 @@
+import { PrismaClient } from "@prisma/client";
 import dotenv from "dotenv";
-import { PrismaClient } from "../generated/prisma";
+import path from "path";
 
-dotenv.config({ path: ".env.test" });
+const envPath = path.join(process.cwd(), ".env.test");
+dotenv.config({ path: envPath });
 
 const prisma = new PrismaClient();
 
@@ -18,7 +20,7 @@ afterEach(async () => {
 });
 
 afterAll(async () => {
-    console.log("disconnecting to db...");
+    console.log("disconnecting from db...");
     await prisma.$disconnect();
 });
 

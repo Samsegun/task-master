@@ -101,13 +101,14 @@ class AuthController {
                 email
             );
 
-            // trying not to reveal if email exists or not because of attackers
+            // trying to prevent an email-enumeration attack
             if (!resetPasswordMailSent.success) {
                 res.status(200).json({
                     success: true,
                     message:
                         "If an account with this email exists, a password reset link has been sent.",
                 });
+                return;
             }
 
             res.status(200).json({

@@ -6,11 +6,18 @@ const tsJestTransformCfg = createDefaultPreset().transform;
 module.exports = {
     preset: "ts-jest",
     testEnvironment: "node",
-    transform: {
-        ...tsJestTransformCfg,
+    roots: ["<rootDir>/src"],
+    testMatch: [
+        "**/__tests__/**/*.test.ts",
+        "**/*.test.ts", 
+    moduleNameMapper: {
+        "^@/(.*)$": "<rootDir>/src/$1",
     },
-    roots: ["<rootDir>/src", "<rootDir>/tests"],
-    testMatch: ["**/__tests__/**/*.ts", "**/?(*.)+(spec|test).ts"],
-    collectCoverageFrom: ["src/**/*.ts", "!src/**/*.d.ts", "!src/server.ts"],
-    setupFilesAfterEnv: ["<rootDir>/tests/setup.ts"],
+    collectCoverageFrom: [
+        "src/**/*.ts",
+        "!src/**/*.d.ts",
+        "!src/server.ts",
+        "!src/__tests__/**", 
+    ],
+    setupFilesAfterEnv: ["<rootDir>/src/__tests__/setup.ts"],
 };
