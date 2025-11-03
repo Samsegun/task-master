@@ -1,5 +1,7 @@
 import { Response } from "express";
-import { v4 as uuidv4 } from "uuid";
+import { randomUUID } from "node:crypto";
+
+// import { v4 as uuidv4 } from "uuid";
 import {
     accessTokenCookieOptions,
     authConfig,
@@ -25,7 +27,8 @@ class TokenService {
             isVerified,
         });
 
-        const refreshTokenId = uuidv4();
+        // const refreshTokenId = uuidv4();
+        const refreshTokenId = randomUUID();
         const refreshToken = generateRefreshToken({
             userId,
             tokenId: refreshTokenId,

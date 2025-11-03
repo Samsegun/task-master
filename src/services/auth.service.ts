@@ -1,4 +1,5 @@
-import { v4 as uuidv4 } from "uuid";
+// import { v4 as uuidv4 } from "uuid";
+import { randomUUID } from "node:crypto";
 import { authConfig } from "../config/auth.config";
 import { ForbiddenError, ValidationError } from "../errors";
 import { comparePassword, hashPassword } from "../utils/passwordUtils";
@@ -23,7 +24,8 @@ class AuthService {
         if (!hashedPassword) throw Error("Server error");
 
         // generate verification token
-        const verificationToken = uuidv4();
+        // const verificationToken = uuidv4();
+        const verificationToken = randomUUID();
         const verificationTokenExpiry = new Date(
             Date.now() + 24 * 60 * 60 * 1000
         );
@@ -39,6 +41,7 @@ class AuthService {
             select: {
                 id: true,
                 email: true,
+                isVerified: true,
             },
         });
         if (!newUser) throw Error("Failed to create user. An error occurred");
@@ -57,6 +60,7 @@ class AuthService {
                 password: true,
                 isVerified: true,
                 role: true,
+                username: true,
             },
         });
         if (!user) throw new ValidationError("Invalid credentials");
@@ -82,7 +86,17 @@ class AuthService {
                 authTokensArgs.isVerified
             );
 
-        return { accessToken, refreshToken, user };
+        const safeUser = {
+            id: user.id,
+            email: user.email,
+            username: user.username,
+            role: user.role,
+            // firstName: user.firstName,
+            // lastName: user.lastName,
+            isVerified: user.isVerified,
+        };
+
+        return { accessToken, refreshToken, user: safeUser };
     };
 
     static refreshToken = async (userInfo: any) => {
@@ -180,7 +194,8 @@ class AuthService {
         });
         if (!user || !user.isVerified) return { success: false };
 
-        const resetPasswordToken = uuidv4();
+        // const resetPasswordToken = uuidv4();
+        const resetPasswordToken = randomUUID();
         const resetPasswordTokenExpiry = new Date(
             Date.now() + authConfig.refreshPasswordTokenTime * 60 * 1000
         );

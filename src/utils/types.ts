@@ -1,4 +1,4 @@
-import { User as PrismaUser, Role } from "../generated/prisma";
+import { User as PrismaUser, Role } from "@prisma/client";
 
 interface ValidationError extends Error {
     statusCode?: number;
