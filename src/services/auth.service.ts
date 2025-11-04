@@ -24,7 +24,6 @@ class AuthService {
         if (!hashedPassword) throw Error("Server error");
 
         // generate verification token
-        // const verificationToken = uuidv4();
         const verificationToken = randomUUID();
         const verificationTokenExpiry = new Date(
             Date.now() + 24 * 60 * 60 * 1000
@@ -182,9 +181,11 @@ class AuthService {
             id: updatedUser.id,
             email: updatedUser.email,
             role: updatedUser.role,
+            isVerified: updatedUser.isVerified,
+            verificationToken: updatedUser.verificationToken,
         };
 
-        return { accessToken, refreshToken, userDetails };
+        return { accessToken, refreshToken, user: userDetails };
     };
 
     static forgotPassword = async (email: string) => {
@@ -194,7 +195,6 @@ class AuthService {
         });
         if (!user || !user.isVerified) return { success: false };
 
-        // const resetPasswordToken = uuidv4();
         const resetPasswordToken = randomUUID();
         const resetPasswordTokenExpiry = new Date(
             Date.now() + authConfig.refreshPasswordTokenTime * 60 * 1000

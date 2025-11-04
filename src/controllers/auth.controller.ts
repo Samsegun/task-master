@@ -73,7 +73,7 @@ class AuthController {
                 throw new ValidationError("Invalid token");
             }
 
-            const { accessToken, refreshToken, userDetails } =
+            const { accessToken, refreshToken, user } =
                 await AuthService.verifyUserMail(token);
 
             // set cookies
@@ -82,9 +82,7 @@ class AuthController {
             res.status(200).json({
                 success: true,
                 message: "Email verified successfully. You can now sign in.",
-                user: {
-                    ...userDetails,
-                },
+                user,
             });
         }
     );
