@@ -1,4 +1,3 @@
-// import { v4 as uuidv4 } from "uuid";
 import { randomUUID } from "node:crypto";
 import { authConfig } from "../config/auth.config";
 import { ForbiddenError, ValidationError } from "../errors";

@@ -23,13 +23,13 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  // Basic profile info
+  // basic profile info
   firstName String?
   lastName String?
 
   refreshTokens RefreshToken[]
   
-  // Project Management Relations
+  // project management relations
   ownedProjects Project[] @relation("ProjectOwner")
   projectMembers ProjectMember[]
   assignedTasks Task[]
@@ -50,7 +50,7 @@ model RefreshToken {
     @@map("refresh_tokens")
 }
 
-// Projects
+// projects
 model Project {
   id String @id @default(cuid())
   name String
@@ -81,7 +81,7 @@ model ProjectMember {
   @@map("project_members")
 }
 
-// Tasks
+// tasks
 model Task {
   id String @id @default(cuid())
   title String
@@ -106,7 +106,7 @@ model Task {
   @@map("tasks")
 }
 
-// Enums
+// enums
 enum Role {
   USER
   MODERATOR

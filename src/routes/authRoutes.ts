@@ -1,25 +1,20 @@
 import { Router } from "express";
 import AuthController from "../controllers/auth.controller";
 import AuthMiddleware from "../middleware/AuthMiddleware";
-import {
-    ForgotPasswordSchema,
-    ResetPasswordSchema,
-    UserLoginSchema,
-    UserRegistrationSchema,
-    validateData,
-} from "../validators/auth.validator";
+import AuthValidator from "../validators/auth.validator";
+import { validateData } from "../validators/validateData";
 
 const authRouter = Router();
 
 authRouter.post(
     "/register",
-    validateData(UserRegistrationSchema),
+    validateData(AuthValidator.create),
     AuthController.createUser
 );
 
 authRouter.post(
     "/login",
-    validateData(UserLoginSchema),
+    validateData(AuthValidator.login),
     AuthController.loginUser
 );
 
@@ -35,13 +30,13 @@ authRouter.get("/verify-email", AuthController.verifyUserMail);
 
 authRouter.post(
     "/forgot-password",
-    validateData(ForgotPasswordSchema),
+    validateData(AuthValidator.forgotPassword),
     AuthController.forgotPassword
 );
 
 authRouter.post(
     "/reset-password",
-    validateData(ResetPasswordSchema),
+    validateData(AuthValidator.resetPassword),
     AuthController.resetPassword
 );
 

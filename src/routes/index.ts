@@ -1,15 +1,14 @@
 import { Router } from "express";
-import AuthMiddleware from "../middleware/AuthMiddleware";
 import authRouter from "./authRoutes";
-import protectedRouter from "./protectedRoutes";
+import v1Router from "./v1Routes";
 
 const appRouter = Router();
 
 appRouter.use("/auth", authRouter);
-appRouter.use("/protected", AuthMiddleware.authenticateUser, protectedRouter);
+appRouter.use("/v1", v1Router);
 
-appRouter.use("/", (req, res) => {
-    res.send("welcome to task-master api");
+appRouter.get("/", (req, res) => {
+    res.send("welcome to task-master API");
 });
 
 export default appRouter;

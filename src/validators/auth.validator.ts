@@ -1,7 +1,6 @@
-import { NextFunction, Request, Response } from "express";
-import { z, ZodError } from "zod";
+import { z } from "zod";
 
-export const UserRegistrationSchema = z.object({
+const create = z.object({
     email: z.email("Invalid email format"),
     password: z
         .string()
@@ -16,40 +15,23 @@ export const UserRegistrationSchema = z.object({
         ),
 });
 
-export const UserLoginSchema = z.object({
+const login = z.object({
     email: z.email("Invalid email format"),
     password: z.string().trim(),
 });
 
-export const ForgotPasswordSchema = UserRegistrationSchema.omit({
+const forgotPassword = create.omit({
     password: true,
 });
 
-export const ResetPasswordSchema = z.object({
+const resetPassword = z.object({
     token: z.string().trim(),
-    password: UserRegistrationSchema.shape.password,
+    password: create.shape.password,
 });
 
-export function validateData(schema: z.ZodObject<any, any>) {
-    return (req: Request, res: Response, next: NextFunction) => {
-        try {
-            schema.parse(req.body);
-            next();
-        } catch (error) {
-            if (error instanceof ZodError) {
-                const errorMessages = error.issues.map((issue: any) => ({
-                    message: `${issue.message}`,
-                }));
-
-                res.status(400).json({
-                    error: "Input Validation failed.",
-                    details: errorMessages,
-                });
-            } else {
-                res.status(500).json({
-                    error: "Internal Server Error",
-                });
-            }
-        }
-    };
-}
+export default {
+    create,
+    login,
+    forgotPassword,
+    resetPassword,
+};
