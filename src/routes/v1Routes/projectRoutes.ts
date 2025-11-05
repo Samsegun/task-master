@@ -5,9 +5,7 @@ import { validateData } from "../../validators/validateData";
 
 const projectRouter = Router();
 
-projectRouter.get("/", (req, res) => {
-    res.send("hello from projects");
-});
+projectRouter.get("/", ProjectController.getUserProjects);
 
 projectRouter.get("/:id", (req, res) => {
     const { id } = req.params;

@@ -64,6 +64,7 @@ model Project {
   members ProjectMember[]
   tasks Task[]
 
+  @@unique([name, ownerId])
   @@map("projects")
 }
 

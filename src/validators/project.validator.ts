@@ -25,7 +25,9 @@ const updateMemberRole = z.object({
 
 export type ProjectStatus = z.infer<typeof ProjectStatus>;
 export type MemberRole = z.infer<typeof MemberRole>;
-// export type CreateProject = z.infer<typeof create>;
+export type CreateProject = z.infer<typeof create>;
+export type UpdateProject = z.infer<typeof update>;
+export type AddProjectMember = z.infer<typeof addMember>;
 
 export default {
     create,

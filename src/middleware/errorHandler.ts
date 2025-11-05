@@ -18,6 +18,7 @@ export default function errorHandler(
 
     if (error instanceof CustomError) {
         res.status(error.statusCode).json({
+            success: false,
             error: {
                 message: error.message,
                 code: error.code,
@@ -33,6 +34,7 @@ export default function errorHandler(
         responseMessage = getErrorMessage(error);
 
     res.status(500).json({
+        success: false,
         error: {
             message: responseMessage,
         },

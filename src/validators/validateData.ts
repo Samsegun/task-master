@@ -13,11 +13,13 @@ export function validateData(schema: z.ZodObject<any, any>) {
                 }));
 
                 res.status(400).json({
+                    success: false,
                     error: "Input Validation failed.",
                     details: errorMessages,
                 });
             } else {
                 res.status(500).json({
+                    success: false,
                     error: "Internal Server Error",
                 });
             }
