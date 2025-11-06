@@ -7,16 +7,20 @@ const projectRouter = Router();
 
 projectRouter.get("/", ProjectController.getUserProjects);
 
-projectRouter.get("/:id", (req, res) => {
-    const { id } = req.params;
-
-    res.send(`hello from specific project ${id}`);
-});
-
 projectRouter.post(
     "/",
     validateData(projectValidator.create),
     ProjectController.createProject
 );
+
+projectRouter.get("/:projectId", ProjectController.getProject);
+
+projectRouter.patch(
+    "/:projectId",
+    validateData(projectValidator.update),
+    ProjectController.updateProject
+);
+
+projectRouter.delete("/:projectId", ProjectController.deleteProject);
 
 export default projectRouter;

@@ -1,6 +1,6 @@
-import { EntityNotFound, ValidationError } from "../errors";
+import { EntityNotFound, ForbiddenError, ValidationError } from "../errors";
 import prisma from "../utils/prisma";
-import { CreateProject } from "../validators/project.validator";
+import { CreateProject, ProjectStatus } from "../validators/project.validator";
 
 class ProjectService {
     static async createProject(ownerId: string, data: CreateProject) {
@@ -81,60 +81,103 @@ class ProjectService {
         return projects;
     }
 
-    // static async getProjectById(projectId: string, userId: string) {
-    //     // Check if user has access to this project
-    //     const member = await prisma.projectMember.findUnique({
-    //         where: {
-    //             projectId_userId: {
-    //                 projectId,
-    //                 userId,
-    //             },
-    //         },
-    //     });
+    static async getProjectById(projectId: string, userId: string) {
+        // check if user has access to this project
+        const member = await prisma.projectMember.findUnique({
+            where: {
+                projectId_userId: {
+                    projectId,
+                    userId,
+                },
+            },
+        });
+        if (!member) {
+            throw new ForbiddenError("You do not have access to this project");
+        }
 
-    //     if (!member) {
-    //         throw new ForbiddenError('You do not have access to this project');
-    //     }
+        const project = await prisma.project.findUnique({
+            where: { id: projectId },
+            include: {
+                owner: {
+                    select: {
+                        id: true,
+                        email: true,
+                    },
+                },
+                members: {
+                    include: {
+                        user: {
+                            select: {
+                                id: true,
+                                email: true,
+                            },
+                        },
+                    },
+                    omit: {
+                        joinedAt: true,
+                        projectId: true,
+                    },
+                },
+                _count: {
+                    select: {
+                        tasks: true,
+                    },
+                },
+            },
+        });
+        if (!project) {
+            throw new EntityNotFound("Project not found");
+        }
 
-    //     const project = await prisma.project.findUnique({
-    //         where: { id: projectId },
-    //         include: {
-    //             owner: {
-    //                 select: {
-    //                     id: true,
-    //                     email: true,
-    //                     username: true,
-    //                     firstName: true,
-    //                     lastName: true,
-    //                 },
-    //             },
-    //             members: {
-    //                 include: {
-    //                     user: {
-    //                         select: {
-    //                             id: true,
-    //                             email: true,
-    //                             username: true,
-    //                             firstName: true,
-    //                             lastName: true,
-    //                         },
-    //                     },
-    //                 },
-    //             },
-    //             _count: {
-    //                 select: {
-    //                     tasks: true,
-    //                 },
-    //             },
-    //         },
-    //     });
+        return project;
+    }
 
-    //     if (!project) {
-    //         throw new NotFoundError('Project not found');
-    //     }
+    static async updateProject(
+        projectId: string,
+        userId: string,
+        data: { name?: string; description?: string; status?: ProjectStatus }
+    ) {
+        // check if user is owner or has permission
+        const member = await prisma.projectMember.findUnique({
+            where: {
+                projectId_userId: {
+                    projectId,
+                    userId,
+                },
+            },
+        });
+        if (!member || member.role !== "OWNER")
+            throw new ForbiddenError(
+                "Only project owners can update project details"
+            );
 
-    //     return project;
-    // }
+        const project = await prisma.project.update({
+            where: { id: projectId },
+            data,
+        });
+
+        return project;
+    }
+
+    static async deleteProject(projectId: string, userId: string) {
+        const project = await prisma.project.findUnique({
+            where: { id: projectId },
+        });
+        if (!project) {
+            throw new EntityNotFound("Project not found");
+        }
+        if (project.ownerId !== userId) {
+            throw new ForbiddenError(
+                "Only project owner can delete this project"
+            );
+        }
+
+        await prisma.project.delete({
+            where: { id: projectId },
+        });
+
+        return { message: "Project deleted successfully" };
+    }
 }
 
 export default ProjectService;
