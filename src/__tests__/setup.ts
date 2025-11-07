@@ -14,9 +14,18 @@ beforeAll(async () => {
 
 afterEach(async () => {
     const deleteRefreshTokens = prisma.refreshToken.deleteMany();
+    const deleteTasks = prisma.task.deleteMany();
+    const deleteProjectMembers = prisma.projectMember.deleteMany();
+    const deleteProjects = prisma.project.deleteMany();
     const deleteUsers = prisma.user.deleteMany();
 
-    await prisma.$transaction([deleteRefreshTokens, deleteUsers]);
+    await prisma.$transaction([
+        deleteRefreshTokens,
+        deleteTasks,
+        deleteProjectMembers,
+        deleteProjects,
+        deleteUsers,
+    ]);
 });
 
 afterAll(async () => {
