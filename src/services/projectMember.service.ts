@@ -18,7 +18,7 @@ class ProjectMemberService {
             },
         });
         if (!requesterMember || requesterMember.role !== "OWNER")
-            throw new ForbiddenError("Only project owners can add members");
+            throw new ForbiddenError("Only project owner can add members");
 
         // find user by email
         const userToAdd = await prisma.user.findUnique({
@@ -123,7 +123,7 @@ class ProjectMemberService {
         });
         if (!requesterMember || requesterMember.role !== "OWNER")
             throw new ForbiddenError(
-                "Only project owners can update member roles"
+                "Only project owner can update member roles"
             );
 
         // check if member exists
@@ -197,33 +197,6 @@ class ProjectMemberService {
             },
         });
 
-        // // prevent changing project owner's role
-        // const project = await prisma.project.findUnique({
-        //     where: { id: projectId },
-        //     select: { ownerId: true },
-        // });
-        // if (memberToUpdate.userId === project?.ownerId)
-        //     throw new ForbiddenError("Cannot change project owner role");
-
-        // update role
-        // const updatedMember = await prisma.projectMember.update({
-        //     where: {
-        //         projectId_userId: {
-        //             projectId,
-        //             userId: userIdToUpdate,
-        //         },
-        //     },
-        //     data: { role: newRole },
-        //     include: {
-        //         user: {
-        //             select: {
-        //                 id: true,
-        //                 email: true,
-        //             },
-        //         },
-        //     },
-        // });
-
         return updatedMember;
     }
 
@@ -242,7 +215,7 @@ class ProjectMemberService {
             },
         });
         if (!requesterMember || requesterMember.role !== "OWNER")
-            throw new ForbiddenError("Only project owners can remove members");
+            throw new ForbiddenError("Only project owner can remove members");
 
         // check if member exists
         const memberToRemove = await prisma.projectMember.findUnique({
