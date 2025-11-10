@@ -148,7 +148,7 @@ class ProjectService {
         });
         if (!member || member.role !== "OWNER")
             throw new ForbiddenError(
-                "Only project owners can update project details"
+                "Only project owner can update project details"
             );
 
         const project = await prisma.project.update({
