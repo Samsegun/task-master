@@ -1,11 +1,7 @@
 import { Request, Response } from "express";
-// import { ValidationError } from "../errors";
-// import AuthService from "../services/auth.service";
-// import TokenService from "../services/token.service";
 import ProjectService from "../services/project.service";
 import asyncHandler from "../utils/asyncRequestHandler";
 import { CreateProject, UpdateProject } from "../validators/project.validator";
-// import { ValidatedAuthRequest } from "../utils/types";
 
 class ProjectController {
     static createProject = asyncHandler(async (req: Request, res: Response) => {

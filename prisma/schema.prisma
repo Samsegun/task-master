@@ -104,6 +104,7 @@ model Task {
   assignee User? @relation(fields: [assigneeId], references: [id], onDelete: SetNull)
   creator User @relation("TaskCreator", fields: [creatorId], references: [id], onDelete: Cascade)
 
+  @@unique([title, projectId])
   @@map("tasks")
 }
 

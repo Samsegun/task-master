@@ -3,29 +3,14 @@ import ProjectController from "../../controllers/project.controller";
 import ProjectMemberController from "../../controllers/projectMember.controller";
 import projectValidator from "../../validators/project.validator";
 import { validateData } from "../../validators/validateData";
+import taskRouter from "./task.routes";
 
 const projectRouter = Router();
 
-// === project routes ===
-projectRouter.get("/", ProjectController.getUserProjects);
+// ****************** task routes ******************
+projectRouter.use("/:projectId/tasks", taskRouter);
 
-projectRouter.post(
-    "/",
-    validateData(projectValidator.create),
-    ProjectController.createProject
-);
-
-projectRouter.get("/:projectId", ProjectController.getProject);
-
-projectRouter.patch(
-    "/:projectId",
-    validateData(projectValidator.update),
-    ProjectController.updateProject
-);
-
-projectRouter.delete("/:projectId", ProjectController.deleteProject);
-
-// === project member routes ===
+// ****************** project member routes ******************
 projectRouter.post(
     "/:projectId/members",
     validateData(projectValidator.addMember),
@@ -46,5 +31,24 @@ projectRouter.delete(
 );
 
 projectRouter.delete("/:projectId/leave", ProjectMemberController.leaveProject);
+
+// ****************** project routes ******************
+projectRouter.get("/", ProjectController.getUserProjects);
+
+projectRouter.post(
+    "/",
+    validateData(projectValidator.create),
+    ProjectController.createProject
+);
+
+projectRouter.get("/:projectId", ProjectController.getProject);
+
+projectRouter.patch(
+    "/:projectId",
+    validateData(projectValidator.update),
+    ProjectController.updateProject
+);
+
+projectRouter.delete("/:projectId", ProjectController.deleteProject);
 
 export default projectRouter;
