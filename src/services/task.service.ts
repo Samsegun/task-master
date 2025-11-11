@@ -1,7 +1,7 @@
 import { Prisma, TaskPriority, TaskStatus } from "@prisma/client";
 import { EntityNotFound, ForbiddenError, ValidationError } from "../errors";
 import prisma from "../utils/prisma";
-import { CreateTask } from "../validators/task.validator";
+import { CreateTask, UpdateTask } from "../validators/task.validator";
 
 class TaskService {
     static async createTask(
@@ -138,11 +138,7 @@ class TaskService {
                     },
                 },
             },
-            orderBy: [
-                { status: "asc" },
-                { priority: "desc" },
-                { createdAt: "desc" },
-            ],
+            orderBy: [{ createdAt: "desc" }],
         });
 
         return tasks;
@@ -198,6 +194,85 @@ class TaskService {
             throw new EntityNotFound("Task not found");
 
         return task;
+    }
+
+    static async updateTask(
+        projectId: string,
+        taskId: string,
+        userId: string,
+        data: UpdateTask
+    ) {
+        // check if user is a project member
+        const member = await prisma.projectMember.findUnique({
+            where: {
+                projectId_userId: {
+                    projectId,
+                    userId,
+                },
+            },
+        });
+        if (!member)
+            throw new ForbiddenError("You are not a member of this project");
+
+        // check if task exists in project
+        const existingTask = await prisma.task.findUnique({
+            where: { id: taskId },
+        });
+        if (!existingTask || existingTask.projectId !== projectId)
+            throw new EntityNotFound("Task not found");
+
+        // if assigneeId provided, verify they are a project member
+        if (data.assigneeId) {
+            const assigneeMember = await prisma.projectMember.findUnique({
+                where: {
+                    projectId_userId: {
+                        projectId,
+                        userId: data.assigneeId,
+                    },
+                },
+            });
+            if (!assigneeMember)
+                throw new ValidationError(
+                    "Assignee is not a member of this project"
+                );
+        }
+
+        // set completedAt if status is DONE
+        const updateData: any = { ...data };
+        if (data.status) {
+            if (data.status === "DONE" && !existingTask.completedAt) {
+                updateData.completedAt = new Date();
+            } else if (data.status !== "DONE" && existingTask.completedAt) {
+                updateData.completedAt = null;
+            }
+        }
+
+        const updatedTask = await prisma.task.update({
+            where: { id: taskId },
+            data: updateData,
+            include: {
+                assignee: {
+                    select: {
+                        id: true,
+                        email: true,
+                        // username: true,
+                        // firstName: true,
+                        // lastName: true,
+                    },
+                },
+                creator: {
+                    select: {
+                        id: true,
+                        email: true,
+                        // username: true,
+                        // firstName: true,
+                        // lastName: true,
+                    },
+                },
+            },
+        });
+
+        return updatedTask;
     }
 }
 
