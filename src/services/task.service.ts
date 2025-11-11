@@ -1,3 +1,4 @@
+import { Prisma, TaskPriority, TaskStatus } from "@prisma/client";
 import { ForbiddenError, ValidationError } from "../errors";
 import prisma from "../utils/prisma";
 import { CreateTask } from "../validators/task.validator";
@@ -84,6 +85,67 @@ class TaskService {
         });
 
         return task;
+    }
+
+    static async getProjectTasks(
+        projectId: string,
+        userId: string,
+        filters?: {
+            status?: TaskStatus;
+            assigneeId?: string;
+            priority?: TaskPriority;
+        }
+    ) {
+        // check if user is a project member
+        const member = await prisma.projectMember.findUnique({
+            where: {
+                projectId_userId: {
+                    projectId,
+                    userId,
+                },
+            },
+        });
+        if (!member)
+            throw new ForbiddenError("You do not have access to this project");
+
+        //  build 'where' clause with possible filters
+        // const where: any = { projectId };
+        const where: Prisma.TaskWhereInput = { projectId };
+
+        if (filters?.status) where.status = filters.status;
+        if (filters?.assigneeId) where.assigneeId = filters.assigneeId;
+        if (filters?.priority) where.priority = filters.priority;
+
+        const tasks = await prisma.task.findMany({
+            where,
+            include: {
+                assignee: {
+                    select: {
+                        id: true,
+                        email: true,
+                        // username: true,
+                        // firstName: true,
+                        // lastName: true,
+                    },
+                },
+                creator: {
+                    select: {
+                        id: true,
+                        email: true,
+                        // username: true,
+                        // firstName: true,
+                        // lastName: true,
+                    },
+                },
+            },
+            orderBy: [
+                { status: "asc" },
+                { priority: "desc" },
+                { createdAt: "desc" },
+            ],
+        });
+
+        return tasks;
     }
 }
 

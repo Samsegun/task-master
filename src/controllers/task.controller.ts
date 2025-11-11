@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import TaskService from "../services/task.service";
 import asyncHandler from "../utils/asyncRequestHandler";
-import { CreateTask } from "../validators/task.validator";
+import { CreateTask, TaskFilters } from "../validators/task.validator";
 
 class TaskController {
     static createTask = asyncHandler(async (req: Request, res: Response) => {
@@ -17,6 +17,25 @@ class TaskController {
             task,
         });
     });
+
+    static getProjectTasks = asyncHandler(
+        async (req: Request, res: Response) => {
+            const userId = (req as any).userId;
+            const { projectId } = req.params;
+            const filters: TaskFilters = req.query;
+
+            const tasks = await TaskService.getProjectTasks(
+                projectId,
+                userId,
+                filters
+            );
+
+            res.status(200).json({
+                success: true,
+                tasks,
+            });
+        }
+    );
 }
 
 export default TaskController;

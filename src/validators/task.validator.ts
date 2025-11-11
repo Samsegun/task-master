@@ -1,7 +1,8 @@
+import { TaskPriority, TaskStatus } from "@prisma/client";
 import { z } from "zod";
 
-const TaskStatusEnum = z.enum(["TODO", "IN_PROGRESS", "DONE"]);
-const TaskPriorityEnum = z.enum(["LOW", "MEDIUM", "HIGH"]);
+const TaskStatusEnum = z.enum(TaskStatus);
+const TaskPriorityEnum = z.enum(TaskPriority);
 
 const create = z.object({
     title: z.string().min(5).max(200),
@@ -20,12 +21,18 @@ const update = z.object({
     assigneeId: z.string().optional().nullable(),
 });
 
+const get = z.object({
+    status: TaskStatusEnum.optional(),
+    priority: TaskPriorityEnum.optional(),
+    assigneeId: z.string().or(z.literal("null")).optional(),
+});
+
 export type CreateTask = z.infer<typeof create>;
 export type UpdateTask = z.infer<typeof update>;
+export type TaskFilters = z.infer<typeof get>;
 
 export default {
     create,
     update,
-    TaskStatusEnum,
-    TaskPriorityEnum,
+    get,
 };
