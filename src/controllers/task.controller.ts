@@ -36,6 +36,24 @@ class TaskController {
             });
         }
     );
+
+    static getProjectTask = asyncHandler(
+        async (req: Request, res: Response) => {
+            const userId = (req as any).userId;
+            const { projectId, taskId } = req.params;
+
+            const task = await TaskService.getProjectTask(
+                projectId,
+                taskId,
+                userId
+            );
+
+            res.status(200).json({
+                success: true,
+                task,
+            });
+        }
+    );
 }
 
 export default TaskController;

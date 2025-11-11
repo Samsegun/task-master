@@ -1,5 +1,5 @@
 import { Prisma, TaskPriority, TaskStatus } from "@prisma/client";
-import { ForbiddenError, ValidationError } from "../errors";
+import { EntityNotFound, ForbiddenError, ValidationError } from "../errors";
 import prisma from "../utils/prisma";
 import { CreateTask } from "../validators/task.validator";
 
@@ -146,6 +146,58 @@ class TaskService {
         });
 
         return tasks;
+    }
+
+    static async getProjectTask(
+        projectId: string,
+        taskId: string,
+        userId: string
+    ) {
+        // check if user is a project member
+        const member = await prisma.projectMember.findUnique({
+            where: {
+                projectId_userId: {
+                    projectId,
+                    userId,
+                },
+            },
+        });
+        if (!member)
+            throw new ForbiddenError("You do not have access to this project");
+
+        const task = await prisma.task.findUnique({
+            where: { id: taskId },
+            include: {
+                assignee: {
+                    select: {
+                        id: true,
+                        email: true,
+                        // username: true,
+                        // firstName: true,
+                        // lastName: true,
+                    },
+                },
+                creator: {
+                    select: {
+                        id: true,
+                        email: true,
+                        // username: true,
+                        // firstName: true,
+                        // lastName: true,
+                    },
+                },
+                project: {
+                    select: {
+                        id: true,
+                        name: true,
+                    },
+                },
+            },
+        });
+        if (!task || task.projectId !== projectId)
+            throw new EntityNotFound("Task not found");
+
+        return task;
     }
 }
 

@@ -7,7 +7,7 @@ import { validateRequestQuery } from "../../validators/validateRequestQuery";
 const taskRouter = Router({ mergeParams: true });
 
 const { create, get } = TaskValidator;
-const { getProjectTasks, createTask } = TaskController;
+const { getProjectTasks, getProjectTask, createTask } = TaskController;
 
 /** ON-HOLD!!!
 // user tasks across all projects
@@ -16,12 +16,10 @@ taskRouter.get("/my-tasks", (req, res) => {
 });
 */
 
-// project tasks specific to a project
+// project-tasks specific to a project
 taskRouter.get("/", validateRequestQuery(get), getProjectTasks);
 
-taskRouter.get("/:taskId", (req, res) => {
-    res.send("hello from task id");
-});
+taskRouter.get("/:taskId", getProjectTask);
 
 taskRouter.post("/", validateData(create), createTask);
 
