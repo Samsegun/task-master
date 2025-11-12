@@ -76,6 +76,29 @@ class TaskController {
             task,
         });
     });
+
+    static deleteTask = asyncHandler(async (req: Request, res: Response) => {
+        const userId = (req as any).userId;
+        const { projectId, taskId } = req.params;
+
+        const result = await TaskService.deleteTask(projectId, taskId, userId);
+
+        res.status(200).json({
+            success: true,
+            message: result.message,
+        });
+    });
+
+    static getMyTasks = asyncHandler(async (req: Request, res: Response) => {
+        const userId = (req as any).userId;
+
+        const tasks = await TaskService.getMyTasks(userId);
+
+        res.status(200).json({
+            success: true,
+            tasks,
+        });
+    });
 }
 
 export default TaskController;

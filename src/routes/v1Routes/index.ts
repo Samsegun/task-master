@@ -5,7 +5,9 @@ import userRouter from "./user.routes";
 
 const v1Router = Router();
 
-v1Router.use(AuthMiddleware.authenticateUser);
+const { authenticateUser } = AuthMiddleware;
+
+v1Router.use(authenticateUser);
 
 v1Router.use("/projects", projectRouter);
 v1Router.use("/users", userRouter);

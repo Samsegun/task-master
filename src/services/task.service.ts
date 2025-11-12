@@ -274,6 +274,62 @@ class TaskService {
 
         return updatedTask;
     }
+
+    static async deleteTask(projectId: string, taskId: string, userId: string) {
+        // check if user is a project member
+        const member = await prisma.projectMember.findUnique({
+            where: {
+                projectId_userId: {
+                    projectId,
+                    userId,
+                },
+            },
+        });
+        if (!member)
+            throw new ForbiddenError("You are not a member of this project");
+
+        const task = await prisma.task.findUnique({
+            where: { id: taskId },
+        });
+
+        if (!task || task.projectId !== projectId)
+            throw new EntityNotFound("Task not found");
+
+        await prisma.task.delete({
+            where: { id: taskId },
+        });
+
+        return { message: "Task deleted successfully" };
+    }
+
+    // get tasks assigned to user (across all projects)
+    static async getMyTasks(userId: string) {
+        const tasks = await prisma.task.findMany({
+            where: {
+                assigneeId: userId,
+            },
+            include: {
+                project: {
+                    select: {
+                        id: true,
+                        name: true,
+                    },
+                },
+                creator: {
+                    select: {
+                        id: true,
+                        email: true,
+                        // username: true,
+                        // firstName: true,
+                        // lastName: true,
+                    },
+                },
+            },
+            orderBy: [{ status: "asc" }, { dueDate: "asc" }],
+        });
+
+        return tasks;
+    }
 }
 
 export default TaskService;
