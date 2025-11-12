@@ -10,6 +10,6 @@ const { authenticateUser } = AuthMiddleware;
 v1Router.use(authenticateUser);
 
 v1Router.use("/projects", projectRouter);
-v1Router.use("/users", userRouter);
+v1Router.use("/users/me", userRouter);
 
 export default v1Router;

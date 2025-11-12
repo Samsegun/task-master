@@ -330,6 +330,29 @@ class TaskService {
 
         return tasks;
     }
+
+    static async getOverdueTasks(userId: string) {
+        const tasks = await prisma.task.findMany({
+            where: {
+                assigneeId: userId,
+                status: { not: "DONE" },
+                dueDate: { lt: new Date() },
+            },
+            include: {
+                project: {
+                    select: {
+                        id: true,
+                        name: true,
+                    },
+                },
+            },
+            orderBy: {
+                dueDate: "asc",
+            },
+        });
+
+        return tasks;
+    }
 }
 
 export default TaskService;

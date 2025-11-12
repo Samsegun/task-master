@@ -195,4 +195,28 @@ describe("TaskService", () => {
             });
         });
     });
+
+    describe("getOverdueTasks", () => {
+        beforeEach(async () => {
+            await TaskService.createTask(projectId, ownerId, {
+                title: "overdue task 1",
+                priority: "HIGH",
+                assigneeId: ownerId,
+                dueDate: new Date("2025-10-10T10:00:00Z"),
+            });
+
+            await TaskService.createTask(projectId, ownerId, {
+                title: "overdue task 2",
+                priority: "HIGH",
+                assigneeId: ownerId,
+                dueDate: new Date("2025-10-09T10:00:00Z"),
+            });
+        });
+
+        it("should return overdue tasks across all projects", async () => {
+            const tasks = await TaskService.getOverdueTasks(ownerId);
+
+            expect(tasks).toHaveLength(2);
+        });
+    });
 });
