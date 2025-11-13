@@ -1,7 +1,7 @@
 import nodemailer from "nodemailer";
 
 async function generateCredentials() {
-    // Create a test account
+    // create a test account
     const account = await nodemailer.createTestAccount();
 
     console.log("Your Ethereal credentials:");
