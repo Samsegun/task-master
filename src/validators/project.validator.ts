@@ -1,7 +1,8 @@
+import { ProjectRole, ProjectStatus } from "@prisma/client";
 import { z } from "zod";
 
-const ProjectStatusEnum = z.enum(["ACTIVE", "COMPLETED", "ARCHIVED"]);
-const MemberRoleEnum = z.enum(["OWNER", "MEMBER"]);
+const ProjectStatusEnum = z.enum(ProjectStatus);
+const MemberRoleEnum = z.enum(ProjectRole);
 
 const create = z.object({
     name: z.string().min(3).max(100),
@@ -23,8 +24,6 @@ const updateMemberRole = z.object({
     role: MemberRoleEnum,
 });
 
-export type ProjectStatus = z.infer<typeof ProjectStatusEnum>;
-export type MemberRole = z.infer<typeof MemberRoleEnum>;
 export type CreateProject = z.infer<typeof create>;
 export type UpdateProject = z.infer<typeof update>;
 export type AddProjectMember = z.infer<typeof addMember>;

@@ -1,7 +1,8 @@
+import { ProjectRole } from "@prisma/client";
 import { Request, Response } from "express";
 import ProjectMemberService from "../services/projectMember.service";
 import asyncHandler from "../utils/asyncRequestHandler";
-import { AddProjectMember, MemberRole } from "../validators/project.validator";
+import { AddProjectMember } from "../validators/project.validator";
 
 class ProjectMemberController {
     static addMember = asyncHandler(async (req: Request, res: Response) => {
@@ -40,7 +41,7 @@ class ProjectMemberController {
         async (req: Request, res: Response) => {
             const requesterId = (req as any).userId;
             const { projectId, userIdToUpdate } = req.params;
-            const { role } = req.body as { role: MemberRole };
+            const { role } = req.body as { role: ProjectRole };
 
             const updatedMember = await ProjectMemberService.updateMemberRole(
                 projectId,

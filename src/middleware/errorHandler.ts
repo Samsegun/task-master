@@ -37,6 +37,7 @@ export default function errorHandler(
         success: false,
         error: {
             message: responseMessage,
+            code: 500,
         },
     });
 }

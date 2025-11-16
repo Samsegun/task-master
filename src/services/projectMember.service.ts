@@ -1,12 +1,12 @@
+import { ProjectRole } from "@prisma/client";
 import { EntityNotFound, ForbiddenError, ValidationError } from "../errors";
 import prisma from "../utils/prisma";
-import { MemberRole } from "../validators/project.validator";
 
 class ProjectMemberService {
     static async addMember(
         projectId: string,
         requesterId: string,
-        data: { email: string; role?: MemberRole }
+        data: { email: string; role?: ProjectRole }
     ) {
         // check if current user is owner
         const requesterMember = await prisma.projectMember.findUnique({
@@ -110,7 +110,7 @@ class ProjectMemberService {
         projectId: string,
         userIdToUpdate: string,
         requesterId: string,
-        newRole: MemberRole
+        newRole: ProjectRole
     ) {
         // check if requester is owner
         const requesterMember = await prisma.projectMember.findUnique({

@@ -1,6 +1,7 @@
+import { ProjectStatus } from "@prisma/client";
 import { EntityNotFound, ForbiddenError, ValidationError } from "../errors";
 import prisma from "../utils/prisma";
-import { CreateProject, ProjectStatus } from "../validators/project.validator";
+import { CreateProject } from "../validators/project.validator";
 
 class ProjectService {
     static async createProject(ownerId: string, data: CreateProject) {

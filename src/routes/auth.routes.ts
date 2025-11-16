@@ -6,17 +6,11 @@ import { validateData } from "../validators/validateData";
 
 const authRouter = Router();
 
-authRouter.post(
-    "/register",
-    validateData(AuthValidator.create),
-    AuthController.createUser
-);
+const { create, login, forgotPassword, resetPassword } = AuthValidator;
 
-authRouter.post(
-    "/login",
-    validateData(AuthValidator.login),
-    AuthController.loginUser
-);
+authRouter.post("/register", validateData(create), AuthController.createUser);
+
+authRouter.post("/login", validateData(login), AuthController.loginUser);
 
 authRouter.post("/logout", AuthController.logoutUser);
 
@@ -30,13 +24,13 @@ authRouter.get("/verify-email", AuthController.verifyUserMail);
 
 authRouter.post(
     "/forgot-password",
-    validateData(AuthValidator.forgotPassword),
+    validateData(forgotPassword),
     AuthController.forgotPassword
 );
 
 authRouter.post(
     "/reset-password",
-    validateData(AuthValidator.resetPassword),
+    validateData(resetPassword),
     AuthController.resetPassword
 );
 
