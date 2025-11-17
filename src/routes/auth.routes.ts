@@ -6,32 +6,42 @@ import { validateData } from "../validators/validateData";
 
 const authRouter = Router();
 
-const { create, login, forgotPassword, resetPassword } = AuthValidator;
+const { create, login, validateForgotPassword, validateResetPassword } =
+    AuthValidator;
+const {
+    createUser,
+    loginUser,
+    logoutUser,
+    refreshAccessToken,
+    verifyUserMail,
+    forgotPassword,
+    resetPassword,
+} = AuthController;
 
-authRouter.post("/register", validateData(create), AuthController.createUser);
+authRouter.post("/register", validateData(create), createUser);
 
-authRouter.post("/login", validateData(login), AuthController.loginUser);
+authRouter.post("/login", validateData(login), loginUser);
 
-authRouter.post("/logout", AuthController.logoutUser);
+authRouter.post("/logout", logoutUser);
 
 authRouter.post(
     "/refresh-token",
     AuthMiddleware.refreshTokenValidation,
-    AuthController.refreshAccessToken
+    refreshAccessToken
 );
 
-authRouter.get("/verify-email", AuthController.verifyUserMail);
+authRouter.get("/verify-email", verifyUserMail);
 
 authRouter.post(
     "/forgot-password",
-    validateData(forgotPassword),
-    AuthController.forgotPassword
+    validateData(validateForgotPassword),
+    forgotPassword
 );
 
 authRouter.post(
     "/reset-password",
-    validateData(resetPassword),
-    AuthController.resetPassword
+    validateData(validateResetPassword),
+    resetPassword
 );
 
 export default authRouter;

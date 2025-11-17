@@ -20,11 +20,11 @@ const login = z.object({
     password: z.string().trim(),
 });
 
-const forgotPassword = create.omit({
+const validateForgotPassword = create.omit({
     password: true,
 });
 
-const resetPassword = z.object({
+const validateResetPassword = z.object({
     token: z.string().trim(),
     password: create.shape.password,
 });
@@ -32,6 +32,6 @@ const resetPassword = z.object({
 export default {
     create,
     login,
-    forgotPassword,
-    resetPassword,
+    validateForgotPassword,
+    validateResetPassword,
 };

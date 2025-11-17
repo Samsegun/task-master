@@ -13,10 +13,7 @@ class AuthService {
                 email,
             },
         });
-
-        if (userExists) {
-            throw new ValidationError("User already exists");
-        }
+        if (userExists) throw new ValidationError("User already exists");
 
         // hashpassword
         const hashedPassword = await hashPassword(password);
@@ -42,7 +39,6 @@ class AuthService {
                 isVerified: true,
             },
         });
-        if (!newUser) throw Error("Failed to create user. An error occurred");
 
         await EmailService.sendVerificationEmail(email, verificationToken);
 

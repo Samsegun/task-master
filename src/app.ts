@@ -2,6 +2,7 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import express from "express";
 import morgan from "morgan";
+import { setupSwagger } from "./config/swagger";
 import errorHandler from "./middleware/errorHandler";
 import appRouter from "./routes";
 
@@ -33,6 +34,8 @@ app.use(morgan("combined"));
 app.use(cookieParser());
 
 app.use("/api", appRouter);
+
+setupSwagger(app);
 
 app.use(errorHandler);
 

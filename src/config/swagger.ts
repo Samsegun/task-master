@@ -13,11 +13,11 @@ const options = {
         },
         servers: [
             {
-                url: "http://localhost:7000/api/v1",
+                url: "http://localhost:7000/api",
                 description: "Development server",
             },
             {
-                url: "/api/v1",
+                url: "/api",
                 description: "Production server",
             },
         ],
@@ -41,26 +41,29 @@ const options = {
                         error: {
                             type: "object",
                             properties: {
-                                message: { type: "string" },
-                                code: { type: "string" },
+                                message: {
+                                    type: "string",
+                                    example: "An error occurred",
+                                },
+                                code: { type: "number", example: 100 },
                             },
                         },
                     },
                 },
-                User: {
-                    type: "object",
-                    properties: {
-                        id: { type: "string" },
-                        email: { type: "string" },
-                        username: { type: "string" },
-                        firstName: { type: "string" },
-                        lastName: { type: "string" },
-                        role: {
-                            type: "string",
-                            enum: ["USER", "ADMIN", "MODERATOR", "SUPER_ADMIN"],
-                        },
-                    },
-                },
+                // User: {
+                //     type: "object",
+                //     properties: {
+                //         id: { type: "string" },
+                //         email: { type: "string" },
+                //         username: { type: "string" },
+                //         firstName: { type: "string" },
+                //         lastName: { type: "string" },
+                //         role: {
+                //             type: "string",
+                //             enum: ["USER", "ADMIN", "MODERATOR", "SUPER_ADMIN"],
+                //         },
+                //     },
+                // },
                 Project: {
                     type: "object",
                     properties: {
@@ -112,7 +115,8 @@ const options = {
             { name: "Tasks", description: "Task management endpoints" },
         ],
     },
-    apis: ["./src/routes/*.ts", "./src/routes/v1/*.ts"],
+    // apis: ["./src/routes/*.ts", "./src/routes/v1/*.ts"],
+    apis: ["./src/docs/*.yaml"],
 };
 
 const specs = swaggerJsdoc(options);

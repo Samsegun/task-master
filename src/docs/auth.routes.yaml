@@ -1,0 +1,282 @@
+# this file documents all routes uunder the /auth tag
+paths:
+    /auth/register:
+        post:
+            summary: Register a new user
+            tags: [Auth]
+            security: []
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            required:
+                                - email
+                                - password
+                            properties:
+                                email:
+                                    type: string
+                                    format: email
+                                    example: user@example.com
+                                password:
+                                    type: string
+                                    format: password
+                                    example: Password123!
+            responses:
+                201:
+                    description: Verify email before logging in.
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    success:
+                                        type: boolean
+                                        example: true
+                                    message:
+                                        type: string
+                                        example: User created. Please check email to verify account
+                                    user:
+                                        type: object
+                                        properties:
+                                            id:
+                                                type: string
+                                                example: xxxxxxxx
+                                            email:
+                                                type: string
+                                                example: user@example.com
+                                            isVerified:
+                                                type: boolean
+                                                example: false
+                400:
+                    description: Validation error
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Error"
+                500:
+                    description: Internal server error
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Error"
+
+    /auth/login:
+        post:
+            summary: Login user
+            tags: [Auth]
+            security: []
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            required:
+                                - email
+                                - password
+                            properties:
+                                email:
+                                    type: string
+                                    format: email
+                                    example: user@example.com
+                                password:
+                                    type: string
+                                    format: password
+                                    example: Password123!
+            responses:
+                200:
+                    description: Login successful
+                    headers:
+                        Set-Cookie:
+                            schema:
+                                type: string
+                                example: accessToken=xxx; refreshToken=yy
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    success:
+                                        type: boolean
+                                        example: true
+                                    user:
+                                        type: object
+                                        properties:
+                                            id:
+                                                type: string
+                                                example: xxxxxxxx
+                                            email:
+                                                type: string
+                                                example: user@example.com
+                                            username:
+                                                type: string
+                                                example: john_doe
+                                            role:
+                                                type: string
+                                                example: USER
+                                            isVerified:
+                                                type: boolean
+                                                example: true
+                400:
+                    description: Validation error
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Error"
+                500:
+                    description: Internal server error
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Error"
+
+    /auth/logout:
+        post:
+            summary: Logout user
+            tags: [Auth]
+            responses:
+                200:
+                    description: Logged out successfully
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    success:
+                                        type: boolean
+                                        example: true
+                                    message:
+                                        type: string
+                                        example: Logged out successfully
+
+    /auth/refresh-token:
+        post:
+            summary: Refresh access token
+            tags: [Auth]
+            responses:
+                200:
+                    description: Tokens refreshed successfully
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    success:
+                                        type: boolean
+                                        example: true
+                                    message:
+                                        type: string
+                                        example: Tokens refreshed successfully
+                401:
+                    description: Invalid or expired refresh token
+                    content:
+                        application/json:
+                            schema:
+                            $ref: "#/components/schemas/Error"
+                403:
+                    description: You can not perform this operation
+                    content:
+                        application/json:
+                            schema:
+                            $ref: "#/components/schemas/Error"
+                500:
+                    description: Internal server error
+                    content:
+                        application/json:
+                            schema:
+                            $ref: "#/components/schemas/Error"
+
+    /auth/verify-email:
+        post:
+            summary: Verify Email
+            tags: [Auth]
+            responses:
+                200:
+                    description: User can successfully log in.
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    success:
+                                        type: boolean
+                                        example: true
+                                    message:
+                                        type: string
+                                        example: Email verified successfully. You can now sign in.
+                400:
+                    description: Invalid or expired verification token
+                    content:
+                        application/json:
+                            schema:
+                            $ref: "#/components/schemas/Error"
+                500:
+                    description: Internal server error
+                    content:
+                        application/json:
+                            schema:
+                            $ref: "#/components/schemas/Error"
+
+    /auth/forgot-password:
+        post:
+            summary: Forgot user password
+            tags: [Auth]
+            responses:
+                200:
+                    description: Send password reset link.
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    success:
+                                        type: boolean
+                                        example: true
+                                    message:
+                                        type: string
+                                        example: If an account with this email exists, a password reset link has been sent.
+                400:
+                    description: operation failed
+                    content:
+                        application/json:
+                            schema:
+                            $ref: "#/components/schemas/Error"
+                500:
+                    description: Internal server error
+                    content:
+                        application/json:
+                            schema:
+                            $ref: "#/components/schemas/Error"
+
+    /auth/reset-password:
+        post:
+            summary: Reset user password
+            tags: [Auth]
+            responses:
+                200:
+                    description: Reset user password.
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    success:
+                                        type: boolean
+                                        example: true
+                                    message:
+                                        type: string
+                                        example: Password reset successful. Please log in with your new password
+                400:
+                    description: Invalid reset details
+                    content:
+                        application/json:
+                            schema:
+                            $ref: "#/components/schemas/Error"
+                500:
+                    description: Internal server error
+                    content:
+                        application/json:
+                            schema:
+                            $ref: "#/components/schemas/Error"

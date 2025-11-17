@@ -95,7 +95,7 @@ class AuthController {
                 email
             );
 
-            // trying to prevent an email-enumeration attack
+            // try to prevent an email-enumeration attack
             if (!resetPasswordMailSent.success) {
                 res.status(200).json({
                     success: true,

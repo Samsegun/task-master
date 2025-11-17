@@ -28,6 +28,7 @@ export default function errorHandler(
     }
 
     // server error handling
+    // throw explicit error messages in dev/test mode while generic message in production
     let responseMessage =
         "An internal server error occurred. Please try again later.";
     if (process.env.NODE_ENV !== "production")

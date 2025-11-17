@@ -30,7 +30,7 @@ class AuthMiddleware {
             next();
         } catch (error) {
             if (error instanceof jwt.TokenExpiredError) {
-                // specific signal for frontend to indicate expired token
+                // specific signal for frontend to renew tokens
                 throw new UnauthorizedError("Token expired", "TOKEN_EXPIRED");
             } else if (error instanceof jwt.JsonWebTokenError) {
                 // user should be logged out!!!
