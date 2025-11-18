@@ -25,10 +25,6 @@ class ProjectMemberService {
             where: { email: data.email },
             select: {
                 id: true,
-                email: true,
-                username: true,
-                firstName: true,
-                lastName: true,
             },
         });
         if (!userToAdd)
@@ -60,9 +56,9 @@ class ProjectMemberService {
                     select: {
                         id: true,
                         email: true,
-                        username: true,
-                        firstName: true,
-                        lastName: true,
+                        // username: true,
+                        // firstName: true,
+                        // lastName: true,
                     },
                 },
             },
@@ -92,9 +88,9 @@ class ProjectMemberService {
                     select: {
                         id: true,
                         email: true,
-                        username: true,
-                        firstName: true,
-                        lastName: true,
+                        // username: true,
+                        // firstName: true,
+                        // lastName: true,
                     },
                 },
             },
@@ -168,7 +164,7 @@ class ProjectMemberService {
                 }),
             ]);
         } else {
-            // just update to MEMBER (normal role change)
+            // just update to MEMBER or any other role that comes up in later versions of the app (normal role change)
             await prisma.projectMember.update({
                 where: {
                     projectId_userId: {
@@ -226,7 +222,6 @@ class ProjectMemberService {
                 },
             },
         });
-
         if (!memberToRemove)
             throw new EntityNotFound("Member not found in this project");
 
@@ -235,12 +230,10 @@ class ProjectMemberService {
             where: { id: projectId },
             select: { ownerId: true },
         });
-
-        if (userIdToRemove === project?.ownerId) {
+        if (userIdToRemove === project?.ownerId)
             throw new ForbiddenError(
                 "Cannot remove project owner from project"
             );
-        }
 
         // remove member
         await prisma.projectMember.delete({

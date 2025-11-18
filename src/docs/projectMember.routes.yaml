@@ -1,0 +1,193 @@
+# this file documents all routes under the /v1/projects/projectId/members tag
+paths:
+    /v1/projects/:projectId/members:
+        post:
+            summary: Add a new project member
+            tags: [Project Members]
+            parameters:
+                - in: path
+                  name: projectId
+                  required: true
+                  schema:
+                      type: string
+                  description: Project ID
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            required:
+                                - email
+                                - role
+                            properties:
+                                email:
+                                    type: string
+                                role:
+                                    type: string
+                                    enum: [OWNER, MEMBER]
+            responses:
+                201:
+                    description: Project member added
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    success:
+                                        type: boolean
+                                    newMember:
+                                        $ref: "#/components/schemas/ProjectMember"
+                400:
+                    description: User is already a member of this project
+                403:
+                    description: Only project owner can add members
+                404:
+                    description: User with this email does not exist
+                500:
+                    description: Internal server error
+
+        get:
+            summary: Get project members
+            tags: [Project Members]
+            parameters:
+                - in: path
+                  name: projectId
+                  required: true
+                  schema:
+                      type: string
+                  description: Project ID
+            responses:
+                200:
+                    description: List members of a project
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    success:
+                                        type: boolean
+                                    projectMembers:
+                                        type: array
+                                        items:
+                                            $ref: "#/components/schemas/ProjectMember"
+
+                403:
+                    description: You do not have access to this project
+                500:
+                    description: Internal server error
+
+    /v1/projects/:projectId/members/:userIdToUpdate:
+        patch:
+            summary: Update project member role
+            tags: [Project Members]
+            parameters:
+                - in: path
+                  name: projectId
+                  required: true
+                  schema:
+                      type: string
+                  description: Project ID
+                - in: path
+                  name: userIdToUpdate
+                  required: true
+                  schema:
+                      type: string
+                  description: ID of user that needs to be updated
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            required:
+                                - role
+                            properties:
+                                role:
+                                    type: string
+                                    enum: [OWNER, MEMBER]
+            responses:
+                200:
+                    description: update a project member's role
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    success:
+                                        type: boolean
+                                    updatedMember:
+                                        $ref: "#/components/schemas/ProjectMember"
+
+                403:
+                    description: Only project owner can update member roles
+                404:
+                    description: Member not found in this project
+                500:
+                    description: Internal server error
+
+    /v1/projects/:projectId/members/:userIdToRemove:
+        delete:
+            summary: Remove project member
+            tags: [Project Members]
+            parameters:
+                - in: path
+                  name: projectId
+                  required: true
+                  schema:
+                      type: string
+                  description: Project ID
+                - in: path
+                  name: userIdToRemove
+                  required: true
+                  schema:
+                      type: string
+                  description: ID of user that needs to be removed
+            responses:
+                200:
+                    description: Project member removed
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    success:
+                                        type: boolean
+                                    message:
+                                        type: string
+                403:
+                    description: Only project owner can remove members or Cannot remove project owner from project
+                404:
+                    description: Member not found in this project
+                500:
+                    description: Internal server error
+
+    /v1/projects/:projectId/leave:
+        delete:
+            summary: Leave project
+            tags: [Project Members]
+            parameters:
+                - in: path
+                  name: projectId
+                  required: true
+                  schema:
+                      type: string
+                  description: Project ID
+            responses:
+                200:
+                    description: Project member left project
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    success:
+                                        type: boolean
+                                    message:
+                                        type: string
+                403:
+                    description: Project owner cannot leave. Promote another member to owner first or delete the project.
+                404:
+                    description: You are not a member of this project
+                500:
+                    description: Internal server error

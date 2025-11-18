@@ -1,4 +1,4 @@
-# this file documents all routes uunder the /v1/projects tag
+# this file documents all routes under the /v1/projects tag
 paths:
     /v1/projects:
         post:
@@ -67,7 +67,7 @@ paths:
                 500:
                     description: Internal server error
 
-    /v1/projects/projectID:
+    /v1/projects/:projectID:
         get:
             summary: Get project by ID
             tags: [Projects]

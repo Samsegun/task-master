@@ -50,20 +50,20 @@ const options = {
                         },
                     },
                 },
-                // User: {
-                //     type: "object",
-                //     properties: {
-                //         id: { type: "string" },
-                //         email: { type: "string" },
-                //         username: { type: "string" },
-                //         firstName: { type: "string" },
-                //         lastName: { type: "string" },
-                //         role: {
-                //             type: "string",
-                //             enum: ["USER", "ADMIN", "MODERATOR", "SUPER_ADMIN"],
-                //         },
-                //     },
-                // },
+                User: {
+                    type: "object",
+                    properties: {
+                        id: { type: "string" },
+                        email: { type: "string" },
+                        // username: { type: "string" },
+                        // firstName: { type: "string" },
+                        // lastName: { type: "string" },
+                        role: {
+                            type: "string",
+                            enum: ["USER", "ADMIN", "MODERATOR", "SUPER_ADMIN"],
+                        },
+                    },
+                },
                 Project: {
                     type: "object",
                     properties: {
@@ -77,6 +77,29 @@ const options = {
                         ownerId: { type: "string" },
                         createdAt: { type: "string", format: "date-time" },
                         updatedAt: { type: "string", format: "date-time" },
+                    },
+                },
+                ProjectMember: {
+                    type: "object",
+                    properties: {
+                        id: { type: "string" },
+                        projectId: { type: "string" },
+                        userId: { type: "string" },
+                        role: {
+                            type: "string",
+                            enum: ["OWNER", "MEMBER"],
+                        },
+                        joinedAt: {
+                            type: "string",
+                            format: "date-time",
+                        },
+                        user: {
+                            type: "object",
+                            properties: {
+                                id: { type: "string" },
+                                email: { type: "string", format: "email" },
+                            },
+                        },
                     },
                 },
                 Task: {
