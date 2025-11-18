@@ -7,6 +7,17 @@ import taskRouter from "./task.routes";
 
 const projectRouter = Router();
 
+const {
+    getUserProjects,
+    createProject,
+    getProject,
+    updateProject,
+    deleteProject,
+} = ProjectController;
+
+const { addMember, getMembers, updateMemberRole, removeMember, leaveProject } =
+    ProjectMemberController;
+
 // ****************** task routes ******************
 projectRouter.use("/:projectId/tasks", taskRouter);
 
@@ -14,41 +25,34 @@ projectRouter.use("/:projectId/tasks", taskRouter);
 projectRouter.post(
     "/:projectId/members",
     validateData(projectValidator.addMember),
-    ProjectMemberController.addMember
+    addMember
 );
 
-projectRouter.get("/:projectId/members", ProjectMemberController.getMembers);
+projectRouter.get("/:projectId/members", getMembers);
 
 projectRouter.patch(
     "/:projectId/members/:userIdToUpdate",
     validateData(projectValidator.updateMemberRole),
-    ProjectMemberController.updateMemberRole
+    updateMemberRole
 );
 
-projectRouter.delete(
-    "/:projectId/members/:userIdToRemove",
-    ProjectMemberController.removeMember
-);
+projectRouter.delete("/:projectId/members/:userIdToRemove", removeMember);
 
-projectRouter.delete("/:projectId/leave", ProjectMemberController.leaveProject);
+projectRouter.delete("/:projectId/leave", leaveProject);
 
 // ****************** project routes ******************
-projectRouter.get("/", ProjectController.getUserProjects);
+projectRouter.get("/", getUserProjects);
 
-projectRouter.post(
-    "/",
-    validateData(projectValidator.create),
-    ProjectController.createProject
-);
+projectRouter.post("/", validateData(projectValidator.create), createProject);
 
-projectRouter.get("/:projectId", ProjectController.getProject);
+projectRouter.get("/:projectId", getProject);
 
 projectRouter.patch(
     "/:projectId",
     validateData(projectValidator.update),
-    ProjectController.updateProject
+    updateProject
 );
 
-projectRouter.delete("/:projectId", ProjectController.deleteProject);
+projectRouter.delete("/:projectId", deleteProject);
 
 export default projectRouter;

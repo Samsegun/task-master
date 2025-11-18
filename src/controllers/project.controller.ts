@@ -5,10 +5,10 @@ import { CreateProject, UpdateProject } from "../validators/project.validator";
 
 class ProjectController {
     static createProject = asyncHandler(async (req: Request, res: Response) => {
-        const userId = (req as any).userId;
+        const ownerId = (req as any).userId;
         const { name, description } = req.body as CreateProject;
 
-        const project = await ProjectService.createProject(userId, {
+        const project = await ProjectService.createProject(ownerId, {
             name,
             description,
         });
@@ -41,7 +41,7 @@ class ProjectController {
 
         res.status(200).json({
             success: true,
-            data: project,
+            project,
         });
     });
 
@@ -56,7 +56,7 @@ class ProjectController {
 
         res.status(200).json({
             success: true,
-            data: project,
+            project,
         });
     });
 

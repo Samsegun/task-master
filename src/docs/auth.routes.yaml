@@ -50,17 +50,9 @@ paths:
                                                 type: boolean
                                                 example: false
                 400:
-                    description: Validation error
-                    content:
-                        application/json:
-                            schema:
-                                $ref: "#/components/schemas/Error"
+                    description: Validation error or Invalid input details
                 500:
                     description: Internal server error
-                    content:
-                        application/json:
-                            schema:
-                                $ref: "#/components/schemas/Error"
 
     /auth/login:
         post:
@@ -120,17 +112,9 @@ paths:
                                                 type: boolean
                                                 example: true
                 400:
-                    description: Validation error
-                    content:
-                        application/json:
-                            schema:
-                                $ref: "#/components/schemas/Error"
+                    description: Validation error or Invalid credentials or email not verified
                 500:
                     description: Internal server error
-                    content:
-                        application/json:
-                            schema:
-                                $ref: "#/components/schemas/Error"
 
     /auth/logout:
         post:
@@ -171,22 +155,10 @@ paths:
                                         example: Tokens refreshed successfully
                 401:
                     description: Invalid or expired refresh token
-                    content:
-                        application/json:
-                            schema:
-                            $ref: "#/components/schemas/Error"
                 403:
                     description: You can not perform this operation
-                    content:
-                        application/json:
-                            schema:
-                            $ref: "#/components/schemas/Error"
                 500:
                     description: Internal server error
-                    content:
-                        application/json:
-                            schema:
-                            $ref: "#/components/schemas/Error"
 
     /auth/verify-email:
         post:
@@ -208,16 +180,8 @@ paths:
                                         example: Email verified successfully. You can now sign in.
                 400:
                     description: Invalid or expired verification token
-                    content:
-                        application/json:
-                            schema:
-                            $ref: "#/components/schemas/Error"
                 500:
                     description: Internal server error
-                    content:
-                        application/json:
-                            schema:
-                            $ref: "#/components/schemas/Error"
 
     /auth/forgot-password:
         post:
@@ -239,10 +203,6 @@ paths:
                                         example: If an account with this email exists, a password reset link has been sent.
                 400:
                     description: operation failed
-                    content:
-                        application/json:
-                            schema:
-                            $ref: "#/components/schemas/Error"
                 500:
                     description: Internal server error
                     content:
@@ -269,14 +229,6 @@ paths:
                                         type: string
                                         example: Password reset successful. Please log in with your new password
                 400:
-                    description: Invalid reset details
-                    content:
-                        application/json:
-                            schema:
-                            $ref: "#/components/schemas/Error"
+                    description: Invalid or expired reset token
                 500:
                     description: Internal server error
-                    content:
-                        application/json:
-                            schema:
-                            $ref: "#/components/schemas/Error"
