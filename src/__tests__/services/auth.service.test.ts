@@ -6,7 +6,7 @@ import { prisma } from "../setup";
 // mock external services
 jest.mock("../../services/email.service");
 
-describe.skip("AuthService", () => {
+describe("AuthService", () => {
     const validUserData = {
         email: "test@example.com",
         password: "Password123!",

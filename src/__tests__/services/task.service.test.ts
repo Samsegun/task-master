@@ -59,7 +59,7 @@ describe("TaskService", () => {
             expect(task.creatorId).toBe(ownerId);
         });
 
-        it("should throw error if creator is not a project member", async () => {
+        it("should throw error if creator is not the owner of project", async () => {
             const outsider = await prisma.user.create({
                 data: {
                     email: "outsider@example.com",
@@ -73,7 +73,7 @@ describe("TaskService", () => {
                     title: "Unauthorized Task",
                     priority: "LOW",
                 })
-            ).rejects.toThrow(/not a member/i);
+            ).rejects.toThrow(/not the owner/i);
         });
 
         it("should throw error if assignee is not a project member", async () => {

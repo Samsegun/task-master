@@ -2,7 +2,7 @@ import ProjectService from "../../services/project.service";
 import { hashPassword } from "../../utils/passwordUtils";
 import { prisma } from "../setup";
 
-describe.skip("ProjectService", () => {
+describe("ProjectService", () => {
     let userId: string;
 
     beforeEach(async () => {

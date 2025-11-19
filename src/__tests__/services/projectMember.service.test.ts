@@ -3,7 +3,7 @@ import ProjectMemberService from "../../services/projectMember.service";
 import { hashPassword } from "../../utils/passwordUtils";
 import { prisma } from "../setup";
 
-describe.skip("ProjectMemberService", () => {
+describe("ProjectMemberService", () => {
     let ownerId: string;
     let memberId: string;
     let projectId: string;
