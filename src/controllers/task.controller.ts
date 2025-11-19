@@ -102,6 +102,7 @@ class TaskController {
     static getOverdueTasks = asyncHandler(
         async (req: Request, res: Response) => {
             const userId = (req as any).userId;
+
             const tasks = await TaskService.getOverdueTasks(userId);
 
             res.status(200).json({

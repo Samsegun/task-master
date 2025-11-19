@@ -136,6 +136,7 @@ const options = {
                 description: "Project member management",
             },
             { name: "Tasks", description: "Task management endpoints" },
+            { name: "Users", description: "User management endpoints" },
         ],
     },
     // apis: ["./src/routes/*.ts", "./src/routes/v1/*.ts"],

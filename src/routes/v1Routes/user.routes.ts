@@ -3,6 +3,8 @@ import TaskController from "../../controllers/task.controller";
 
 const userRouter = Router();
 
+const { getMyTasks, getOverdueTasks } = TaskController;
+
 userRouter.get("/", (req, res) => {
     const userId = (req as any).userId;
 
@@ -10,7 +12,7 @@ userRouter.get("/", (req, res) => {
 });
 
 // user tasks across all projects
-userRouter.get("/tasks", TaskController.getMyTasks);
-userRouter.get("/tasks/overdue", TaskController.getOverdueTasks);
+userRouter.get("/tasks", getMyTasks);
+userRouter.get("/tasks/overdue", getOverdueTasks);
 
 export default userRouter;

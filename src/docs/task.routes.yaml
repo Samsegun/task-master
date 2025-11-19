@@ -13,15 +13,32 @@ paths:
                   description: Project ID
             requestBody:
                 required: true
+                description: Title is the only required property here. All other properties are optional and can be added when updating a task.
                 content:
                     application/json:
                         schema:
                             type: object
-                            required:
-                                - title
                             properties:
                                 title:
                                     type: string
+                                    description: The title of the task
+                                description:
+                                    type: string
+                                    description: A brief description of the task
+                                priority:
+                                    type: string
+                                    enum: [LOW, MEDIUM, HIGH]
+                                    description: The priority level of the task
+                                    example: MEDIUM
+                                dueDate:
+                                    type: string
+                                    format: date-time
+                                    description: The due date for the task
+                                    example: 2025-12-31T23:59:59Z
+                                assigneeId:
+                                    type: string
+                                    description: The ID of the user assigned to the task
+                                    example: 123e4567-e89b-12d3-a456-426614174000
             responses:
                 201:
                     description: Task created successfully
@@ -147,6 +164,7 @@ paths:
                   description: ID of task that needs to be updated
             requestBody:
                 required: true
+                description: All properties are optional. Only include the fields you want to update.
                 content:
                     application/json:
                         schema:
@@ -176,8 +194,7 @@ paths:
                                 assigneeId:
                                     type: string
                                     description: The ID of the user assigned to the task
-                                    example: xxxxxxxx-xxxxxxx
-                        description: All properties are optional. Only include the fields you want to update.
+                                    example: 123e4567-e89b-12d3-a456-426614174000
             responses:
                 200:
                     description: Update a task under a project
@@ -202,7 +219,7 @@ paths:
 
         delete:
             summary: Delete task
-            tags: [Task]
+            tags: [Tasks]
             parameters:
                 - in: path
                   name: projectId

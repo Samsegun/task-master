@@ -1,0 +1,47 @@
+# this file documents all routes under the /v1/users/me/tasks tag
+paths:
+    /v1/users/me/tasks:
+        get:
+            summary: User tasks across all projects
+            tags: [Users]
+            responses:
+                200:
+                    description: List of all tasks assigned to a user
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    success:
+                                        type: boolean
+                                    tasks:
+                                        type: array
+                                        items:
+                                            $ref: "#/components/schemas/Task"
+                404:
+                    description: No tasks found
+                500:
+                    description: Internal server error
+
+    /v1/users/me/tasks/overdue:
+        get:
+            summary: Overdue User tasks across all projects
+            tags: [Users]
+            responses:
+                200:
+                    description: List of all overdue tasks assigned to a user
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    success:
+                                        type: boolean
+                                    tasks:
+                                        type: array
+                                        items:
+                                            $ref: "#/components/schemas/Task"
+                404:
+                    description: No tasks found
+                500:
+                    description: Internal server error
