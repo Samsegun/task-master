@@ -1,5 +1,10 @@
 import { Prisma, TaskPriority, TaskStatus } from "@prisma/client";
-import { EntityNotFound, ForbiddenError, ValidationError } from "../errors";
+import {
+    EntityNotFound,
+    ForbiddenError,
+    UnauthorizedError,
+    ValidationError,
+} from "../errors";
 import prisma from "../utils/prisma";
 import { CreateTask, UpdateTask } from "../validators/task.validator";
 
@@ -19,7 +24,7 @@ class TaskService {
             },
         });
         if (!member)
-            throw new ForbiddenError("You are not a member of this project");
+            throw new ForbiddenError("You are not the owner of this project");
 
         // if assigneeId provided, verify they are a project member
         if (data.assigneeId) {
@@ -33,7 +38,7 @@ class TaskService {
             });
 
             if (!assigneeMember)
-                throw new ValidationError(
+                throw new UnauthorizedError(
                     "Assignee is not a member of this project"
                 );
         }
@@ -294,6 +299,11 @@ class TaskService {
 
         if (!task || task.projectId !== projectId)
             throw new EntityNotFound("Task not found");
+
+        if (member.role !== "OWNER" && task.creatorId !== userId)
+            throw new ForbiddenError(
+                "Only project owners or task creators can delete tasks"
+            );
 
         await prisma.task.delete({
             where: { id: taskId },

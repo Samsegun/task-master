@@ -1,3 +1,236 @@
 # this file documents all routes under the /v1/projects/projectId/tasks tag
 paths:
     /v1/projects/:projectId/tasks:
+        post:
+            summary: Create a new task
+            tags: [Tasks]
+            parameters:
+                - in: path
+                  name: projectId
+                  required: true
+                  schema:
+                      type: string
+                  description: Project ID
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            required:
+                                - title
+                            properties:
+                                title:
+                                    type: string
+            responses:
+                201:
+                    description: Task created successfully
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    success:
+                                        type: boolean
+                                    task:
+                                        $ref: "#/components/schemas/Task"
+                400:
+                    description: You already have a task with this name in this project
+                401:
+                    description: Assignee is not a member of this project
+                403:
+                    description: You are not the owner of this project
+                404:
+                    description: User with this email does not exist
+                500:
+                    description: Internal server error
+
+        get:
+            summary: Tasks under a project
+            tags: [Tasks]
+            parameters:
+                - in: path
+                  name: projectId
+                  required: true
+                  schema:
+                      type: string
+                  description: Project ID
+                - in: query
+                  name: status
+                  schema:
+                      type: string
+                      enum: [TODO, IN_PROGRESS, DONE]
+                  description: Filter by status
+                - in: query
+                  name: priority
+                  schema:
+                      type: string
+                      enum: [LOW, MEDIUM, HIGH]
+                  description: Filter by priority
+                - in: query
+                  name: assigneeId
+                  schema:
+                      type: string
+                  description: Filter by assignee
+            responses:
+                200:
+                    description: List of tasks in a project
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    success:
+                                        type: boolean
+                                    tasks:
+                                        type: array
+                                        items:
+                                            $ref: "#/components/schemas/Task"
+
+                403:
+                    description: You do not have access to this project
+                500:
+                    description: Internal server error
+
+    /v1/projects/:projectId/tasks/:taskId:
+        get:
+            summary: Task under a project
+            tags: [Tasks]
+            parameters:
+                - in: path
+                  name: projectId
+                  required: true
+                  schema:
+                      type: string
+                  description: Project ID
+                - in: path
+                  name: taskId
+                  required: true
+                  schema:
+                      type: string
+                  description: Task ID
+            responses:
+                200:
+                    description: List of tasks in a project
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    success:
+                                        type: boolean
+                                    tasks:
+                                        $ref: "#/components/schemas/Task"
+
+                403:
+                    description: You do not have access to this project
+                404:
+                    description: Task not found
+                500:
+                    description: Internal server error
+
+        patch:
+            summary: Update task under a project
+            tags: [Tasks]
+            parameters:
+                - in: path
+                  name: projectId
+                  required: true
+                  schema:
+                      type: string
+                  description: Project ID
+                - in: path
+                  name: taskId
+                  required: true
+                  schema:
+                      type: string
+                  description: ID of task that needs to be updated
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                title:
+                                    type: string
+                                    description: The title of the task
+                                description:
+                                    type: string
+                                    description: A brief description of the task
+                                status:
+                                    type: string
+                                    enum: [TODO, IN_PROGRESS, DONE]
+                                    description: The current status of the task
+                                    example: IN_PROGRESS
+                                priority:
+                                    type: string
+                                    enum: [LOW, MEDIUM, HIGH]
+                                    description: The priority level of the task
+                                    example: HIGH
+                                dueDate:
+                                    type: string
+                                    format: date-time
+                                    description: The due date for the task
+                                    example: 2025-12-31T23:59:59Z
+                                assigneeId:
+                                    type: string
+                                    description: The ID of the user assigned to the task
+                                    example: xxxxxxxx-xxxxxxx
+                        description: All properties are optional. Only include the fields you want to update.
+            responses:
+                200:
+                    description: Update a task under a project
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    success:
+                                        type: boolean
+                                    task:
+                                        $ref: "#/components/schemas/Task"
+
+                400:
+                    description: Assignee is not a member of this project
+                403:
+                    description: You are not a member of this project
+                404:
+                    description: Task not found
+                500:
+                    description: Internal server error
+
+        delete:
+            summary: Delete task
+            tags: [Task]
+            parameters:
+                - in: path
+                  name: projectId
+                  required: true
+                  schema:
+                      type: string
+                  description: Project ID
+                - in: path
+                  name: taskId
+                  required: true
+                  schema:
+                      type: string
+                  description: ID of task that needs to be deleted
+            responses:
+                200:
+                    description: Deleted task
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    success:
+                                        type: boolean
+                                    message:
+                                        type: string
+                403:
+                    description: Only project owners or task creators can delete tasks
+                404:
+                    description: Member not found in this project
+                500:
+                    description: Internal server error

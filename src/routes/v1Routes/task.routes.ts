@@ -10,7 +10,7 @@ const { create, get, update } = TaskValidator;
 const { getProjectTasks, getProjectTask, createTask, updateTask, deleteTask } =
     TaskController;
 
-// project-tasks specific to a project
+// tasks specific to a project
 taskRouter.get("/", validateRequestQuery(get), getProjectTasks);
 
 taskRouter.get("/:taskId", getProjectTask);
