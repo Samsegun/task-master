@@ -2,7 +2,7 @@
 
 A REST API for a collaborative project management tool. This service powers the "Task-Master" application, handling everything from user authentication and project creation to task assignments and role management.
 
-## ✨ Key Features
+## Key Features
 
 -   **Authentication:** Secure JWT (Access & Refresh) token-based auth.
 -   **Project Management:** Full CRUD for collaborative projects.
@@ -11,7 +11,7 @@ A REST API for a collaborative project management tool. This service powers the 
 -   **Validation:** End-to-end data validation with Zod.
 -   **API Documentation:** Interactive API docs powered by Swagger/OpenAPI.
 
-## 🚀 API Documentation
+## API Documentation
 
 A complete, interactive API reference is available for all endpoints. Once the server is running, you can access the live documentation locally at:
 
@@ -27,7 +27,7 @@ A complete, interactive API reference is available for all endpoints. Once the s
 -   **Validation:** Zod
 -   **Testing:** Jest
 
-## ⚙️ Getting Started
+## Getting Started
 
 Follow these instructions to get the project running on your local machine for development and testing.
 
@@ -68,7 +68,7 @@ DIRECT_URL="postgresql://username:password@direct-host:5432/dbname"
 # ...other env variables, JWT and EMAIL secrets
 ```
 
-## ⚠️ Important Note on DATABASE_URL and DIRECT_URL
+## Important Note on DATABASE_URL and DIRECT_URL
 
 For production environments, especially when using services like Supabase, Prisma may sometimes use `DATABASE_URL` inconsistently. To ensure proper functionality, you may need to explicitly set both `DATABASE_URL` and `DIRECT_URL` in your ` .env` file.
 
@@ -102,6 +102,6 @@ Server will be running on http://localhost:7000 .
 pnpm run test
 ```
 
-## 🙏 Feedback Request
+## Feedback Request
 
 This is my first major backend project, and I’m eager to learn and improve. If you’re a senior developer or have experience with building scalable backend systems, I’d greatly appreciate your feedback on this project. Please feel free to point out areas where I can improve, whether it’s code structure, best practices, performance, or anything else. Your insights will help me grow as a developer. Thank you!

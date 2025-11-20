@@ -21,7 +21,7 @@ export const baseCookieOptions: CookieOptions = {
 };
 
 /**
- * The accessToken cookie maxAge is same as the refreshToken.
+ * Here, the accessToken cookie maxAge is same as the refreshToken.
  * If accessToken cookie maxAge is short-lived(e.g 5mins),
  * the browser deletes the cookie once it expires and will not be sent to the server.
  *  This prevents the auth-middleware from handling valid or invalid tokens.

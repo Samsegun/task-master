@@ -9,7 +9,7 @@ const options = {
             title: "Task Master API",
             version: "1.0.0",
             description:
-                "A project management API for managing projects, tasks, and team members.",
+                "A web-app project management API for managing projects, tasks, and team members.",
         },
         servers: [
             {
