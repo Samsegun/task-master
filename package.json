@@ -14,12 +14,16 @@
         "migrate": "npx prisma migrate deploy",
         "migrate:dev": "npx dotenv -e .env.development -- npx prisma migrate dev",
         "migrate:test": "npx dotenv -e .env.test -- npx prisma migrate deploy",
-        "generate": "npx prisma generate"
+        "generate": "npx prisma generate",
+        "seed:dev": "npx dotenv -e .env.development -- npx prisma db seed"
     },
     "keywords": [],
     "author": "",
     "license": "ISC",
     "packageManager": "pnpm@10.12.4",
+    "prisma": {
+        "seed": "ts-node prisma/seed.ts"
+    },
     "dependencies": {
         "@prisma/client": "^6.17.1",
         "bcryptjs": "^3.0.2",

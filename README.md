@@ -75,10 +75,7 @@ For production environments, especially when using services like Supabase, Prism
 -   `DATABASE_URL`: Primary connection string Prisma uses for migrations and general database operations.
 -   `DIRECT_URL`: Optional connection string that can be used to in place of DATABASE_URL when necessary.
 
-If you're using a service like Supabase with connection pooling enabled, ensure that:
-
--   `DATABASE_URL` points to the connection pool.
--   `DIRECT_URL` points to the direct database connection (bypassing the pool).
+If you're using a service like Supabase, you can find both URLs by clicking the connect button on your project dashboard and navigating to ORMS and selecting Prisma in the Tool dropdown
 
 ### 5. Run Database Migrations
 
@@ -88,7 +85,13 @@ This command will set up all the tables based on your prisma/schema.prisma file:
 pnpm run migrate:dev
 ```
 
-### 6. Start the Development Server
+### 6. Seed data to local db
+
+```bash
+pnpm run seed:dev
+```
+
+### 7. Start the Development Server
 
 ```bash
 pnpm run dev
@@ -96,7 +99,7 @@ pnpm run dev
 
 Server will be running on http://localhost:7000 .
 
-### 7. Run Tests
+### 8. Run Tests
 
 ```bash
 pnpm run test
@@ -104,4 +107,4 @@ pnpm run test
 
 ## Feedback Request
 
-This is my first major backend project, and I’m eager to learn and improve. If you’re a senior developer or have experience with building scalable backend systems, I’d greatly appreciate your feedback on this project. Please feel free to point out areas where I can improve, whether it’s code structure, best practices, performance, or anything else. Your insights will help me grow as a developer. Thank you!
+This is my first major backend project and am eager to learn and improve. If you are a senior developer or have experience with building scalable backend systems, I’d highly appreciate your feedback on this project. Please feel free to point out areas where I can improve, whether it’s code structure, best practices, performance or anything else. Your insights will help me grow as a developer. You can shoot me a mail; oyebadesegunsam@gmail.com Thank you!
