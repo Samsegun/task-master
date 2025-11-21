@@ -1,16 +1,21 @@
 import { CookieOptions } from "express";
+import ms from "ms";
+import {
+    ACCESS_TOKEN_EXPIRY,
+    getEnvVariable,
+    REFRESH_TOKEN_EXPIRY,
+} from "../utils/tokenManagement";
 
-// ADJUST SUBSTRING POSITIONING WHEN EXPIRATION VALUES CHANGE!!!
-const ACCESS_TOEKN_EXPIRY = parseInt(
-    process.env.JWT_ACCESS_EXPIRATION!.substring(-1, 2)
+const REFRESH_PASSWORD_EXPIRATION_TIME = getEnvVariable(
+    "REFRESH_PASSWORD_EXPIRATION"
 );
-const REFRESH_TOKEN_EXPIRY = parseInt(
-    process.env.JWT_REFRESH_EXPIRATION!.substring(-1, 1)
-);
+
+const ACCESS_TOKEN_EXPIRY_TIME = parseInt(ms(ACCESS_TOKEN_EXPIRY));
+const REFRESH_TOKEN_EXPIRY_TIME = parseInt(ms(REFRESH_TOKEN_EXPIRY));
 const REFRESH_PASSWORD_TOKEN_EXPIRY = parseInt(
-    process.env.REFRESH_PASSWORD_EXPIRATION!
+    REFRESH_PASSWORD_EXPIRATION_TIME
 );
-const MAX_AGE = REFRESH_TOKEN_EXPIRY * 24 * 60 * 60 * 1000;
+const MAX_AGE = REFRESH_TOKEN_EXPIRY_TIME;
 
 export const baseCookieOptions: CookieOptions = {
     httpOnly: true,
@@ -42,7 +47,7 @@ export const refreshTokenCookieOptions = {
 };
 
 export const authConfig = {
-    accessTokenExpiryTime: ACCESS_TOEKN_EXPIRY,
-    refreshTokenExpiryTime: REFRESH_TOKEN_EXPIRY,
+    accessTokenExpiryTime: ACCESS_TOKEN_EXPIRY_TIME,
+    refreshTokenExpiryTime: REFRESH_TOKEN_EXPIRY_TIME,
     refreshPasswordTokenTime: REFRESH_PASSWORD_TOKEN_EXPIRY,
 };

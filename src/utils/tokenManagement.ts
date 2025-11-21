@@ -35,9 +35,11 @@ function verifyRefreshToken(token: string) {
 }
 
 export {
+    ACCESS_TOKEN_EXPIRY,
     generateAccessToken,
     generateRefreshToken,
     getEnvVariable,
+    REFRESH_TOKEN_EXPIRY,
     verifyAccessToken,
     verifyRefreshToken,
 };

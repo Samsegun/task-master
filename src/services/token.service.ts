@@ -34,8 +34,7 @@ class TokenService {
                 token: refreshToken,
                 userId,
                 expiresAt: new Date(
-                    Date.now() +
-                        authConfig.refreshTokenExpiryTime * 24 * 60 * 60 * 1000
+                    Date.now() + authConfig.refreshTokenExpiryTime
                 ),
             },
         });

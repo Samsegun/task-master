@@ -190,7 +190,7 @@ class AuthService {
 
         const resetPasswordToken = randomUUID();
         const resetPasswordTokenExpiry = new Date(
-            Date.now() + authConfig.refreshPasswordTokenTime * 60 * 1000
+            Date.now() + authConfig.refreshPasswordTokenTime
         );
 
         // update user with reset token
