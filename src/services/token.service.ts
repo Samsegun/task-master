@@ -14,26 +14,20 @@ import {
 } from "../utils/tokenManagement";
 
 class TokenService {
-    static async createAuthTokens(
-        userId: string,
-        role: string,
-        isVerified: boolean
-    ) {
-        // 1. Generate tokens
+    static async createAuthTokens(userId: string, isVerified: boolean) {
+        // generate tokens
         const accessToken = generateAccessToken({
             userId,
-            role,
             isVerified,
         });
 
-        // const refreshTokenId = uuidv4();
         const refreshTokenId = randomUUID();
         const refreshToken = generateRefreshToken({
             userId,
             tokenId: refreshTokenId,
         });
 
-        // 2. Store refresh token in database
+        // store refresh token in db
         const token = await prisma.refreshToken.create({
             data: {
                 id: refreshTokenId,

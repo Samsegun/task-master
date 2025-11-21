@@ -1,8 +1,8 @@
 import { Router } from "express";
 import AuthController from "../controllers/auth.controller";
 import AuthMiddleware from "../middleware/AuthMiddleware";
+import ValidationMiddleware from "../middleware/ValidationMiddleware";
 import AuthValidator from "../validators/auth.validator";
-import { validateData } from "../validators/validateData";
 
 const authRouter = Router();
 
@@ -17,10 +17,11 @@ const {
     forgotPassword,
     resetPassword,
 } = AuthController;
+const { validateBodyData } = ValidationMiddleware;
 
-authRouter.post("/register", validateData(create), createUser);
+authRouter.post("/register", validateBodyData(create), createUser);
 
-authRouter.post("/login", validateData(login), loginUser);
+authRouter.post("/login", validateBodyData(login), loginUser);
 
 authRouter.post("/logout", logoutUser);
 
@@ -34,13 +35,13 @@ authRouter.get("/verify-email", verifyUserMail);
 
 authRouter.post(
     "/forgot-password",
-    validateData(validateForgotPassword),
+    validateBodyData(validateForgotPassword),
     forgotPassword
 );
 
 authRouter.post(
     "/reset-password",
-    validateData(validateResetPassword),
+    validateBodyData(validateResetPassword),
     resetPassword
 );
 

@@ -14,14 +14,12 @@ class AuthMiddleware {
         next: NextFunction
     ) => {
         const accessToken = req.cookies.accessToken;
-
-        if (!accessToken) {
+        if (!accessToken)
             // user should be logged out!!!
             throw new UnauthorizedError(
                 "Authentication required",
                 "TOKEN_MISSING"
             );
-        }
 
         try {
             const { userId } = verifyAccessToken(accessToken) as JwtPayload;

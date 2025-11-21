@@ -76,7 +76,6 @@ class AuthService {
         const { accessToken, refreshToken } =
             await TokenService.createAuthTokens(
                 authTokensArgs.userId,
-                authTokensArgs.role,
                 authTokensArgs.isVerified
             );
 
@@ -130,7 +129,7 @@ class AuthService {
             user: { id, isVerified, role },
         } = storedToken;
         const { accessToken, refreshToken } =
-            await TokenService.createAuthTokens(id, role, isVerified);
+            await TokenService.createAuthTokens(id, isVerified);
 
         return { accessToken, refreshToken };
     };
@@ -168,7 +167,6 @@ class AuthService {
         const { accessToken, refreshToken } =
             await TokenService.createAuthTokens(
                 authTokensArgs.userId,
-                authTokensArgs.role,
                 authTokensArgs.isVerified
             );
 

@@ -32,8 +32,8 @@ export const accessTokenCookieOptions = {
 };
 
 /**
- * refreshToken cookie is scoped to /api/auth.
- * This reduces exposure by keeping it off non-auth API calls.
+ * refreshToken cookie is scoped to /api/auth
+ * reduces exposure by keeping it off non-auth API calls.
  */
 export const refreshTokenCookieOptions = {
     ...baseCookieOptions,

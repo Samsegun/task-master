@@ -1,8 +1,8 @@
 import { Router } from "express";
 import ProjectController from "../../controllers/project.controller";
 import ProjectMemberController from "../../controllers/projectMember.controller";
+import ValidationMiddleware from "../../middleware/ValidationMiddleware";
 import projectValidator from "../../validators/project.validator";
-import { validateData } from "../../validators/validateData";
 import taskRouter from "./task.routes";
 
 const projectRouter = Router();
@@ -17,6 +17,7 @@ const {
 
 const { addMember, getMembers, updateMemberRole, removeMember, leaveProject } =
     ProjectMemberController;
+const { validateBodyData } = ValidationMiddleware;
 
 // ****************** task routes ******************
 projectRouter.use("/:projectId/tasks", taskRouter);
@@ -24,7 +25,7 @@ projectRouter.use("/:projectId/tasks", taskRouter);
 // ****************** project member routes ******************
 projectRouter.post(
     "/:projectId/members",
-    validateData(projectValidator.addMember),
+    validateBodyData(projectValidator.addMember),
     addMember
 );
 
@@ -32,7 +33,7 @@ projectRouter.get("/:projectId/members", getMembers);
 
 projectRouter.patch(
     "/:projectId/members/:userIdToUpdate",
-    validateData(projectValidator.updateMemberRole),
+    validateBodyData(projectValidator.updateMemberRole),
     updateMemberRole
 );
 
@@ -43,13 +44,17 @@ projectRouter.delete("/:projectId/leave", leaveProject);
 // ****************** project routes ******************
 projectRouter.get("/", getUserProjects);
 
-projectRouter.post("/", validateData(projectValidator.create), createProject);
+projectRouter.post(
+    "/",
+    validateBodyData(projectValidator.create),
+    createProject
+);
 
 projectRouter.get("/:projectId", getProject);
 
 projectRouter.patch(
     "/:projectId",
-    validateData(projectValidator.update),
+    validateBodyData(projectValidator.update),
     updateProject
 );
 
