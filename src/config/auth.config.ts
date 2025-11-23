@@ -20,8 +20,8 @@ const MAX_AGE = REFRESH_TOKEN_EXPIRY_TIME;
 export const baseCookieOptions: CookieOptions = {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    // sameSite: "strict",
-    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+    sameSite: "strict",
+    // sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
     path: "/",
 };
 

@@ -42,7 +42,7 @@ class AuthController {
 
         // always clear cookies (even if token didn't exist)
         TokenService.clearAuthCookies(res);
-        res.status(200).json({
+        res.status(204).json({
             success: true,
             message: "Logged out successfully",
         });
