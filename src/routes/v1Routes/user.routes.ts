@@ -1,15 +1,13 @@
 import { Router } from "express";
 import TaskController from "../../controllers/task.controller";
+import UserController from "../../controllers/user.controller";
 
 const userRouter = Router();
 
 const { getMyTasks, getOverdueTasks } = TaskController;
+const { getAuthStatus } = UserController;
 
-userRouter.get("/", (req, res) => {
-    const userId = (req as any).userId;
-
-    res.send(`hello from user ${userId}`);
-});
+userRouter.get("/", getAuthStatus);
 
 // user tasks across all projects
 userRouter.get("/tasks", getMyTasks);
