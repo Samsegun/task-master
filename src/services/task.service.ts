@@ -26,7 +26,7 @@ class TaskService {
         if (!member)
             throw new ForbiddenError("You are not the owner of this project");
 
-        // if assigneeId provided, verify they are a project member
+        // if assigneeId is provided, verify they are a project member
         if (data.assigneeId) {
             const assigneeMember = await prisma.projectMember.findUnique({
                 where: {

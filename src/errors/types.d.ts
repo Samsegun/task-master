@@ -13,4 +13,5 @@ type ErrorCode =
     | "ERR_UNAUTH"
     | "ERR_FORBIDDEN"
     | "ERR_CONFLICT"
-    | "ERR_RATE_LIMIT";
+    | "ERR_RATE_LIMIT"
+    | "REFRESH_TOKEN_MISSING";

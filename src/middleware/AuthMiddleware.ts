@@ -53,7 +53,10 @@ class AuthMiddleware {
 
         if (!refreshToken) {
             // user should be logged out!!!
-            throw new UnauthorizedError("No token provided");
+            throw new UnauthorizedError(
+                "Refresh token required",
+                "REFRESH_TOKEN_MISSING"
+            );
         }
 
         try {
