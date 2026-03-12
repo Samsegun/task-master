@@ -91,7 +91,27 @@ class TaskController {
     static getMyTasks = asyncHandler(async (req: Request, res: Response) => {
         const userId = (req as any).userId;
 
-        const tasks = await TaskService.getMyTasks(userId);
+        // parse query parameters
+        const limit = req.query.limit
+            ? parseInt(req.query.limit as string)
+            : undefined;
+        const sort = req.query.sort as string;
+
+        // parse sort (like "assignedAt:desc" or "createdAt:asc")
+        let sortBy = "createdAt";
+        let sortOrder: "asc" | "desc" = "desc";
+
+        if (sort) {
+            const [field, order] = sort.split(":");
+            if (field) sortBy = field;
+            if (order === "asc" || order === "desc") sortOrder = order;
+        }
+
+        const tasks = await TaskService.getMyTasks(userId, {
+            limit,
+            sortBy,
+            sortOrder,
+        });
 
         res.status(200).json({
             success: true,

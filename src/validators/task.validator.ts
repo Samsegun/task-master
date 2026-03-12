@@ -25,6 +25,13 @@ const get = z.object({
     status: TaskStatusEnum.optional(),
     priority: TaskPriorityEnum.optional(),
     assigneeId: z.string().or(z.literal("null")).optional(),
+
+    // query params for getMyTasks
+    limit: z.coerce.number().int().min(1).max(100).optional(),
+    sort: z
+        .string()
+        .regex(/^(createdAt|updatedAt|dueDate|priority|status):(asc|desc)$/)
+        .optional(),
 });
 
 export type CreateTask = z.infer<typeof create>;

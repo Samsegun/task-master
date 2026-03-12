@@ -6,6 +6,7 @@ import {
     ValidationError,
 } from "../errors";
 import prisma from "../utils/prisma";
+import { GetMyTasksOptions } from "../utils/types";
 import { CreateTask, UpdateTask } from "../validators/task.validator";
 
 class TaskService {
@@ -114,9 +115,7 @@ class TaskService {
             throw new ForbiddenError("You do not have access to this project");
 
         //  build 'where' clause with possible filters
-        // const where: any = { projectId };
         const where: Prisma.TaskWhereInput = { projectId };
-
         if (filters?.status) where.status = filters.status;
         if (filters?.assigneeId) where.assigneeId = filters.assigneeId;
         if (filters?.priority) where.priority = filters.priority;
@@ -312,8 +311,14 @@ class TaskService {
         return { message: "Task deleted successfully" };
     }
 
-    // get tasks assigned to user (across all projects)
-    static async getMyTasks(userId: string) {
+    // get tasks assigned to user across all projects
+    static async getMyTasks(userId: string, queryOptions: GetMyTasksOptions) {
+        const {
+            limit,
+            sortBy = "createdAt",
+            sortOrder = "desc",
+        } = queryOptions;
+
         const tasks = await prisma.task.findMany({
             where: {
                 assigneeId: userId,
@@ -335,7 +340,11 @@ class TaskService {
                     },
                 },
             },
-            orderBy: [{ status: "asc" }, { dueDate: "asc" }],
+            // orderBy: [{ status: "asc" }, { dueDate: "asc" }],
+            orderBy: {
+                [sortBy]: sortOrder,
+            },
+            ...(limit && { take: limit }),
         });
 
         return tasks;

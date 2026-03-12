@@ -22,7 +22,14 @@ interface RefreshTokenPayload {
 
 type User = Omit<PrismaUser, "password">;
 
+interface GetMyTasksOptions {
+    limit?: number;
+    sortBy?: string;
+    sortOrder?: "asc" | "desc";
+}
+
 export {
+    GetMyTasksOptions,
     JwtPayload,
     RefreshTokenPayload,
     User,
