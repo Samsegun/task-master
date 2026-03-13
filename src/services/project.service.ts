@@ -1,6 +1,7 @@
 import { ProjectStatus } from "@prisma/client";
 import { EntityNotFound, ForbiddenError, ValidationError } from "../errors";
 import prisma from "../utils/prisma";
+import { GetDataOptions } from "../utils/types";
 import { CreateProject } from "../validators/project.validator";
 
 class ProjectService {
@@ -50,9 +51,14 @@ class ProjectService {
         return project;
     }
 
-    static async getUserProjects(userId: string) {
+    static async getUserProjects(userId: string, queryOptions: GetDataOptions) {
+        const {
+            limit,
+            sortBy = "updatedAt",
+            sortOrder = "desc",
+        } = queryOptions;
+
         const projects = await prisma.project.findMany({
-            take: 3,
             where: {
                 members: {
                     some: {
@@ -67,19 +73,59 @@ class ProjectService {
                         email: true,
                     },
                 },
+                tasks: {
+                    select: {
+                        id: true,
+                        status: true,
+                        dueDate: true,
+                    },
+                },
                 _count: {
                     select: {
-                        tasks: true,
+                        // tasks: true,
                         members: true,
                     },
                 },
             },
             orderBy: {
-                updatedAt: "desc",
+                [sortBy]: sortOrder,
             },
+            ...(limit && { take: limit }),
         });
 
-        return projects;
+        // computed progress and due date for each project
+        const projectsWithMetrics = projects.map(project => {
+            const totalTasks = project.tasks.length;
+            const completedTasks = project.tasks.filter(
+                t => t.status === "DONE"
+            ).length;
+            const progress =
+                totalTasks > 0
+                    ? Math.round((completedTasks / totalTasks) * 100)
+                    : 0;
+
+            // get latest dueDates from tasks
+            const dueDates = project.tasks
+                .map(t => t.dueDate)
+                .filter((date): date is Date => date != null);
+
+            const dueDate =
+                dueDates.length > 0
+                    ? new Date(Math.max(...dueDates.map(d => d.getTime())))
+                    : null;
+
+            const { tasks, ...projectData } = project;
+
+            return {
+                ...projectData,
+                completedTasks,
+                totalTasks,
+                progress,
+                dueDate,
+            };
+        });
+
+        return projectsWithMetrics;
     }
 
     static async getProjectById(projectId: string, userId: string) {

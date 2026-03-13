@@ -17,7 +17,7 @@ const {
 
 const { addMember, getMembers, updateMemberRole, removeMember, leaveProject } =
     ProjectMemberController;
-const { validateBodyData } = ValidationMiddleware;
+const { validateBodyData, validateRequestQuery } = ValidationMiddleware;
 
 // ****************** task routes ******************
 projectRouter.use("/:projectId/tasks", taskRouter);
@@ -42,7 +42,11 @@ projectRouter.delete("/:projectId/members/:userIdToRemove", removeMember);
 projectRouter.delete("/:projectId/leave", leaveProject);
 
 // ****************** project routes ******************
-projectRouter.get("/", getUserProjects);
+projectRouter.get(
+    "/",
+    validateRequestQuery(projectValidator.getProjects),
+    getUserProjects
+);
 
 projectRouter.post(
     "/",

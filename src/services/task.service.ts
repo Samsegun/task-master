@@ -6,7 +6,7 @@ import {
     ValidationError,
 } from "../errors";
 import prisma from "../utils/prisma";
-import { GetMyTasksOptions } from "../utils/types";
+import { GetDataOptions } from "../utils/types";
 import { CreateTask, UpdateTask } from "../validators/task.validator";
 
 class TaskService {
@@ -312,7 +312,7 @@ class TaskService {
     }
 
     // get tasks assigned to user across all projects
-    static async getMyTasks(userId: string, queryOptions: GetMyTasksOptions) {
+    static async getMyTasks(userId: string, queryOptions: GetDataOptions) {
         const {
             limit,
             sortBy = "createdAt",

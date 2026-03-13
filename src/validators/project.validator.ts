@@ -24,13 +24,23 @@ const updateMemberRole = z.object({
     role: MemberRoleEnum,
 });
 
+const getProjects = z.object({
+    limit: z.coerce.number().int().min(1).max(100).optional(),
+    sort: z
+        .string()
+        .regex(/^(createdAt|updatedAt|name|status):(asc|desc)$/)
+        .optional(),
+});
+
 export type CreateProject = z.infer<typeof create>;
 export type UpdateProject = z.infer<typeof update>;
 export type AddProjectMember = z.infer<typeof addMember>;
+export type GetProjects = z.infer<typeof getProjects>;
 
 export default {
     create,
     update,
     addMember,
     updateMemberRole,
+    getProjects,
 };

@@ -24,7 +24,25 @@ class ProjectController {
         async (req: Request, res: Response) => {
             const userId = (req as any).userId;
 
-            const projects = await ProjectService.getUserProjects(userId);
+            const limit = req.query.limit
+                ? parseInt(req.query.limit as string)
+                : undefined;
+            const sort = req.query.sort as string;
+
+            let sortBy = "updatedAt";
+            let sortOrder: "asc" | "desc" = "desc";
+
+            if (sort) {
+                const [field, order] = sort.split(":");
+                if (field) sortBy = field;
+                if (order === "asc" || order === "desc") sortOrder = order;
+            }
+
+            const projects = await ProjectService.getUserProjects(userId, {
+                limit,
+                sortBy,
+                sortOrder,
+            });
 
             res.status(200).json({
                 success: true,
