@@ -35,7 +35,6 @@ const getProjects = z.object({
 export type CreateProject = z.infer<typeof create>;
 export type UpdateProject = z.infer<typeof update>;
 export type AddProjectMember = z.infer<typeof addMember>;
-export type GetProjects = z.infer<typeof getProjects>;
 
 export default {
     create,

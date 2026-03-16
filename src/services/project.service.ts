@@ -1,5 +1,10 @@
 import { ProjectStatus } from "@prisma/client";
 import { EntityNotFound, ForbiddenError, ValidationError } from "../errors";
+import {
+    numOfcompletedTasks,
+    progressNumber,
+    projectTasksLength,
+} from "../utils/computeProjectMetrics";
 import prisma from "../utils/prisma";
 import { GetDataOptions } from "../utils/types";
 import { CreateProject } from "../validators/project.validator";
@@ -95,16 +100,21 @@ class ProjectService {
 
         // computed progress and due date for each project
         const projectsWithMetrics = projects.map(project => {
-            const totalTasks = project.tasks.length;
-            const completedTasks = project.tasks.filter(
-                t => t.status === "DONE"
-            ).length;
-            const progress =
-                totalTasks > 0
-                    ? Math.round((completedTasks / totalTasks) * 100)
-                    : 0;
+            const totalTasks = projectTasksLength(project.tasks);
+            // const completedTasks = project.tasks.filter(
+            //     t => t.status === "DONE"
+            // ).length;
+            // const progress =
+            //     totalTasks > 0
+            //         ? Math.round((completedTasks / totalTasks) * 100)
+            const completedTasks = numOfcompletedTasks(project.tasks);
+            const progress = progressNumber(totalTasks, completedTasks);
 
-            // get latest dueDates from tasks
+            /** get latest dueDates from tasks
+             *
+             * project due date is same as due date for last created task
+             *
+             * */
             const dueDates = project.tasks
                 .map(t => t.dueDate)
                 .filter((date): date is Date => date != null);
@@ -143,39 +153,82 @@ class ProjectService {
 
         const project = await prisma.project.findUnique({
             where: { id: projectId },
-            include: {
-                owner: {
+            select: {
+                id: true,
+                name: true,
+                description: true,
+                status: true,
+                tasks: {
                     select: {
-                        id: true,
-                        email: true,
-                    },
-                },
-                members: {
-                    include: {
-                        user: {
-                            select: {
-                                id: true,
-                                email: true,
-                            },
-                        },
-                    },
-                    omit: {
-                        joinedAt: true,
-                        projectId: true,
+                        dueDate: true,
+                        status: true,
                     },
                 },
                 _count: {
                     select: {
-                        tasks: true,
+                        members: true,
                     },
                 },
             },
+            // include: {
+            //     owner: {
+            //         select: {
+            //             id: true,
+            //             email: true,
+            //         },
+            //     },
+            //     members: {
+            //         include: {
+            //             user: {
+            //                 select: {
+            //                     id: true,
+            //                     email: true,
+            //                 },
+            //             },
+            //         },
+            //         omit: {
+            //             joinedAt: true,
+            //             projectId: true,
+            //         },
+            //     },
+            //     _count: {
+            //         select: {
+            //             tasks: true,
+            //         },
+            //     },
+            // },
         });
         if (!project) {
             throw new EntityNotFound("Project not found");
         }
 
-        return project;
+        /*** project metrics ***/
+        const totalMembers = project._count.members;
+
+        const totalTasks = projectTasksLength(project.tasks);
+        const completedTasks = numOfcompletedTasks(project.tasks);
+        const progress = progressNumber(totalTasks, completedTasks);
+
+        // get latest dueDates from tasks
+        const dueDates = project.tasks
+            .map(t => t.dueDate)
+            .filter((date): date is Date => date != null);
+        const dueDate =
+            dueDates.length > 0
+                ? new Date(Math.max(...dueDates.map(d => d.getTime())))
+                : null;
+
+        const projectData = {
+            id: project.id,
+            name: project.name,
+            description: project.description,
+            status: project.status,
+            dueDate,
+            totalMembers,
+            progress,
+        };
+
+        return projectData;
     }
 
     static async updateProject(
