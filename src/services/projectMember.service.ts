@@ -77,22 +77,24 @@ class ProjectMemberService {
                 },
             },
         });
-        if (!member) {
+        if (!member)
             throw new ForbiddenError("You do not have access to this project");
-        }
 
         const projectMembers = await prisma.projectMember.findMany({
             where: { projectId },
-            include: {
+            select: {
+                id: true,
+                projectId: true,
                 user: {
                     select: {
                         id: true,
-                        email: true,
-                        // username: true,
-                        // firstName: true,
-                        // lastName: true,
+                        firstName: true,
+                        lastName: true,
                     },
                 },
+
+                role: true,
+                joinedAt: true,
             },
             orderBy: {
                 joinedAt: "asc",

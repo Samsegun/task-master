@@ -170,33 +170,6 @@ class ProjectService {
                     },
                 },
             },
-            // include: {
-            //     owner: {
-            //         select: {
-            //             id: true,
-            //             email: true,
-            //         },
-            //     },
-            //     members: {
-            //         include: {
-            //             user: {
-            //                 select: {
-            //                     id: true,
-            //                     email: true,
-            //                 },
-            //             },
-            //         },
-            //         omit: {
-            //             joinedAt: true,
-            //             projectId: true,
-            //         },
-            //     },
-            //     _count: {
-            //         select: {
-            //             tasks: true,
-            //         },
-            //     },
-            // },
         });
         if (!project) {
             throw new EntityNotFound("Project not found");

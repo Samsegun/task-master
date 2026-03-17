@@ -24,12 +24,17 @@ class TaskController {
     static getProjectTasks = asyncHandler(
         async (req: Request, res: Response) => {
             const userId = (req as any).userId;
+
             const { projectId } = req.params;
             const filters: TaskFilters = req.query;
+            const limit = req.query.limit
+                ? parseInt(req.query.limit as string)
+                : undefined;
 
             const tasks = await TaskService.getProjectTasks(
                 projectId,
                 userId,
+                { limit },
                 filters
             );
 

@@ -96,12 +96,15 @@ class TaskService {
     static async getProjectTasks(
         projectId: string,
         userId: string,
+        queryOptions: GetDataOptions,
         filters?: {
             status?: TaskStatus;
             assigneeId?: string;
             priority?: TaskPriority;
         }
     ) {
+        const { limit } = queryOptions;
+
         // check if user is a project member
         const member = await prisma.projectMember.findUnique({
             where: {
@@ -122,27 +125,37 @@ class TaskService {
 
         const tasks = await prisma.task.findMany({
             where,
-            include: {
-                assignee: {
-                    select: {
-                        id: true,
-                        email: true,
-                        // username: true,
-                        // firstName: true,
-                        // lastName: true,
-                    },
-                },
-                creator: {
-                    select: {
-                        id: true,
-                        email: true,
-                        // username: true,
-                        // firstName: true,
-                        // lastName: true,
-                    },
-                },
+            select: {
+                id: true,
+                title: true,
+                status: true,
+                priority: true,
+                assignee: { select: { firstName: true, lastName: true } },
+                assigneeId: true,
+                dueDate: true,
             },
+            // include: {
+            //     assignee: {
+            //         select: {
+            //             id: true,
+            //             email: true,
+            //             // username: true,
+            //             // firstName: true,
+            //             // lastName: true,
+            //         },
+            //     },
+            //     creator: {
+            //         select: {
+            //             id: true,
+            //             email: true,
+            //             // username: true,
+            //             // firstName: true,
+            //             // lastName: true,
+            //         },
+            //     },
+            // },
             orderBy: [{ createdAt: "desc" }],
+            ...(limit && { take: limit }),
         });
 
         return tasks;
