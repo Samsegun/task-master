@@ -6,13 +6,13 @@ import { AddProjectMember } from "../validators/project.validator";
 
 class ProjectMemberController {
     static addMember = asyncHandler(async (req: Request, res: Response) => {
-        const requesterId = (req as any).userId;
+        const userId = (req as any).userId;
         const { projectId } = req.params;
         const data = req.body as AddProjectMember;
 
         const newMember = await ProjectMemberService.addMember(
             projectId,
-            requesterId,
+            userId,
             data
         );
 

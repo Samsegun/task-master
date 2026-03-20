@@ -190,6 +190,7 @@ class ProjectService {
             name: project.name,
             description: project.description,
             status: project.status,
+            projectRole: member.role,
             dueDate,
             totalMembers,
             progress,

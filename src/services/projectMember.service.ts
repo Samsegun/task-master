@@ -5,7 +5,7 @@ import prisma from "../utils/prisma";
 class ProjectMemberService {
     static async addMember(
         projectId: string,
-        requesterId: string,
+        userId: string,
         data: { email: string; role?: ProjectRole }
     ) {
         // check if current user is owner
@@ -13,11 +13,11 @@ class ProjectMemberService {
             where: {
                 projectId_userId: {
                     projectId,
-                    userId: requesterId,
+                    userId,
                 },
             },
         });
-        if (!requesterMember || requesterMember.role !== "OWNER")
+        if (!requesterMember || requesterMember.role !== ProjectRole["OWNER"])
             throw new ForbiddenError("Only project owner can add members");
 
         // find user by email
@@ -49,19 +49,27 @@ class ProjectMemberService {
             data: {
                 projectId,
                 userId: userToAdd.id,
-                role: data.role || "MEMBER",
+                role: data.role || ProjectRole["MEMBER"],
             },
-            include: {
+            select: {
                 user: {
                     select: {
                         id: true,
                         email: true,
-                        // username: true,
-                        // firstName: true,
-                        // lastName: true,
                     },
                 },
             },
+            // include: {
+            //     user: {
+            //         select: {
+            //             id: true,
+            //             email: true,
+            //             // username: true,
+            //             // firstName: true,
+            //             // lastName: true,
+            //         },
+            //     },
+            // },
         });
 
         return newMember;
