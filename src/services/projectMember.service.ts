@@ -92,12 +92,11 @@ class ProjectMemberService {
                         lastName: true,
                     },
                 },
-
                 role: true,
                 joinedAt: true,
             },
             orderBy: {
-                joinedAt: "asc",
+                joinedAt: "desc",
             },
         });
 

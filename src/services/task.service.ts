@@ -90,7 +90,7 @@ class TaskService {
             },
         });
 
-        return task;
+        return { id: task.id, title: task.title, projectId: task.projectId };
     }
 
     static async getProjectTasks(
@@ -180,31 +180,19 @@ class TaskService {
 
         const task = await prisma.task.findUnique({
             where: { id: taskId },
-            include: {
+            select: {
+                id: true,
+                title: true,
+                status: true,
+                priority: true,
+                projectId: true,
                 assignee: {
-                    select: {
-                        id: true,
-                        email: true,
-                        // username: true,
-                        // firstName: true,
-                        // lastName: true,
-                    },
+                    select: { id: true, firstName: true, lastName: true },
                 },
                 creator: {
-                    select: {
-                        id: true,
-                        email: true,
-                        // username: true,
-                        // firstName: true,
-                        // lastName: true,
-                    },
+                    select: { id: true, firstName: true, lastName: true },
                 },
-                project: {
-                    select: {
-                        id: true,
-                        name: true,
-                    },
-                },
+                project: { select: { id: true, name: true } },
             },
         });
         if (!task || task.projectId !== projectId)

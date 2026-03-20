@@ -53,7 +53,8 @@ class ProjectService {
             return newProject;
         });
 
-        return project;
+        // return project;
+        return { id: project.id, name: project.name };
     }
 
     static async getUserProjects(userId: string, queryOptions: GetDataOptions) {
@@ -87,7 +88,6 @@ class ProjectService {
                 },
                 _count: {
                     select: {
-                        // tasks: true,
                         members: true,
                     },
                 },
@@ -101,12 +101,6 @@ class ProjectService {
         // computed progress and due date for each project
         const projectsWithMetrics = projects.map(project => {
             const totalTasks = projectTasksLength(project.tasks);
-            // const completedTasks = project.tasks.filter(
-            //     t => t.status === "DONE"
-            // ).length;
-            // const progress =
-            //     totalTasks > 0
-            //         ? Math.round((completedTasks / totalTasks) * 100)
             const completedTasks = numOfcompletedTasks(project.tasks);
             const progress = progressNumber(totalTasks, completedTasks);
 
