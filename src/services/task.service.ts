@@ -63,30 +63,11 @@ class TaskService {
                 description: data.description,
                 dueDate: data.dueDate,
                 priority: data.priority || "MEDIUM",
-                assigneeId: data.assigneeId,
+                // assigneeId: data.assigneeId,
                 projectId,
                 creatorId,
                 status: "TODO",
-            },
-            include: {
-                assignee: {
-                    select: {
-                        id: true,
-                        email: true,
-                        // username: true,
-                        // firstName: true,
-                        // lastName: true,
-                    },
-                },
-                creator: {
-                    select: {
-                        id: true,
-                        email: true,
-                        // username: true,
-                        // firstName: true,
-                        // lastName: true,
-                    },
-                },
+                ...(data.assigneeId && { assigneeId: data.assigneeId }),
             },
         });
 
