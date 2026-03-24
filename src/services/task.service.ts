@@ -63,7 +63,6 @@ class TaskService {
                 description: data.description,
                 dueDate: data.dueDate,
                 priority: data.priority || "MEDIUM",
-                // assigneeId: data.assigneeId,
                 projectId,
                 creatorId,
                 status: "TODO",
@@ -111,6 +110,7 @@ class TaskService {
                 title: true,
                 status: true,
                 priority: true,
+                description: true,
                 assignee: { select: { firstName: true, lastName: true } },
                 assigneeId: true,
                 dueDate: true,
@@ -167,6 +167,7 @@ class TaskService {
                 status: true,
                 priority: true,
                 projectId: true,
+                description: true,
                 assignee: {
                     select: { id: true, firstName: true, lastName: true },
                 },
@@ -235,26 +236,14 @@ class TaskService {
 
         const updatedTask = await prisma.task.update({
             where: { id: taskId },
-            data: updateData,
-            include: {
-                assignee: {
-                    select: {
-                        id: true,
-                        email: true,
-                        // username: true,
-                        // firstName: true,
-                        // lastName: true,
-                    },
-                },
-                creator: {
-                    select: {
-                        id: true,
-                        email: true,
-                        // username: true,
-                        // firstName: true,
-                        // lastName: true,
-                    },
-                },
+            data: {
+                ...updateData,
+                ...(data.assigneeId && { assigneeId: data.assigneeId }),
+            },
+            select: {
+                id: true,
+                title: true,
+                projectId: true,
             },
         });
 

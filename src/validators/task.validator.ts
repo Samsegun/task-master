@@ -13,7 +13,7 @@ const create = z.object({
 });
 
 const update = z.object({
-    title: z.string().min(3).max(200).optional(),
+    title: z.string().min(5).max(200).optional(),
     description: z.string().max(1000).optional(),
     dueDate: z.coerce.date().optional(),
     priority: TaskPriorityEnum.optional(),

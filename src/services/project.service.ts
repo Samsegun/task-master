@@ -158,6 +158,19 @@ class ProjectService {
                         status: true,
                     },
                 },
+                members: {
+                    select: {
+                        joinedAt: true,
+                        role: true,
+                        user: {
+                            select: {
+                                id: true,
+                                firstName: true,
+                                lastName: true,
+                            },
+                        },
+                    },
+                },
                 _count: {
                     select: {
                         members: true,
@@ -192,6 +205,7 @@ class ProjectService {
             status: project.status,
             projectRole: member.role,
             dueDate,
+            members: project.members,
             totalMembers,
             progress,
         };
