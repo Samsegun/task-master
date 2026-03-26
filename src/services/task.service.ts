@@ -114,27 +114,8 @@ class TaskService {
                 assignee: { select: { firstName: true, lastName: true } },
                 assigneeId: true,
                 dueDate: true,
+                creatorId: true,
             },
-            // include: {
-            //     assignee: {
-            //         select: {
-            //             id: true,
-            //             email: true,
-            //             // username: true,
-            //             // firstName: true,
-            //             // lastName: true,
-            //         },
-            //     },
-            //     creator: {
-            //         select: {
-            //             id: true,
-            //             email: true,
-            //             // username: true,
-            //             // firstName: true,
-            //             // lastName: true,
-            //         },
-            //     },
-            // },
             orderBy: [{ createdAt: "desc" }],
             ...(limit && { take: limit }),
         });

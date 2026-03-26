@@ -9,7 +9,7 @@ const create = z.object({
     description: z.string().max(1000).optional(),
     dueDate: z.coerce.date().optional(),
     priority: TaskPriorityEnum.optional().default("MEDIUM"),
-    assigneeId: z.string().optional(),
+    assigneeId: z.string().optional().nullable(),
 });
 
 const update = z.object({
