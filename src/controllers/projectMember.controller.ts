@@ -18,7 +18,7 @@ class ProjectMemberController {
 
         res.status(201).json({
             success: true,
-            newMember,
+            newMember: { id: newMember?.user.id, email: newMember?.user.email },
         });
     });
 

@@ -3,9 +3,9 @@ import { JwtPayload, RefreshTokenPayload } from "./types";
 
 function getEnvVariable(key: string): string {
     const value = process.env[key];
-    if (value === undefined || value === null) {
+    if (value === undefined || value === null)
         throw Error(`Environment variable "${key}" is not set.`);
-    }
+
     return value;
 }
 

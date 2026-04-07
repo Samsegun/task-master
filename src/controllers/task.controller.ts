@@ -18,7 +18,7 @@ class TaskController {
         res.status(201).json({
             success: true,
             message: "Task created successfully",
-            task,
+            task: { id: task.id, title: task.title, projectId: task.projectId },
         });
     });
 
@@ -80,7 +80,11 @@ class TaskController {
         res.status(200).json({
             success: true,
             message: "Task updated successfully",
-            task,
+            task: {
+                id: task.id,
+                title: task.title,
+                projectId: task.projectId,
+            },
         });
     });
 
@@ -124,6 +128,7 @@ class TaskController {
         res.status(200).json({
             success: true,
             tasks,
+            userId,
         });
     });
 

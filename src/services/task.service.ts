@@ -70,7 +70,7 @@ class TaskService {
             },
         });
 
-        return { id: task.id, title: task.title, projectId: task.projectId };
+        return task;
     }
 
     static async getProjectTasks(
@@ -111,10 +111,46 @@ class TaskService {
                 status: true,
                 priority: true,
                 description: true,
-                assignee: { select: { firstName: true, lastName: true } },
-                assigneeId: true,
+                completedAt: true,
+                createdAt: true,
+                updatedAt: true,
+                assignee: {
+                    select: {
+                        id: true,
+                        firstName: true,
+                        lastName: true,
+                        username: true,
+                    },
+                },
                 dueDate: true,
-                creatorId: true,
+                creator: {
+                    select: {
+                        id: true,
+                        firstName: true,
+                        lastName: true,
+                        username: true,
+                    },
+                },
+                project: {
+                    select: {
+                        id: true,
+                        name: true,
+                        members: {
+                            select: {
+                                role: true,
+                                joinedAt: true,
+                                user: {
+                                    select: {
+                                        id: true,
+                                        firstName: true,
+                                        lastName: true,
+                                        username: true,
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
             },
             orderBy: [{ createdAt: "desc" }],
             ...(limit && { take: limit }),
@@ -225,6 +261,8 @@ class TaskService {
                 id: true,
                 title: true,
                 projectId: true,
+                status: true,
+                completedAt: true,
             },
         });
 
@@ -275,24 +313,53 @@ class TaskService {
             where: {
                 assigneeId: userId,
             },
-            include: {
-                project: {
+            select: {
+                id: true,
+                title: true,
+                status: true,
+                priority: true,
+                description: true,
+                completedAt: true,
+                createdAt: true,
+                updatedAt: true,
+                dueDate: true,
+                assignee: {
                     select: {
                         id: true,
-                        name: true,
+                        firstName: true,
+                        lastName: true,
+                        username: true,
                     },
                 },
                 creator: {
                     select: {
                         id: true,
-                        email: true,
-                        // username: true,
-                        // firstName: true,
-                        // lastName: true,
+                        firstName: true,
+                        lastName: true,
+                        username: true,
+                    },
+                },
+                project: {
+                    select: {
+                        id: true,
+                        name: true,
+                        members: {
+                            select: {
+                                role: true,
+                                joinedAt: true,
+                                user: {
+                                    select: {
+                                        id: true,
+                                        firstName: true,
+                                        lastName: true,
+                                        username: true,
+                                    },
+                                },
+                            },
+                        },
                     },
                 },
             },
-            // orderBy: [{ status: "asc" }, { dueDate: "asc" }],
             orderBy: {
                 [sortBy]: sortOrder,
             },

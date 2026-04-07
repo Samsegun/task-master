@@ -27,8 +27,7 @@ class ProjectMemberService {
                 id: true,
             },
         });
-        if (!userToAdd)
-            throw new EntityNotFound("User with this email does not exist");
+        if (!userToAdd) throw new EntityNotFound("Invalid credentials");
 
         // check if user is already a member
         const existingMember = await prisma.projectMember.findUnique({
@@ -44,6 +43,57 @@ class ProjectMemberService {
                 "User is already a member of this project"
             );
 
+        // if owner role is requested for the new member, perform atomic transfer:
+        if (data.role === ProjectRole["OWNER"]) {
+            // create new member as OWNER
+            await prisma.$transaction([
+                prisma.projectMember.create({
+                    data: {
+                        projectId,
+                        userId: userToAdd.id,
+                        role: ProjectRole["OWNER"],
+                    },
+                }),
+
+                // demote current owner (requester) to MEMBER
+                prisma.projectMember.update({
+                    where: {
+                        projectId_userId: {
+                            projectId,
+                            userId,
+                        },
+                    },
+                    data: { role: ProjectRole["MEMBER"] },
+                }),
+
+                // update project's ownerId to the new owner
+                prisma.project.update({
+                    where: { id: projectId },
+                    data: { ownerId: userToAdd.id },
+                }),
+            ]);
+
+            const created = await prisma.projectMember.findUnique({
+                where: {
+                    projectId_userId: {
+                        projectId,
+                        userId: userToAdd.id,
+                    },
+                },
+                select: {
+                    user: {
+                        select: {
+                            id: true,
+                            email: true,
+                        },
+                    },
+                    role: true,
+                },
+            });
+
+            return created;
+        }
+
         // add member
         const newMember = await prisma.projectMember.create({
             data: {
@@ -58,18 +108,8 @@ class ProjectMemberService {
                         email: true,
                     },
                 },
+                role: true,
             },
-            // include: {
-            //     user: {
-            //         select: {
-            //             id: true,
-            //             email: true,
-            //             // username: true,
-            //             // firstName: true,
-            //             // lastName: true,
-            //         },
-            //     },
-            // },
         });
 
         return newMember;
@@ -142,6 +182,11 @@ class ProjectMemberService {
         });
         if (!memberToUpdate || memberToUpdate.projectId !== projectId)
             throw new EntityNotFound("Member not found in this project");
+
+        if (requesterId === userIdToUpdate && newRole !== "OWNER")
+            throw new ForbiddenError(
+                "Project owner cannot change their own role. Promote another member to owner first or delete the project."
+            );
 
         // if promoting someone to OWNER, demote current owner to MEMBER
         if (newRole === "OWNER") {
@@ -244,15 +289,28 @@ class ProjectMemberService {
                 "Cannot remove project owner from project"
             );
 
-        // remove member
-        await prisma.projectMember.delete({
-            where: {
-                projectId_userId: {
-                    projectId,
-                    userId: userIdToRemove,
+        await prisma.$transaction([
+            // Unassign all tasks assigned to this member in this project
+            prisma.task.updateMany({
+                where: {
+                    projectId: projectId,
+                    assigneeId: userIdToRemove,
                 },
-            },
-        });
+                data: {
+                    assigneeId: null,
+                },
+            }),
+
+            // remove member
+            prisma.projectMember.delete({
+                where: {
+                    projectId_userId: {
+                        projectId,
+                        userId: userIdToRemove,
+                    },
+                },
+            }),
+        ]);
 
         return { message: "Member removed successfully" };
     }

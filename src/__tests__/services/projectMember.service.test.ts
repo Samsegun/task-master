@@ -46,8 +46,8 @@ describe("ProjectMemberService", () => {
                 { email: "member@example.com" }
             );
 
-            expect(newMember.userId).toBe(memberId);
-            expect(newMember.role).toBe("MEMBER");
+            expect(newMember?.user.id).toBe(memberId);
+            expect(newMember?.role).toBe("MEMBER");
         });
 
         it("should throw error if user not found", async () => {
@@ -55,7 +55,7 @@ describe("ProjectMemberService", () => {
                 ProjectMemberService.addMember(projectId, ownerId, {
                     email: "notfound@example.com",
                 })
-            ).rejects.toThrow(/email does not exist/i);
+            ).rejects.toThrow(/invalid/i);
         });
 
         it("should throw error if user already a member", async () => {

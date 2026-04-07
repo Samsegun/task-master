@@ -53,8 +53,7 @@ class ProjectService {
             return newProject;
         });
 
-        // return project;
-        return { id: project.id, name: project.name };
+        return project;
     }
 
     static async getUserProjects(userId: string, queryOptions: GetDataOptions) {

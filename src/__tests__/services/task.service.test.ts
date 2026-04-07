@@ -187,11 +187,11 @@ describe("TaskService", () => {
         });
 
         it("should return only tasks assigned to user", async () => {
-            const tasks = await TaskService.getMyTasks(memberId);
+            const tasks = await TaskService.getMyTasks(memberId, { limit: 2 });
 
             expect(tasks).toHaveLength(2);
             tasks.forEach(task => {
-                expect(task.assigneeId).toBe(memberId);
+                expect(task.assignee?.id).toBe(memberId);
             });
         });
     });

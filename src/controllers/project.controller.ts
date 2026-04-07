@@ -16,7 +16,7 @@ class ProjectController {
         res.status(201).json({
             success: true,
             message: "Project created successfully",
-            project,
+            project: { id: project.id, name: project.name },
         });
     });
 

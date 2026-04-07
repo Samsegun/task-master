@@ -33,7 +33,7 @@ describe("ProjectService", () => {
             expect(newProject.name).toBe("project test");
             expect(newProject.ownerId).toBe(userId);
 
-            // Check owner is added as member
+            // check if owner is added as member
             const member = await prisma.projectMember.findUnique({
                 where: {
                     projectId_userId: {
@@ -59,7 +59,9 @@ describe("ProjectService", () => {
             await ProjectService.createProject(userId, { name: "Project 1" });
             await ProjectService.createProject(userId, { name: "Project 2" });
 
-            const projects = await ProjectService.getUserProjects(userId);
+            const projects = await ProjectService.getUserProjects(userId, {
+                limit: 3,
+            });
 
             expect(projects).toHaveLength(2);
         });
