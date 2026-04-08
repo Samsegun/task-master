@@ -3,13 +3,17 @@ import { ValidationError } from "../errors";
 import AuthService from "../services/auth.service";
 import TokenService from "../services/token.service";
 import asyncHandler from "../utils/asyncRequestHandler";
-import { ValidatedAuthRequest } from "../utils/types";
+import {
+    ValidatedLoginRequest,
+    ValidatedRegisterRequest,
+} from "../utils/types";
 
 class AuthController {
     static createUser = asyncHandler(async (req: Request, res: Response) => {
-        const { email, password } = req.body as ValidatedAuthRequest;
+        const { email, password, username } =
+            req.body as ValidatedRegisterRequest;
 
-        const newUser = await AuthService.createUser(email, password);
+        const newUser = await AuthService.createUser(email, password, username);
 
         res.status(201).json({
             success: true,
@@ -19,10 +23,10 @@ class AuthController {
     });
 
     static loginUser = asyncHandler(async (req: Request, res: Response) => {
-        const { email, password } = req.body as ValidatedAuthRequest;
+        const { emailOrusername, password } = req.body as ValidatedLoginRequest;
 
         const { accessToken, refreshToken, user } = await AuthService.loginUser(
-            email,
+            emailOrusername,
             password
         );
 

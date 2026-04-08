@@ -5,8 +5,14 @@ interface ValidationError extends Error {
     data?: { field: string; message: string }[];
 }
 
-type ValidatedAuthRequest = {
+type ValidatedRegisterRequest = {
     email: string;
+    password: string;
+    username: string;
+};
+
+type ValidatedLoginRequest = {
+    emailOrusername: string;
     password: string;
 };
 
@@ -33,6 +39,7 @@ export {
     JwtPayload,
     RefreshTokenPayload,
     User,
-    ValidatedAuthRequest,
+    ValidatedLoginRequest,
+    ValidatedRegisterRequest,
     ValidationError,
 };

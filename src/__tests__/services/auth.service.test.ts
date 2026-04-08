@@ -10,12 +10,14 @@ describe("AuthService", () => {
     const validUserData = {
         email: "test@example.com",
         password: "Password123!",
+        username: "tester",
     };
 
     const createTestUser = async () => {
         return await AuthService.createUser(
             validUserData.email,
-            validUserData.password
+            validUserData.password,
+            validUserData.username
         );
     };
     const userInDB = async () => {
@@ -77,6 +79,7 @@ describe("AuthService", () => {
                 data: {
                     email: validUserData.email,
                     password: hashedPassword,
+                    username: "tester",
                     isVerified: true,
                 },
             });
@@ -106,6 +109,7 @@ describe("AuthService", () => {
                 data: {
                     email: "unverified@example.com",
                     password: hashedPassword,
+                    username: "tester",
                     isVerified: false,
                 },
             });
@@ -132,6 +136,7 @@ describe("AuthService", () => {
                 data: {
                     email: validUserData.email,
                     password: hashedPassword,
+                    username: "tester",
                     verificationToken,
                     verificationTokenExpiry: new Date(
                         Date.now() + 24 * 60 * 60 * 1000
@@ -183,6 +188,7 @@ describe("AuthService", () => {
                 data: {
                     email: validUserData.email,
                     password: hashedPassword,
+                    username: "tester",
                     isVerified: true,
                 },
             });
@@ -224,6 +230,7 @@ describe("AuthService", () => {
                 data: {
                     email: validUserData.email,
                     password: hashedPassword,
+                    username: "tester",
                     isVerified: true,
                     passwordResetToken: resetToken,
                     passwordResetExpiry: new Date(

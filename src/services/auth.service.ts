@@ -7,10 +7,14 @@ import EmailService from "./email.service";
 import TokenService from "./token.service";
 
 class AuthService {
-    static createUser = async (email: string, password: string) => {
-        const userExists = await prisma.user.findUnique({
+    static createUser = async (
+        email: string,
+        password: string,
+        username: string
+    ) => {
+        const userExists = await prisma.user.findFirst({
             where: {
-                email,
+                OR: [{ email }, { username }],
             },
         });
         if (userExists) throw new ValidationError("User already exists");
@@ -28,8 +32,9 @@ class AuthService {
         // create user
         const newUser = await prisma.user.create({
             data: {
-                email: email,
+                email,
                 password: hashedPassword,
+                username,
                 verificationToken,
                 verificationTokenExpiry,
             },
@@ -45,9 +50,11 @@ class AuthService {
         return newUser;
     };
 
-    static loginUser = async (email: string, password: string) => {
-        const user = await prisma.user.findUnique({
-            where: { email },
+    static loginUser = async (emailOrusername: string, password: string) => {
+        const user = await prisma.user.findFirst({
+            where: {
+                OR: [{ email: emailOrusername }, { username: emailOrusername }],
+            },
             select: {
                 id: true,
                 email: true,
@@ -55,6 +62,8 @@ class AuthService {
                 isVerified: true,
                 role: true,
                 username: true,
+                firstName: true,
+                lastName: true,
             },
         });
         if (!user) throw new ValidationError("Invalid credentials");
@@ -84,8 +93,8 @@ class AuthService {
             email: user.email,
             username: user.username,
             role: user.role,
-            // firstName: user.firstName,
-            // lastName: user.lastName,
+            firstName: user.firstName,
+            lastName: user.lastName,
             isVerified: user.isVerified,
         };
 
