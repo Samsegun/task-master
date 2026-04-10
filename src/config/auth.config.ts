@@ -6,15 +6,13 @@ import {
     REFRESH_TOKEN_EXPIRY,
 } from "../utils/tokenManagement";
 
-const REFRESH_PASSWORD_EXPIRATION_TIME = getEnvVariable(
+const REFRESH_PASSWORD_EXPIRATION_TIME: any = getEnvVariable(
     "REFRESH_PASSWORD_EXPIRATION"
 );
 
 const ACCESS_TOKEN_EXPIRY_TIME = parseInt(ms(ACCESS_TOKEN_EXPIRY));
 const REFRESH_TOKEN_EXPIRY_TIME = parseInt(ms(REFRESH_TOKEN_EXPIRY));
-const REFRESH_PASSWORD_TOKEN_EXPIRY = parseInt(
-    REFRESH_PASSWORD_EXPIRATION_TIME
-);
+const REFRESH_PASSWORD_EXPIRY = parseInt(ms(REFRESH_PASSWORD_EXPIRATION_TIME));
 const MAX_AGE = REFRESH_TOKEN_EXPIRY_TIME;
 
 export const baseCookieOptions: CookieOptions = {
@@ -49,5 +47,5 @@ export const refreshTokenCookieOptions = {
 export const authConfig = {
     accessTokenExpiryTime: ACCESS_TOKEN_EXPIRY_TIME,
     refreshTokenExpiryTime: REFRESH_TOKEN_EXPIRY_TIME,
-    refreshPasswordTokenTime: REFRESH_PASSWORD_TOKEN_EXPIRY,
+    refreshPasswordTokenTime: REFRESH_PASSWORD_EXPIRY,
 };

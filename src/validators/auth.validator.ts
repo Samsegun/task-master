@@ -24,10 +24,6 @@ const create = z.object({
         ),
 });
 
-// const login = z.object({
-//     email: z.email("Invalid email format"),
-//     password: z.string().trim(),
-// });
 // user should be able to login wih either email or username
 const login = z.object({
     emailOrusername: z

@@ -49,16 +49,17 @@ class EmailService {
         email: string,
         resetPasswordToken: string
     ) => {
-        const resetPasswordUrl = `${
-            process.env.FRONTEND_URL
-        }/api/auth/reset-password?token=${resetPasswordToken}&email=${encodeURIComponent(
-            email
-        )}`;
         // const resetPasswordUrl = `${
         //     process.env.FRONTEND_URL
-        // }/reset-password?token=${resetPasswordToken}&email=${encodeURIComponent(
+        // }/api/auth/reset-password?token=${resetPasswordToken}&email=${encodeURIComponent(
         //     email
         // )}`;
+
+        const resetPasswordUrl = `${
+            process.env.FRONTEND_URL
+        }/reset-password?token=${resetPasswordToken}&email=${encodeURIComponent(
+            email
+        )}`;
 
         const mailOptions = {
             from: process.env.FROM_EMAIL!,
