@@ -70,7 +70,7 @@ class EmailService {
             <h1>Reset Password</h1>
             <p>Please click the link below to reset your password:</p>
             <a href="${resetPasswordUrl}">Reset Password</a>
-            <p>This link will expire in 1 hour.</p>
+            <p>This link will expire in 10 minutes.</p>
             </section>
           `,
         };
