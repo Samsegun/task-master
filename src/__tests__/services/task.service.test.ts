@@ -16,6 +16,7 @@ describe("TaskService", () => {
             data: {
                 email: "owner@example.com",
                 password: hashedPassword,
+                username: "testuser",
                 isVerified: true,
             },
         });
@@ -26,6 +27,7 @@ describe("TaskService", () => {
             data: {
                 email: "member@example.com",
                 password: hashedPassword,
+                username: "memberuser",
                 isVerified: true,
             },
         });
@@ -64,6 +66,7 @@ describe("TaskService", () => {
                 data: {
                     email: "outsider@example.com",
                     password: "password",
+                    username: "outsideruser",
                     isVerified: true,
                 },
             });
@@ -81,6 +84,7 @@ describe("TaskService", () => {
                 data: {
                     email: "outsider@example.com",
                     password: "password",
+                    username: "outsidertuser",
                     isVerified: true,
                 },
             });
@@ -134,6 +138,7 @@ describe("TaskService", () => {
                 data: {
                     email: "outsider@example.com",
                     password: "password",
+                    username: "outsideruser",
                 },
             });
 

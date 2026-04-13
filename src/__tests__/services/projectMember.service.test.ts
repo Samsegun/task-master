@@ -16,6 +16,7 @@ describe("ProjectMemberService", () => {
             data: {
                 email: "test@example.com",
                 password: hashedPassword,
+                username: "testuser",
                 isVerified: true,
             },
         });
@@ -26,6 +27,7 @@ describe("ProjectMemberService", () => {
             data: {
                 email: "member@example.com",
                 password: hashedPassword,
+                username: "memberuser",
                 isVerified: true,
             },
         });

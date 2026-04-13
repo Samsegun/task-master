@@ -12,6 +12,7 @@ describe("ProjectService", () => {
             data: {
                 email: "test@example.com",
                 password: hashedPassword,
+                username: "testuser",
                 isVerified: true,
             },
         });
@@ -87,6 +88,7 @@ describe("ProjectService", () => {
                 data: {
                     email: "other@example.com",
                     password: "password!W",
+                    username: "testuser",
                 },
             });
 
@@ -126,6 +128,7 @@ describe("ProjectService", () => {
                 data: {
                     email: "member@example.com",
                     password: "password",
+                    username: "memberuser",
                 },
             });
 
@@ -177,6 +180,7 @@ describe("ProjectService", () => {
                 data: {
                     email: "other@example.com",
                     password: "password",
+                    username: "testuser",
                 },
             });
 
