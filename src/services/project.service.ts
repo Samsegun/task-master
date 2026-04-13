@@ -104,7 +104,6 @@ class ProjectService {
             const progress = progressNumber(totalTasks, completedTasks);
 
             /** get latest dueDates from tasks
-             *
              * project due date is same as due date for last created task
              *
              * */
@@ -166,6 +165,7 @@ class ProjectService {
                                 id: true,
                                 firstName: true,
                                 lastName: true,
+                                username: true,
                             },
                         },
                     },

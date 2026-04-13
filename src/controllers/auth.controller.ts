@@ -85,7 +85,7 @@ class AuthController {
 
             res.status(200).json({
                 success: true,
-                message: "Email verified successfully. You can now sign in.",
+                message: "Email verified successfully. You are now signned in.",
                 user,
             });
         }

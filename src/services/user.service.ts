@@ -11,6 +11,7 @@ class UserService {
                 username: true,
                 role: true,
                 isVerified: true,
+                firstName: true,
             },
         });
 

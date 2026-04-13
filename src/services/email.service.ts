@@ -10,8 +10,8 @@ class EmailService {
         email: string,
         verificationToken: string
     ) => {
-        const verificationUrl = `${process.env.FRONTEND_URL}/api/auth/verify-email?token=${verificationToken}`;
-        // const verificationUrl = `${process.env.FRONTEND_URL}/verify-email?token=${token}`;
+        // const verificationUrl = `${process.env.FRONTEND_URL}/api/auth/verify-email?token=${verificationToken}`;
+        const verificationUrl = `${process.env.FRONTEND_URL}/verify-email?token=${verificationToken}`;
 
         const mailOptions = {
             from: emailConfig.FROM_EMAIL,
