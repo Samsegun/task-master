@@ -2,8 +2,8 @@ import z from "zod";
 
 const updateProfile = z
     .object({
-        firstName: z.string().min(3).max(30).optional(),
-        lastName: z.string().min(3).max(30).optional(),
+        firstName: z.string().max(30).optional(),
+        lastName: z.string().max(30).optional(),
         username: z
             .string()
             .min(3)

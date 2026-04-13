@@ -19,9 +19,7 @@ class UserService {
             },
         });
 
-        if (!user) {
-            throw new EntityNotFound("User not found");
-        }
+        if (!user) throw new EntityNotFound("User not found");
 
         return user;
     }
