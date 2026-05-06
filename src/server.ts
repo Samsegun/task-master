@@ -10,6 +10,6 @@ const server = http.createServer(app);
 
 server.listen(config.port, () => {
     console.log(
-        `Server running in ${environment} mode on http://localhost:${config.port}`
+        `Server running in ${environment} mode on http://localhost:${config.port}/api`
     );
 });

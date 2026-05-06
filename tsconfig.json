@@ -10,9 +10,10 @@
         "forceConsistentCasingInFileNames": true,
         "resolveJsonModule": true,
         "moduleResolution": "node",
-        "types": ["node", "jest", "@types/jest", "@prisma/client"]
+        "types": ["node", "jest", "@types/jest", "@prisma/client"],
+        "ignoreDeprecations": "6.0"
     },
-    "include": ["src/**/*"],
+    "include": ["src/**/*", "prisma/**/*"],
     "exclude": ["node_modules", "dist"],
     "ts-node": {
         "files": true

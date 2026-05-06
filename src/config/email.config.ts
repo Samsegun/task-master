@@ -1,5 +1,6 @@
 import { getEnvVariable } from "../utils/tokenManagement";
 
+
 // read all possible variables
 const smtpService = getEnvVariable("SMTP_SERVICE");
 const smtpHost = getEnvVariable("SMTP_HOST");
