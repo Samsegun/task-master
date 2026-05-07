@@ -9,7 +9,7 @@ import config from "./config/appConfig";
 const server = http.createServer(app);
 
 server.listen(config.port, () => {
-    console.log(
-        `Server running in ${environment} mode on http://localhost:${config.port}/api`
-    );
+  console.log(
+    `Server running in ${environment} mode on http://localhost:${config.port}/api`,
+  );
 });
