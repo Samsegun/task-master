@@ -3,358 +3,364 @@ import { EntityNotFound, ForbiddenError, ValidationError } from "../errors";
 import prisma from "../utils/prisma";
 
 class ProjectMemberService {
-  static async addMember(
-    projectId: string,
-    userId: string,
-    data: { email: string; role?: ProjectRole },
-  ) {
-    // check if current user is owner
-    const requesterMember = await prisma.projectMember.findUnique({
-      where: {
-        projectId_userId: {
-          projectId,
-          userId,
-        },
-      },
-    });
-    if (!requesterMember || requesterMember.role !== ProjectRole["OWNER"])
-      throw new ForbiddenError("Only project owner can add members");
-
-    // find user by email
-    const userToAdd = await prisma.user.findUnique({
-      where: { email: data.email },
-      select: {
-        id: true,
-      },
-    });
-    if (!userToAdd) throw new EntityNotFound("Invalid credentials");
-
-    // check if user is already a member
-    const existingMember = await prisma.projectMember.findUnique({
-      where: {
-        projectId_userId: {
-          projectId,
-          userId: userToAdd.id,
-        },
-      },
-    });
-    if (existingMember)
-      throw new ValidationError("User is already a member of this project");
-
-    // if owner role is requested for the new member, perform atomic transfer:
-    if (data.role === ProjectRole["OWNER"]) {
-      // create new member as OWNER
-      await prisma.$transaction([
-        prisma.projectMember.create({
-          data: {
-            projectId,
-            userId: userToAdd.id,
-            role: ProjectRole["OWNER"],
-          },
-        }),
-
-        // demote current owner (requester) to MEMBER
-        prisma.projectMember.update({
-          where: {
-            projectId_userId: {
-              projectId,
-              userId,
+    static async addMember(
+        projectId: string,
+        userId: string,
+        data: { email: string; role?: ProjectRole },
+    ) {
+        // check if current user is owner
+        const requesterMember = await prisma.projectMember.findUnique({
+            where: {
+                projectId_userId: {
+                    projectId,
+                    userId,
+                },
             },
-          },
-          data: { role: ProjectRole["MEMBER"] },
-        }),
+        });
+        if (!requesterMember || requesterMember.role !== ProjectRole["OWNER"])
+            throw new ForbiddenError("Only project owner can add members");
 
-        // update project's ownerId to the new owner
-        prisma.project.update({
-          where: { id: projectId },
-          data: { ownerId: userToAdd.id },
-        }),
-      ]);
-
-      const created = await prisma.projectMember.findUnique({
-        where: {
-          projectId_userId: {
-            projectId,
-            userId: userToAdd.id,
-          },
-        },
-        select: {
-          user: {
+        // find user by email
+        const userToAdd = await prisma.user.findUnique({
+            where: { email: data.email },
             select: {
-              id: true,
-              email: true,
+                id: true,
             },
-          },
-          role: true,
-        },
-      });
+        });
+        if (!userToAdd) throw new EntityNotFound("Invalid credentials");
 
-      return created;
+        // check if user is already a member
+        const existingMember = await prisma.projectMember.findUnique({
+            where: {
+                projectId_userId: {
+                    projectId,
+                    userId: userToAdd.id,
+                },
+            },
+        });
+        if (existingMember)
+            throw new ValidationError(
+                "User is already a member of this project",
+            );
+
+        // if owner role is requested for the new member, perform atomic transfer:
+        if (data.role === ProjectRole["OWNER"]) {
+            // create new member as OWNER
+            await prisma.$transaction([
+                prisma.projectMember.create({
+                    data: {
+                        projectId,
+                        userId: userToAdd.id,
+                        role: ProjectRole["OWNER"],
+                    },
+                }),
+
+                // demote current owner (requester) to MEMBER
+                prisma.projectMember.update({
+                    where: {
+                        projectId_userId: {
+                            projectId,
+                            userId,
+                        },
+                    },
+                    data: { role: ProjectRole["MEMBER"] },
+                }),
+
+                // update project's ownerId to the new owner
+                prisma.project.update({
+                    where: { id: projectId },
+                    data: { ownerId: userToAdd.id },
+                }),
+            ]);
+
+            const created = await prisma.projectMember.findUnique({
+                where: {
+                    projectId_userId: {
+                        projectId,
+                        userId: userToAdd.id,
+                    },
+                },
+                select: {
+                    user: {
+                        select: {
+                            id: true,
+                            email: true,
+                        },
+                    },
+                    role: true,
+                },
+            });
+
+            return created;
+        }
+
+        // add member
+        const newMember = await prisma.projectMember.create({
+            data: {
+                projectId,
+                userId: userToAdd.id,
+                role: data.role || ProjectRole["MEMBER"],
+            },
+            select: {
+                user: {
+                    select: {
+                        id: true,
+                        email: true,
+                    },
+                },
+                role: true,
+            },
+        });
+
+        return newMember;
     }
 
-    // add member
-    const newMember = await prisma.projectMember.create({
-      data: {
-        projectId,
-        userId: userToAdd.id,
-        role: data.role || ProjectRole["MEMBER"],
-      },
-      select: {
-        user: {
-          select: {
-            id: true,
-            email: true,
-          },
-        },
-        role: true,
-      },
-    });
-
-    return newMember;
-  }
-
-  static async getMembers(projectId: string, userId: string) {
-    // check if user has access
-    const member = await prisma.projectMember.findUnique({
-      where: {
-        projectId_userId: {
-          projectId,
-          userId,
-        },
-      },
-    });
-    if (!member)
-      throw new ForbiddenError("You do not have access to this project");
-
-    const projectMembers = await prisma.projectMember.findMany({
-      where: { projectId },
-      select: {
-        id: true,
-        projectId: true,
-        user: {
-          select: {
-            id: true,
-            firstName: true,
-            lastName: true,
-          },
-        },
-        role: true,
-        joinedAt: true,
-      },
-      orderBy: {
-        joinedAt: "desc",
-      },
-    });
-
-    return projectMembers;
-  }
-
-  static async updateMemberRole(
-    projectId: string,
-    userIdToUpdate: string,
-    requesterId: string,
-    newRole: ProjectRole,
-  ) {
-    // check if requester is owner
-    const requesterMember = await prisma.projectMember.findUnique({
-      where: {
-        projectId_userId: {
-          projectId,
-          userId: requesterId,
-        },
-      },
-    });
-    if (!requesterMember || requesterMember.role !== "OWNER")
-      throw new ForbiddenError("Only project owner can update member roles");
-
-    // check if member exists
-    const memberToUpdate = await prisma.projectMember.findUnique({
-      where: {
-        projectId_userId: {
-          projectId,
-          userId: userIdToUpdate,
-        },
-      },
-    });
-    if (!memberToUpdate || memberToUpdate.projectId !== projectId)
-      throw new EntityNotFound("Member not found in this project");
-
-    if (requesterId === userIdToUpdate && newRole !== "OWNER")
-      throw new ForbiddenError(
-        "Project owner cannot change their own role. Promote another member to owner first or delete the project.",
-      );
-
-    // if promoting someone to OWNER, demote current owner to MEMBER
-    if (newRole === "OWNER") {
-      await prisma.$transaction([
-        // demote current owner to MEMBER
-        prisma.projectMember.update({
-          where: {
-            projectId_userId: {
-              projectId,
-              userId: requesterId,
+    static async getMembers(projectId: string, userId: string) {
+        // check if user has access
+        const member = await prisma.projectMember.findUnique({
+            where: {
+                projectId_userId: {
+                    projectId,
+                    userId,
+                },
             },
-          },
-          data: { role: "MEMBER" },
-        }),
-        // promote new owner to OWNER
-        prisma.projectMember.update({
-          where: {
-            projectId_userId: {
-              projectId,
-              userId: userIdToUpdate,
+        });
+        if (!member)
+            throw new ForbiddenError("You do not have access to this project");
+
+        const projectMembers = await prisma.projectMember.findMany({
+            where: { projectId },
+            select: {
+                id: true,
+                projectId: true,
+                user: {
+                    select: {
+                        id: true,
+                        firstName: true,
+                        lastName: true,
+                    },
+                },
+                role: true,
+                joinedAt: true,
             },
-          },
-          data: { role: "OWNER" },
-        }),
-        // update project ownerId
-        prisma.project.update({
-          where: { id: projectId },
-          data: { ownerId: userIdToUpdate },
-        }),
-      ]);
-    } else {
-      // just update to MEMBER or any other role that comes up in later versions of the app (normal role change)
-      await prisma.projectMember.update({
-        where: {
-          projectId_userId: {
-            projectId,
-            userId: userIdToUpdate,
-          },
-        },
-        data: { role: newRole },
-      });
+            orderBy: {
+                joinedAt: "desc",
+            },
+        });
+
+        return projectMembers;
     }
 
-    const updatedMember = await prisma.projectMember.findUnique({
-      where: {
-        projectId_userId: {
-          projectId,
-          userId: userIdToUpdate,
-        },
-      },
-      include: {
-        user: {
-          select: {
-            id: true,
-            email: true,
-          },
-        },
-      },
-    });
+    static async updateMemberRole(
+        projectId: string,
+        userIdToUpdate: string,
+        requesterId: string,
+        newRole: ProjectRole,
+    ) {
+        // check if requester is owner
+        const requesterMember = await prisma.projectMember.findUnique({
+            where: {
+                projectId_userId: {
+                    projectId,
+                    userId: requesterId,
+                },
+            },
+        });
+        if (!requesterMember || requesterMember.role !== "OWNER")
+            throw new ForbiddenError(
+                "Only project owner can update member roles",
+            );
 
-    return updatedMember;
-  }
+        // check if member exists
+        const memberToUpdate = await prisma.projectMember.findUnique({
+            where: {
+                projectId_userId: {
+                    projectId,
+                    userId: userIdToUpdate,
+                },
+            },
+        });
+        if (!memberToUpdate || memberToUpdate.projectId !== projectId)
+            throw new EntityNotFound("Member not found in this project");
 
-  static async removeMember(
-    projectId: string,
-    userIdToRemove: string,
-    requesterId: string,
-  ) {
-    // check if requester is owner
-    const requesterMember = await prisma.projectMember.findUnique({
-      where: {
-        projectId_userId: {
-          projectId,
-          userId: requesterId,
-        },
-      },
-    });
-    if (!requesterMember || requesterMember.role !== "OWNER")
-      throw new ForbiddenError("Only project owner can remove members");
+        if (requesterId === userIdToUpdate && newRole !== "OWNER")
+            throw new ForbiddenError(
+                "Project owner cannot change their own role. Promote another member to owner first or delete the project.",
+            );
 
-    // check if member exists
-    const memberToRemove = await prisma.projectMember.findUnique({
-      where: {
-        projectId_userId: {
-          projectId,
-          userId: userIdToRemove,
-        },
-      },
-    });
-    if (!memberToRemove)
-      throw new EntityNotFound("Member not found in this project");
+        // if promoting someone to OWNER, demote current owner to MEMBER
+        if (newRole === "OWNER") {
+            await prisma.$transaction([
+                // demote current owner to MEMBER
+                prisma.projectMember.update({
+                    where: {
+                        projectId_userId: {
+                            projectId,
+                            userId: requesterId,
+                        },
+                    },
+                    data: { role: "MEMBER" },
+                }),
+                // promote new owner to OWNER
+                prisma.projectMember.update({
+                    where: {
+                        projectId_userId: {
+                            projectId,
+                            userId: userIdToUpdate,
+                        },
+                    },
+                    data: { role: "OWNER" },
+                }),
+                // update project ownerId
+                prisma.project.update({
+                    where: { id: projectId },
+                    data: { ownerId: userIdToUpdate },
+                }),
+            ]);
+        } else {
+            // just update to MEMBER or any other role that comes up in later versions of the app (normal role change)
+            await prisma.projectMember.update({
+                where: {
+                    projectId_userId: {
+                        projectId,
+                        userId: userIdToUpdate,
+                    },
+                },
+                data: { role: newRole },
+            });
+        }
 
-    // prevent removing project owner
-    const project = await prisma.project.findUnique({
-      where: { id: projectId },
-      select: { ownerId: true },
-    });
-    if (userIdToRemove === project?.ownerId)
-      throw new ForbiddenError("Cannot remove project owner from project");
+        const updatedMember = await prisma.projectMember.findUnique({
+            where: {
+                projectId_userId: {
+                    projectId,
+                    userId: userIdToUpdate,
+                },
+            },
+            include: {
+                user: {
+                    select: {
+                        id: true,
+                        email: true,
+                    },
+                },
+            },
+        });
 
-    await prisma.$transaction([
-      // Unassign all tasks assigned to this member in this project
-      prisma.task.updateMany({
-        where: {
-          projectId: projectId,
-          assigneeId: userIdToRemove,
-        },
-        data: {
-          assigneeId: null,
-        },
-      }),
-
-      // remove member
-      prisma.projectMember.delete({
-        where: {
-          projectId_userId: {
-            projectId,
-            userId: userIdToRemove,
-          },
-        },
-      }),
-    ]);
-
-    return { message: "Member removed successfully" };
-  }
-
-  static async leaveProject(projectId: string, userId: string) {
-    // check if user is a member
-    const member = await prisma.projectMember.findUnique({
-      where: {
-        projectId_userId: {
-          projectId,
-          userId,
-        },
-      },
-    });
-    if (!member)
-      throw new EntityNotFound("You are not a member of this project");
-
-    // check if user is the owner
-    const project = await prisma.project.findUnique({
-      where: { id: projectId },
-      select: { ownerId: true },
-    });
-    if (project?.ownerId === userId) {
-      // check if there's at least one other owner
-      const otherOwners = await prisma.projectMember.count({
-        where: {
-          projectId,
-          role: "OWNER",
-          userId: { not: userId },
-        },
-      });
-
-      if (otherOwners === 0)
-        throw new ForbiddenError(
-          "Project owner cannot leave. Promote another member to owner first or delete the project.",
-        );
+        return updatedMember;
     }
 
-    // leave project
-    await prisma.projectMember.delete({
-      where: {
-        projectId_userId: {
-          projectId,
-          userId,
-        },
-      },
-    });
+    static async removeMember(
+        projectId: string,
+        userIdToRemove: string,
+        requesterId: string,
+    ) {
+        // check if requester is owner
+        const requesterMember = await prisma.projectMember.findUnique({
+            where: {
+                projectId_userId: {
+                    projectId,
+                    userId: requesterId,
+                },
+            },
+        });
+        if (!requesterMember || requesterMember.role !== "OWNER")
+            throw new ForbiddenError("Only project owner can remove members");
 
-    return { message: "You have left the project successfully" };
-  }
+        // check if member exists
+        const memberToRemove = await prisma.projectMember.findUnique({
+            where: {
+                projectId_userId: {
+                    projectId,
+                    userId: userIdToRemove,
+                },
+            },
+        });
+        if (!memberToRemove)
+            throw new EntityNotFound("Member not found in this project");
+
+        // prevent removing project owner
+        const project = await prisma.project.findUnique({
+            where: { id: projectId },
+            select: { ownerId: true },
+        });
+        if (userIdToRemove === project?.ownerId)
+            throw new ForbiddenError(
+                "Cannot remove project owner from project",
+            );
+
+        await prisma.$transaction([
+            // Unassign all tasks assigned to this member in this project
+            prisma.task.updateMany({
+                where: {
+                    projectId: projectId,
+                    assigneeId: userIdToRemove,
+                },
+                data: {
+                    assigneeId: null,
+                },
+            }),
+
+            // remove member
+            prisma.projectMember.delete({
+                where: {
+                    projectId_userId: {
+                        projectId,
+                        userId: userIdToRemove,
+                    },
+                },
+            }),
+        ]);
+
+        return { message: "Member removed successfully" };
+    }
+
+    static async leaveProject(projectId: string, userId: string) {
+        // check if user is a member
+        const member = await prisma.projectMember.findUnique({
+            where: {
+                projectId_userId: {
+                    projectId,
+                    userId,
+                },
+            },
+        });
+        if (!member)
+            throw new EntityNotFound("You are not a member of this project");
+
+        // check if user is the owner
+        const project = await prisma.project.findUnique({
+            where: { id: projectId },
+            select: { ownerId: true },
+        });
+        if (project?.ownerId === userId) {
+            // check if there's at least one other owner
+            const otherOwners = await prisma.projectMember.count({
+                where: {
+                    projectId,
+                    role: "OWNER",
+                    userId: { not: userId },
+                },
+            });
+
+            if (otherOwners === 0)
+                throw new ForbiddenError(
+                    "Project owner cannot leave. Promote another member to owner first or delete the project.",
+                );
+        }
+
+        // leave project
+        await prisma.projectMember.delete({
+            where: {
+                projectId_userId: {
+                    projectId,
+                    userId,
+                },
+            },
+        });
+
+        return { message: "You have left the project successfully" };
+    }
 }
 
 export default ProjectMemberService;

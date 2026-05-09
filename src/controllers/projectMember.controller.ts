@@ -5,40 +5,50 @@ import asyncHandler from "../utils/asyncRequestHandler";
 import { AddProjectMember } from "../validators/project.validator";
 
 class ProjectMemberController {
-    static addMember = asyncHandler(async (req: Request, res: Response) => {
-        const userId = (req as any).userId;
-        const { projectId } = req.params;
-        const data = req.body as AddProjectMember;
+    static addMember = asyncHandler(
+        async (req: Request<{ projectId: string }>, res: Response) => {
+            const userId = (req as any).userId;
+            const { projectId } = req.params;
+            const data = req.body as AddProjectMember;
 
-        const newMember = await ProjectMemberService.addMember(
-            projectId,
-            userId,
-            data
-        );
+            const newMember = await ProjectMemberService.addMember(
+                projectId,
+                userId,
+                data,
+            );
 
-        res.status(201).json({
-            success: true,
-            newMember: { id: newMember?.user.id, email: newMember?.user.email },
-        });
-    });
+            res.status(201).json({
+                success: true,
+                newMember: {
+                    id: newMember?.user.id,
+                    email: newMember?.user.email,
+                },
+            });
+        },
+    );
 
-    static getMembers = asyncHandler(async (req: Request, res: Response) => {
-        const userId = (req as any).userId;
-        const { projectId } = req.params;
+    static getMembers = asyncHandler(
+        async (req: Request<{ projectId: string }>, res: Response) => {
+            const userId = (req as any).userId;
+            const { projectId } = req.params;
 
-        const projectMembers = await ProjectMemberService.getMembers(
-            projectId,
-            userId
-        );
+            const projectMembers = await ProjectMemberService.getMembers(
+                projectId,
+                userId,
+            );
 
-        res.status(200).json({
-            success: true,
-            projectMembers,
-        });
-    });
+            res.status(200).json({
+                success: true,
+                projectMembers,
+            });
+        },
+    );
 
     static updateMemberRole = asyncHandler(
-        async (req: Request, res: Response) => {
+        async (
+            req: Request<{ projectId: string; userIdToUpdate: string }>,
+            res: Response,
+        ) => {
             const requesterId = (req as any).userId;
             const { projectId, userIdToUpdate } = req.params;
             const { role } = req.body as { role: ProjectRole };
@@ -47,46 +57,53 @@ class ProjectMemberController {
                 projectId,
                 userIdToUpdate,
                 requesterId,
-                role
+                role,
             );
 
             res.status(200).json({
                 success: true,
                 updatedMember,
             });
-        }
+        },
     );
 
-    static removeMember = asyncHandler(async (req: Request, res: Response) => {
-        const requesterId = (req as any).userId;
-        const { projectId, userIdToRemove } = req.params;
+    static removeMember = asyncHandler(
+        async (
+            req: Request<{ projectId: string; userIdToRemove: string }>,
+            res: Response,
+        ) => {
+            const requesterId = (req as any).userId;
+            const { projectId, userIdToRemove } = req.params;
 
-        const result = await ProjectMemberService.removeMember(
-            projectId,
-            userIdToRemove,
-            requesterId
-        );
+            const result = await ProjectMemberService.removeMember(
+                projectId,
+                userIdToRemove,
+                requesterId,
+            );
 
-        res.status(200).json({
-            success: true,
-            message: result.message,
-        });
-    });
+            res.status(200).json({
+                success: true,
+                message: result.message,
+            });
+        },
+    );
 
-    static leaveProject = asyncHandler(async (req: Request, res: Response) => {
-        const userId = (req as any).userId;
-        const { projectId } = req.params;
+    static leaveProject = asyncHandler(
+        async (req: Request<{ projectId: string }>, res: Response) => {
+            const userId = (req as any).userId;
+            const { projectId } = req.params;
 
-        const result = await ProjectMemberService.leaveProject(
-            projectId,
-            userId
-        );
+            const result = await ProjectMemberService.leaveProject(
+                projectId,
+                userId,
+            );
 
-        res.status(200).json({
-            success: true,
-            message: result.message,
-        });
-    });
+            res.status(200).json({
+                success: true,
+                message: result.message,
+            });
+        },
+    );
 }
 
 export default ProjectMemberController;

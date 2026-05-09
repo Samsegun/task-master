@@ -8,22 +8,28 @@ import {
 } from "../validators/task.validator";
 
 class TaskController {
-    static createTask = asyncHandler(async (req: Request, res: Response) => {
-        const userId = (req as any).userId;
-        const data = req.body as CreateTask;
-        const { projectId } = req.params;
+    static createTask = asyncHandler(
+        async (req: Request<{ projectId: string }>, res: Response) => {
+            const userId = (req as any).userId;
+            const data = req.body as CreateTask;
+            const { projectId } = req.params;
 
-        const task = await TaskService.createTask(projectId, userId, data);
+            const task = await TaskService.createTask(projectId, userId, data);
 
-        res.status(201).json({
-            success: true,
-            message: "Task created successfully",
-            task: { id: task.id, title: task.title, projectId: task.projectId },
-        });
-    });
+            res.status(201).json({
+                success: true,
+                message: "Task created successfully",
+                task: {
+                    id: task.id,
+                    title: task.title,
+                    projectId: task.projectId,
+                },
+            });
+        },
+    );
 
     static getProjectTasks = asyncHandler(
-        async (req: Request, res: Response) => {
+        async (req: Request<{ projectId: string }>, res: Response) => {
             const userId = (req as any).userId;
 
             const { projectId } = req.params;
@@ -36,7 +42,7 @@ class TaskController {
                 projectId,
                 userId,
                 { limit },
-                filters
+                filters,
             );
 
             res.status(200).json({
@@ -44,61 +50,78 @@ class TaskController {
                 tasks,
                 userId,
             });
-        }
+        },
     );
 
     static getProjectTask = asyncHandler(
-        async (req: Request, res: Response) => {
+        async (
+            req: Request<{ projectId: string; taskId: string }>,
+            res: Response,
+        ) => {
             const userId = (req as any).userId;
             const { projectId, taskId } = req.params;
 
             const task = await TaskService.getProjectTask(
                 projectId,
                 taskId,
-                userId
+                userId,
             );
 
             res.status(200).json({
                 success: true,
                 task,
             });
-        }
+        },
     );
 
-    static updateTask = asyncHandler(async (req: Request, res: Response) => {
-        const userId = (req as any).userId;
-        const { projectId, taskId } = req.params;
-        const data = req.body as UpdateTask;
+    static updateTask = asyncHandler(
+        async (
+            req: Request<{ projectId: string; taskId: string }>,
+            res: Response,
+        ) => {
+            const userId = (req as any).userId;
+            const { projectId, taskId } = req.params;
+            const data = req.body as UpdateTask;
 
-        const task = await TaskService.updateTask(
-            projectId,
-            taskId,
-            userId,
-            data
-        );
+            const task = await TaskService.updateTask(
+                projectId,
+                taskId,
+                userId,
+                data,
+            );
 
-        res.status(200).json({
-            success: true,
-            message: "Task updated successfully",
-            task: {
-                id: task.id,
-                title: task.title,
-                projectId: task.projectId,
-            },
-        });
-    });
+            res.status(200).json({
+                success: true,
+                message: "Task updated successfully",
+                task: {
+                    id: task.id,
+                    title: task.title,
+                    projectId: task.projectId,
+                },
+            });
+        },
+    );
 
-    static deleteTask = asyncHandler(async (req: Request, res: Response) => {
-        const userId = (req as any).userId;
-        const { projectId, taskId } = req.params;
+    static deleteTask = asyncHandler(
+        async (
+            req: Request<{ projectId: string; taskId: string }>,
+            res: Response,
+        ) => {
+            const userId = (req as any).userId;
+            const { projectId, taskId } = req.params;
 
-        const result = await TaskService.deleteTask(projectId, taskId, userId);
+            const result = await TaskService.deleteTask(
+                projectId,
+                taskId,
+                userId,
+            );
 
-        res.status(200).json({
-            success: true,
-            message: result.message,
-        });
-    });
+            res.status(200).json({
+                success: true,
+                message: result.message,
+            });
+        },
+    );
 
     static getMyTasks = asyncHandler(async (req: Request, res: Response) => {
         const userId = (req as any).userId;
@@ -142,7 +165,7 @@ class TaskController {
                 success: true,
                 data: tasks,
             });
-        }
+        },
     );
 }
 

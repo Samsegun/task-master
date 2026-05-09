@@ -48,47 +48,63 @@ class ProjectController {
                 success: true,
                 projects,
             });
-        }
+        },
     );
 
-    static getProject = asyncHandler(async (req: Request, res: Response) => {
-        const userId = (req as any).userId;
-        const { projectId } = req.params;
+    static getProject = asyncHandler(
+        async (req: Request<{ projectId: string }>, res: Response) => {
+            const userId = (req as any).userId;
+            const { projectId } = req.params;
 
-        const project = await ProjectService.getProjectById(projectId, userId);
+            const project = await ProjectService.getProjectById(
+                projectId,
+                userId,
+            );
 
-        res.status(200).json({
-            success: true,
-            project,
-        });
-    });
+            res.status(200).json({
+                success: true,
+                project,
+            });
+        },
+    );
 
-    static updateProject = asyncHandler(async (req: Request, res: Response) => {
-        const userId = (req as any).userId;
-        const { projectId } = req.params;
-        const data = req.body as UpdateProject;
+    static updateProject = asyncHandler(
+        async (req: Request<{ projectId: string }>, res: Response) => {
+            const userId = (req as any).userId;
+            const { projectId } = req.params;
+            const data = req.body as UpdateProject;
 
-        const project = await ProjectService.updateProject(projectId, userId, {
-            ...data,
-        });
+            const project = await ProjectService.updateProject(
+                projectId,
+                userId,
+                {
+                    ...data,
+                },
+            );
 
-        res.status(200).json({
-            success: true,
-            project,
-        });
-    });
+            res.status(200).json({
+                success: true,
+                project,
+            });
+        },
+    );
 
-    static deleteProject = asyncHandler(async (req: Request, res: Response) => {
-        const userId = (req as any).userId;
-        const { projectId } = req.params;
+    static deleteProject = asyncHandler(
+        async (req: Request<{ projectId: string }>, res: Response) => {
+            const userId = (req as any).userId;
+            const { projectId } = req.params;
 
-        const result = await ProjectService.deleteProject(projectId, userId);
+            const result = await ProjectService.deleteProject(
+                projectId,
+                userId,
+            );
 
-        res.status(200).json({
-            success: true,
-            message: result.message,
-        });
-    });
+            res.status(200).json({
+                success: true,
+                message: result.message,
+            });
+        },
+    );
 }
 
 export default ProjectController;

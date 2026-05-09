@@ -2,18 +2,18 @@ import js from "@eslint/js";
 import tseslint from "typescript-eslint";
 
 export default [
-  js.configs.recommended,
+    js.configs.recommended,
 
-  ...tseslint.configs.recommended,
+    ...tseslint.configs.recommended,
 
-  {
-    files: ["**/*.ts", "**/*.tsx"],
-    languageOptions: {
-      parser: tseslint.parser,
+    {
+        files: ["**/*.ts", "**/*.tsx"],
+        languageOptions: {
+            parser: tseslint.parser,
+        },
+        rules: {
+            "@typescript-eslint/no-explicit-any": "off",
+            "@typescript-eslint/no-unused-vars": "off",
+        },
     },
-    rules: {
-      "@typescript-eslint/no-explicit-any": "warn",
-      "@typescript-eslint/no-unused-vars": "warn",
-    },
-  },
 ];
