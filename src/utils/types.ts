@@ -8,7 +8,6 @@ interface ValidationError extends Error {
 type ValidatedRegisterRequest = {
     email: string;
     password: string;
-    username: string;
 };
 
 type ValidatedLoginRequest = {

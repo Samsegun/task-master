@@ -5,16 +5,13 @@ import { comparePassword, hashPassword } from "../utils/passwordUtils";
 import prisma from "../utils/prisma";
 import EmailService from "./email.service";
 import TokenService from "./token.service";
+import { generateUniqueUsername } from "../utils/username";
 
 class AuthService {
-    static createUser = async (
-        email: string,
-        password: string,
-        username: string
-    ) => {
-        const userExists = await prisma.user.findFirst({
+    static createUser = async (email: string, password: string) => {
+        const userExists = await prisma.user.findUnique({
             where: {
-                OR: [{ email }, { username }],
+                email,
             },
         });
         if (userExists) throw new ValidationError("User already exists");
@@ -26,8 +23,12 @@ class AuthService {
         // generate verification token
         const verificationToken = randomUUID();
         const verificationTokenExpiry = new Date(
-            Date.now() + 24 * 60 * 60 * 1000
+            Date.now() + 24 * 60 * 60 * 1000,
         );
+
+        // generate unique username based on email prefix
+        // const emailPrefix = email.split("@")[0];
+        const username = await generateUniqueUsername();
 
         // create user
         const newUser = await prisma.user.create({
@@ -85,7 +86,7 @@ class AuthService {
         const { accessToken, refreshToken } =
             await TokenService.createAuthTokens(
                 authTokensArgs.userId,
-                authTokensArgs.isVerified
+                authTokensArgs.isVerified,
             );
 
         const safeUser = {
@@ -176,7 +177,7 @@ class AuthService {
         const { accessToken, refreshToken } =
             await TokenService.createAuthTokens(
                 authTokensArgs.userId,
-                authTokensArgs.isVerified
+                authTokensArgs.isVerified,
             );
 
         const userDetails = {
@@ -199,7 +200,7 @@ class AuthService {
 
         const resetPasswordToken = randomUUID();
         const resetPasswordTokenExpiry = new Date(
-            Date.now() + authConfig.refreshPasswordTokenTime
+            Date.now() + authConfig.refreshPasswordTokenTime,
         );
 
         // update user with reset token

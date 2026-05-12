@@ -10,10 +10,9 @@ import {
 
 class AuthController {
     static createUser = asyncHandler(async (req: Request, res: Response) => {
-        const { email, password, username } =
-            req.body as ValidatedRegisterRequest;
+        const { email, password } = req.body as ValidatedRegisterRequest;
 
-        const newUser = await AuthService.createUser(email, password, username);
+        const newUser = await AuthService.createUser(email, password);
 
         res.status(201).json({
             success: true,
@@ -27,7 +26,7 @@ class AuthController {
 
         const { accessToken, refreshToken, user } = await AuthService.loginUser(
             emailOrusername,
-            password
+            password,
         );
 
         // set cookies
@@ -66,7 +65,7 @@ class AuthController {
                 success: true,
                 message: "Tokens refreshed successfully",
             });
-        }
+        },
     );
 
     static verifyUserMail = asyncHandler(
@@ -88,16 +87,15 @@ class AuthController {
                 message: "Email verified successfully. You are now signned in.",
                 user,
             });
-        }
+        },
     );
 
     static forgotPassword = asyncHandler(
         async (req: Request, res: Response) => {
             const { email } = req.body as { email: string };
 
-            const resetPasswordMailSent = await AuthService.forgotPassword(
-                email
-            );
+            const resetPasswordMailSent =
+                await AuthService.forgotPassword(email);
 
             // try to prevent an email-enumeration attack
             if (!resetPasswordMailSent.success) {
@@ -114,7 +112,7 @@ class AuthController {
                 message:
                     "If an account with this email exists, a password reset link has been sent.",
             });
-        }
+        },
     );
 
     static resetPassword = asyncHandler(async (req: Request, res: Response) => {
@@ -128,7 +126,7 @@ class AuthController {
 
         const passwordUpdated = await AuthService.resetPassword(
             token,
-            password
+            password,
         );
 
         TokenService.clearAuthCookies(res);

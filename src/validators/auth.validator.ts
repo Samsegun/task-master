@@ -11,16 +11,7 @@ const create = z.object({
         .regex(/[0-9]/, "Password must contain at least one number")
         .regex(
             /[@$!%*?&]/,
-            "Password must contain at least one special character"
-        ),
-    username: z
-        .string()
-        .trim()
-        .min(3, "Username must be at least 3 characters")
-        .max(30, "Username must be at most 30 characters")
-        .regex(
-            /^[a-zA-Z0-9_]+$/,
-            "Username may contain letters, numbers and underscores only"
+            "Password must contain at least one special character",
         ),
 });
 
@@ -30,7 +21,7 @@ const login = z.object({
         .string()
         .trim()
         .refine(
-            value => {
+            (value) => {
                 const isEmail = z.email().safeParse(value).success;
                 const isUsername = /^[a-zA-Z0-9_]+$/.test(value);
 
@@ -38,14 +29,13 @@ const login = z.object({
             },
             {
                 message: "Enter a valid email or username",
-            }
+            },
         ),
     password: z.string().trim(),
 });
 
 const validateForgotPassword = create.omit({
     password: true,
-    username: true,
 });
 
 const validateResetPassword = z.object({

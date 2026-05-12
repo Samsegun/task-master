@@ -11,7 +11,7 @@ import { CreateProject } from "../validators/project.validator";
 
 class ProjectService {
     static async createProject(ownerId: string, data: CreateProject) {
-        const project = await prisma.$transaction(async tx => {
+        const project = await prisma.$transaction(async (tx) => {
             const { name, description } = data;
 
             const owner = await tx.user.findUnique({
@@ -31,7 +31,7 @@ class ProjectService {
             });
             if (projectExistsByName)
                 throw new ValidationError(
-                    "You already have a project with this name"
+                    "You already have a project with this name",
                 );
 
             const newProject = await tx.project.create({
@@ -98,7 +98,7 @@ class ProjectService {
         });
 
         // computed progress and due date for each project
-        const projectsWithMetrics = projects.map(project => {
+        const projectsWithMetrics = projects.map((project) => {
             const totalTasks = projectTasksLength(project.tasks);
             const completedTasks = numOfcompletedTasks(project.tasks);
             const progress = progressNumber(totalTasks, completedTasks);
@@ -108,12 +108,12 @@ class ProjectService {
              *
              * */
             const dueDates = project.tasks
-                .map(t => t.dueDate)
+                .map((t) => t.dueDate)
                 .filter((date): date is Date => date != null);
 
             const dueDate =
                 dueDates.length > 0
-                    ? new Date(Math.max(...dueDates.map(d => d.getTime())))
+                    ? new Date(Math.max(...dueDates.map((d) => d.getTime())))
                     : null;
 
             const { tasks, ...projectData } = project;
@@ -190,11 +190,11 @@ class ProjectService {
 
         // get latest dueDates from tasks
         const dueDates = project.tasks
-            .map(t => t.dueDate)
+            .map((t) => t.dueDate)
             .filter((date): date is Date => date != null);
         const dueDate =
             dueDates.length > 0
-                ? new Date(Math.max(...dueDates.map(d => d.getTime())))
+                ? new Date(Math.max(...dueDates.map((d) => d.getTime())))
                 : null;
 
         const projectData = {
@@ -215,7 +215,7 @@ class ProjectService {
     static async updateProject(
         projectId: string,
         userId: string,
-        data: { name?: string; description?: string; status?: ProjectStatus }
+        data: { name?: string; description?: string; status?: ProjectStatus },
     ) {
         // check if user is owner or has permission
         const member = await prisma.projectMember.findUnique({
@@ -228,7 +228,7 @@ class ProjectService {
         });
         if (!member || member.role !== "OWNER")
             throw new ForbiddenError(
-                "Only project owner can update project details"
+                "Only project owner can update project details",
             );
 
         const project = await prisma.project.update({
@@ -248,7 +248,7 @@ class ProjectService {
         }
         if (project.ownerId !== userId) {
             throw new ForbiddenError(
-                "Only project owner can delete this project"
+                "Only project owner can delete this project",
             );
         }
 
