@@ -68,6 +68,7 @@ class ProjectService {
                 members: {
                     some: {
                         userId,
+                        status: "ACTIVE",
                     },
                 },
             },
@@ -140,7 +141,7 @@ class ProjectService {
                 },
             },
         });
-        if (!member)
+        if (!member || member.status !== "ACTIVE")
             throw new ForbiddenError("You do not have access to this project");
 
         const project = await prisma.project.findUnique({

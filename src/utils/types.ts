@@ -8,6 +8,7 @@ interface ValidationError extends Error {
 type ValidatedRegisterRequest = {
     email: string;
     password: string;
+    invitationToken?: string;
 };
 
 type ValidatedLoginRequest = {
@@ -25,6 +26,14 @@ interface RefreshTokenPayload {
     tokenId: string;
 }
 
+interface InvitationTokenPayload {
+    type: "existing_user" | "new_user";
+    projectId: string;
+    userId?: string;
+    invitationId?: string;
+    email?: string;
+}
+
 type User = Omit<PrismaUser, "password">;
 
 interface GetDataOptions {
@@ -37,6 +46,7 @@ export {
     GetDataOptions,
     JwtPayload,
     RefreshTokenPayload,
+    InvitationTokenPayload,
     User,
     ValidatedLoginRequest,
     ValidatedRegisterRequest,

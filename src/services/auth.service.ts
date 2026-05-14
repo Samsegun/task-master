@@ -8,7 +8,11 @@ import TokenService from "./token.service";
 import { generateUniqueUsername } from "../utils/username";
 
 class AuthService {
-    static createUser = async (email: string, password: string) => {
+    static createUser = async (
+        email: string,
+        password: string,
+        invitationToken?: string,
+    ) => {
         const userExists = await prisma.user.findUnique({
             where: {
                 email,
@@ -46,7 +50,11 @@ class AuthService {
             },
         });
 
-        await EmailService.sendVerificationEmail(email, verificationToken);
+        await EmailService.sendVerificationEmail(
+            email,
+            verificationToken,
+            invitationToken,
+        );
 
         return newUser;
     };

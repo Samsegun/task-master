@@ -3,15 +3,18 @@ import emailConfig from "../config/email.config";
 
 class EmailService {
     static #transporter = nodemailer.createTransport(
-        emailConfig.transportOptions
+        emailConfig.transportOptions,
     );
 
     static sendVerificationEmail = async (
         email: string,
-        verificationToken: string
+        verificationToken: string,
+        invitationToken?: string,
     ) => {
         // const verificationUrl = `${process.env.FRONTEND_URL}/api/auth/verify-email?token=${verificationToken}`;
-        const verificationUrl = `${process.env.FRONTEND_URL}/verify-email?token=${verificationToken}`;
+        const verificationUrl = invitationToken
+            ? `${process.env.FRONTEND_URL}/verify-email?token=${verificationToken}&invitationToken=${invitationToken}`
+            : `${process.env.FRONTEND_URL}/verify-email?token=${verificationToken}`;
 
         const mailOptions = {
             from: emailConfig.FROM_EMAIL,
@@ -30,14 +33,13 @@ class EmailService {
         try {
             console.log("Sending email...");
 
-            const info: SentMessageInfo = await this.#transporter.sendMail(
-                mailOptions
-            );
+            const info: SentMessageInfo =
+                await this.#transporter.sendMail(mailOptions);
 
             console.log("Email sent");
             console.log(
                 "Ethereal message sent! Preview URL: ",
-                nodemailer.getTestMessageUrl(info)
+                nodemailer.getTestMessageUrl(info),
             );
         } catch (error) {
             console.error("Error sending email:", error);
@@ -47,7 +49,7 @@ class EmailService {
 
     static sendPasswordResetEmail = async (
         email: string,
-        resetPasswordToken: string
+        resetPasswordToken: string,
     ) => {
         // const resetPasswordUrl = `${
         //     process.env.FRONTEND_URL
@@ -58,7 +60,7 @@ class EmailService {
         const resetPasswordUrl = `${
             process.env.FRONTEND_URL
         }/reset-password?token=${resetPasswordToken}&email=${encodeURIComponent(
-            email
+            email,
         )}`;
 
         const mailOptions = {
@@ -77,14 +79,75 @@ class EmailService {
 
         try {
             console.log("Sending email...");
-            const info: SentMessageInfo = await this.#transporter.sendMail(
-                mailOptions
-            );
+            const info: SentMessageInfo =
+                await this.#transporter.sendMail(mailOptions);
 
             console.log("Email sent");
             console.log(
                 "Ethereal message sent! Preview URL: ",
-                nodemailer.getTestMessageUrl(info)
+                nodemailer.getTestMessageUrl(info),
+            );
+        } catch (error) {
+            console.error("Error sending email:", error);
+            throw error;
+        }
+    };
+
+    static sendProjectInvitationEmail = async (
+        email: string,
+        payload: {
+            inviterName: string;
+            projectName: string;
+            invitationToken: string;
+            isNewUser: boolean;
+        },
+    ) => {
+        const { inviterName, projectName, invitationToken, isNewUser } =
+            payload;
+
+        const invitationUrl = `${process.env.FRONTEND_URL}/process-invitation?token=${invitationToken}`;
+
+        const htmlContent = isNewUser
+            ? `
+            <p><strong>${inviterName}</strong> has invited you to join <strong>${projectName}</strong> on TaskMaster.</p>
+            <p>You'll need to create an account first, then you can accept the invitation.</p>
+            <a href="${process.env.FRONTEND_URL}/register?invitationToken=${invitationToken}">
+                Create Account & Join Project
+            </a>
+        `
+            : `
+            <p><strong>${inviterName}</strong> has invited you to join <strong>${projectName}</strong>.</p>
+            <a href="${invitationUrl}">Accept Invitation</a>
+        `;
+
+        const mailOptions = {
+            from: process.env.FROM_EMAIL,
+            to: email,
+            subject: `You've been invited to join ${projectName}`,
+            html: `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                <h2>Project Invitation</h2>
+                <p>Hi there,</p>
+
+                ${htmlContent}
+                
+                <p style="color: #666; font-size: 14px;">
+                    This invitation will expire in 7 days.
+                </p>
+               
+            </div>
+        `,
+        };
+
+        try {
+            console.log("Sending invitation email...");
+            const info: SentMessageInfo =
+                await this.#transporter.sendMail(mailOptions);
+
+            console.log("Email sent");
+            console.log(
+                "Ethereal message sent! Preview URL: ",
+                nodemailer.getTestMessageUrl(info),
             );
         } catch (error) {
             console.error("Error sending email:", error);

@@ -10,9 +10,14 @@ import {
 
 class AuthController {
     static createUser = asyncHandler(async (req: Request, res: Response) => {
-        const { email, password } = req.body as ValidatedRegisterRequest;
+        const { email, password, invitationToken } =
+            req.body as ValidatedRegisterRequest;
 
-        const newUser = await AuthService.createUser(email, password);
+        const newUser = await AuthService.createUser(
+            email,
+            password,
+            invitationToken,
+        );
 
         res.status(201).json({
             success: true,
@@ -86,6 +91,10 @@ class AuthController {
                 success: true,
                 message: "Email verified successfully. You are now signned in.",
                 user,
+                // invitationToken:
+                //     typeof invitationToken === "string"
+                //         ? invitationToken
+                //         : null,
             });
         },
     );

@@ -32,8 +32,10 @@ model User {
   // project management relations
   ownedProjects Project[] @relation("ProjectOwner")
   projectMembers ProjectMember[]
+  invitedMembers ProjectMember[] @relation("InvitedBy")
   assignedTasks Task[]
   createdTasks Task[] @relation("TaskCreator")
+  sentInvitations ProjectInvitation[] @relation("ProjectInviter")
 
   @@map("users")
 }
@@ -62,6 +64,7 @@ model Project {
 
   owner User @relation("ProjectOwner", fields: [ownerId], references: [id], onDelete: Cascade)
   members ProjectMember[]
+  invitations ProjectInvitation[]
   tasks Task[]
 
   @@unique([name, ownerId])
@@ -73,13 +76,36 @@ model ProjectMember {
   projectId String
   userId String
   role ProjectRole @default(MEMBER)
+  status MemberStatus @default(PENDING) 
+  invitedBy String? 
   joinedAt DateTime @default(now())
 
   project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  inviter User? @relation("InvitedBy", fields: [invitedBy], references: [id], onDelete: SetNull)
+
 
   @@unique([projectId, userId])
   @@map("project_members")
+}
+
+// New table for pending invitations (before user exists)
+model ProjectInvitation {
+  id String @id @default(cuid())
+  email String
+  projectId String
+  invitedBy String
+  role ProjectRole @default(MEMBER)
+  token String @unique
+  expiresAt DateTime
+  status InvitationStatus @default(PENDING)
+  createdAt DateTime @default(now())
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  inviter User @relation("ProjectInviter", fields: [invitedBy], references: [id], onDelete: Cascade)
+
+  @@unique([email, projectId])
+  @@map("project_invitations")
 }
 
 // tasks
@@ -125,6 +151,19 @@ enum ProjectStatus {
 enum ProjectRole {
   OWNER
   MEMBER
+}
+
+enum InvitationStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+  EXPIRED
+}
+
+enum MemberStatus {
+  PENDING
+  ACTIVE
+  DECLINED
 }
 
 enum TaskStatus {
