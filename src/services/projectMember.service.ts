@@ -7,10 +7,7 @@ import {
 } from "../errors";
 import prisma from "../utils/prisma";
 import EmailService from "./email.service";
-import {
-    generateInvitationToken,
-    verifyInvitationToken,
-} from "../utils/tokenManagement";
+import { generateInvitationToken } from "../utils/tokenManagement";
 import { InvitationTokenPayload } from "../utils/types";
 
 class ProjectMemberService {
@@ -86,11 +83,6 @@ class ProjectMemberService {
                     throw new ValidationError(
                         "User already has a pending invitation",
                     );
-
-                // if (existingMember.status === "DECLINED")
-                //     throw new ValidationError(
-                //         "User has previously declined an invitation to this project",
-                //     );
             }
 
             // create pending membership
@@ -134,7 +126,7 @@ class ProjectMemberService {
 
         // CASE 2: user doesn't exist - create ProjectInvitation
         else {
-            // Check if invitation already exists
+            // check if invitation already exists
             const existingInvitation =
                 await prisma.projectInvitation.findUnique({
                     where: {
@@ -145,10 +137,17 @@ class ProjectMemberService {
                     },
                 });
 
-            if (existingInvitation && existingInvitation.status === "PENDING") {
-                throw new ValidationError(
-                    "An invitation has already been sent to this email",
-                );
+            if (existingInvitation) {
+                if (existingInvitation.status === "PENDING") {
+                    throw new ValidationError(
+                        "An invitation has already been sent to this email",
+                    );
+                }
+                if (existingInvitation.status === "ACCEPTED") {
+                    throw new ValidationError(
+                        "This invitation was previously accepted",
+                    );
+                }
             }
 
             // generate token
@@ -292,7 +291,7 @@ class ProjectMemberService {
                     "You are already a member of this project",
                 );
 
-            // Transactionally create the membership and mark invitation ACCEPTED
+            // transactionally create the membership and mark invitation ACCEPTED
             const [membership] = await prisma.$transaction([
                 prisma.projectMember.create({
                     data: {
@@ -430,6 +429,7 @@ class ProjectMemberService {
         throw new ValidationError("Unknown invitation type");
     }
 
+    // old add member by owner method - can be used for adding members without invitation
     static async addMember(
         projectId: string,
         userId: string,
@@ -774,15 +774,26 @@ class ProjectMemberService {
                 );
         }
 
-        // leave project
-        await prisma.projectMember.delete({
-            where: {
-                projectId_userId: {
-                    projectId,
-                    userId,
+        await prisma.$transaction([
+            prisma.task.updateMany({
+                where: {
+                    projectId: projectId,
+                    assigneeId: userId,
                 },
-            },
-        });
+                data: {
+                    assigneeId: null,
+                },
+            }),
+            // leave project
+            prisma.projectMember.delete({
+                where: {
+                    projectId_userId: {
+                        projectId,
+                        userId,
+                    },
+                },
+            }),
+        ]);
 
         return { message: "You have left the project successfully" };
     }
