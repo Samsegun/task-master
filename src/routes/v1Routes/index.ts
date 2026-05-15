@@ -1,5 +1,6 @@
 import { Router } from "express";
 import AuthMiddleware from "../../middleware/AuthMiddleware";
+import adminRouter from "./admin.routes";
 import projectRouter from "./project.routes";
 import userRouter from "./user.routes";
 
@@ -11,5 +12,6 @@ v1Router.use(authenticateUser);
 
 v1Router.use("/projects", projectRouter);
 v1Router.use("/users/me", userRouter);
+v1Router.use("/admin", adminRouter);
 
 export default v1Router;

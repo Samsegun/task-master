@@ -30,7 +30,7 @@ class UserService {
             firstName?: string;
             lastName?: string;
             username?: string;
-        }
+        },
     ) {
         // check if username is already taken (if updating username)
         if (data.username) {
@@ -70,7 +70,7 @@ class UserService {
         data: {
             currentPassword: string;
             newPassword: string;
-        }
+        },
     ) {
         const { currentPassword, newPassword } = data;
 
@@ -85,7 +85,7 @@ class UserService {
         // check current password
         const isValidPassword = await comparePassword(
             currentPassword,
-            user.password
+            user.password,
         );
         if (!isValidPassword)
             throw new UnauthorizedError("Current password is incorrect");
@@ -93,11 +93,11 @@ class UserService {
         // no reuse of the same password
         const isSamePassword = await comparePassword(
             newPassword,
-            user.password
+            user.password,
         );
         if (isSamePassword)
             throw new ValidationError(
-                "New password cannot be the same as the current password"
+                "New password cannot be the same as the current password",
             );
 
         const hashedPassword = await hashPassword(newPassword);
@@ -108,6 +108,44 @@ class UserService {
         });
 
         return { message: "Password updated successfully" };
+    }
+
+    static async getAllUsers() {
+        return prisma.user.findMany({
+            select: {
+                id: true,
+                email: true,
+                username: true,
+                role: true,
+                isVerified: true,
+                firstName: true,
+                lastName: true,
+                createdAt: true,
+                updatedAt: true,
+            },
+            orderBy: { createdAt: "desc" },
+        });
+    }
+
+    static async getUserById(userId: string) {
+        const user = await prisma.user.findUnique({
+            where: { id: userId },
+            select: {
+                id: true,
+                email: true,
+                username: true,
+                role: true,
+                isVerified: true,
+                firstName: true,
+                lastName: true,
+                createdAt: true,
+                updatedAt: true,
+            },
+        });
+
+        if (!user) throw new EntityNotFound("User not found");
+
+        return user;
     }
 }
 

@@ -28,7 +28,7 @@ class UserController {
                 success: true,
                 data: user,
             });
-        }
+        },
     );
 
     // not same as reset password
@@ -40,14 +40,35 @@ class UserController {
 
             const passwordUpdated = await UserService.updateUserPassword(
                 userId,
-                { ...userPasswordToUpdate }
+                { ...userPasswordToUpdate },
             );
 
             res.status(200).json({
                 success: true,
                 message: passwordUpdated.message,
             });
-        }
+        },
+    );
+
+    static getAllUsers = asyncHandler(async (req: Request, res: Response) => {
+        const users = await UserService.getAllUsers();
+
+        res.status(200).json({
+            success: true,
+            data: users,
+        });
+    });
+
+    static getUserById = asyncHandler(
+        async (req: Request<{ userId: string }>, res: Response) => {
+            const { userId } = req.params;
+            const user = await UserService.getUserById(userId);
+
+            res.status(200).json({
+                success: true,
+                data: user,
+            });
+        },
     );
 }
 
