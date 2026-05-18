@@ -1,3 +1,4 @@
+import { Role } from "@prisma/client";
 import { Request, Response } from "express";
 import UserService from "../services/user.service";
 import asyncHandler from "../utils/asyncRequestHandler";
@@ -34,8 +35,9 @@ class UserController {
     // not same as reset password
     // this action can only be performed by an authenticated user
     static updateUserPassword = asyncHandler(
-        async (req: Request, res: Response) => {
-            const userId = (req as any).userId;
+        async (req: Request<{ userId: string }>, res: Response) => {
+            // const userId = (req as any).userId;
+            const { userId } = req.params;
             const userPasswordToUpdate = req.body as UpdatePassword;
 
             const passwordUpdated = await UserService.updateUserPassword(
@@ -68,6 +70,38 @@ class UserController {
                 success: true,
                 data: user,
             });
+        },
+    );
+
+    static updateUserRole = asyncHandler(
+        async (req: Request<{ userId: string }>, res: Response) => {
+            const { userId } = req.params;
+            const superUserInfo = (req as any).superUserInfo;
+            const { role } = req.body as { role: Role };
+
+            const user = await UserService.updateUserRole(
+                userId,
+                role,
+                superUserInfo,
+            );
+
+            res.status(200).json({ success: true, data: user });
+        },
+    );
+
+    static updateUserSuspension = asyncHandler(
+        async (req: Request<{ userId: string }>, res: Response) => {
+            const { userId } = req.params;
+            const superUserInfo = (req as any).superUserInfo;
+            const { isSuspended } = req.body as { isSuspended: boolean };
+
+            const user = await UserService.updateUserSuspension(
+                userId,
+                isSuspended,
+                superUserInfo,
+            );
+
+            res.status(200).json({ success: true, data: user });
         },
     );
 }

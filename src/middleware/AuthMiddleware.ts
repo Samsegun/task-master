@@ -1,7 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import { ForbiddenError, UnauthorizedError } from "../errors";
-import prisma from "../utils/prisma";
 import {
     verifyAccessToken,
     verifyInvitationToken,
@@ -86,7 +85,6 @@ class AuthMiddleware {
                     "REFRESH_TOKEN_INVALID",
                 );
             } else {
-                // user should be logged out!!!
                 // user can retry
                 throw new UnauthorizedError(
                     "Authentication failed",
@@ -122,30 +120,6 @@ class AuthMiddleware {
                 throw error;
             }
         }
-    };
-
-    static authorizeNonUser = async (
-        req: Request,
-        res: Response,
-        next: NextFunction,
-    ) => {
-        const userId = (req as any).userId;
-
-        const user = await prisma.user.findUnique({
-            where: { id: userId },
-            select: { role: true },
-        });
-        if (!user) throw new UnauthorizedError("Authentication required");
-
-        const allowedRoles = ["MODERATOR", "ADMIN", "SUPER_ADMIN"];
-
-        if (!allowedRoles.includes(user.role)) {
-            throw new UnauthorizedError(
-                "Access denied: elevated role required",
-            );
-        }
-
-        next();
     };
 }
 

@@ -11,7 +11,7 @@ class ValidationMiddleware {
                 if (error instanceof ZodError) {
                     const formattedErrors: Record<string, string[]> = {};
 
-                    error.issues.forEach(err => {
+                    error.issues.forEach((err) => {
                         const field = err.path.join(".");
                         if (!formattedErrors[field]) {
                             formattedErrors[field] = [];
@@ -43,7 +43,7 @@ class ValidationMiddleware {
                 if (error instanceof ZodError) {
                     const formattedErrors: Record<string, string[]> = {};
 
-                    error.issues.forEach(err => {
+                    error.issues.forEach((err) => {
                         const field = err.path.join(".");
                         if (!formattedErrors[field]) {
                             formattedErrors[field] = [];

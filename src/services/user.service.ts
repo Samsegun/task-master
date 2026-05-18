@@ -1,3 +1,4 @@
+import { Role } from "@prisma/client";
 import { EntityNotFound, UnauthorizedError, ValidationError } from "../errors";
 import { comparePassword, hashPassword } from "../utils/passwordUtils";
 import prisma from "../utils/prisma";
@@ -140,9 +141,73 @@ class UserService {
                 lastName: true,
                 createdAt: true,
                 updatedAt: true,
+                isSuspended: true,
             },
         });
 
+        if (!user) throw new EntityNotFound("User not found");
+
+        return user;
+    }
+
+    static async updateUserRole(
+        userId: string,
+        role: Role,
+        superUserInfo: { id: string; role: Role },
+    ) {
+        if (superUserInfo.id === userId)
+            throw new ValidationError("You cannot update your own role");
+
+        // only ADMINs and SUPER_ADMINs can perform this action
+        const allowedRoles = ["ADMIN", "SUPER_ADMIN"];
+        if (!allowedRoles.includes(superUserInfo.role)) {
+            throw new ValidationError("Insufficient privileges.");
+        }
+
+        const user = await prisma.user.update({
+            where: { id: userId },
+            data: { role },
+            select: {
+                id: true,
+                email: true,
+                username: true,
+                role: true,
+                isVerified: true,
+                isSuspended: true,
+                updatedAt: true,
+            },
+        });
+        if (!user) throw new EntityNotFound("User not found");
+
+        return user;
+    }
+
+    static async updateUserSuspension(
+        userId: string,
+        isSuspended: boolean,
+        superUserInfo: { id: string; role: Role },
+    ) {
+        if (superUserInfo.id === userId)
+            throw new ValidationError("You cannot suspend your account");
+
+        // only ADMINs and SUPER_ADMINs can perform this action
+        const allowedRoles = ["ADMIN", "SUPER_ADMIN"];
+        if (!allowedRoles.includes(superUserInfo.role)) {
+            throw new ValidationError("Insufficient privileges.");
+        }
+
+        const user = await prisma.user.update({
+            where: { id: userId },
+            data: { isSuspended },
+            select: {
+                id: true,
+                email: true,
+                username: true,
+                role: true,
+                isVerified: true,
+                isSuspended: true,
+            },
+        });
         if (!user) throw new EntityNotFound("User not found");
 
         return user;

@@ -1,4 +1,7 @@
+import { Role } from "@prisma/client";
 import z from "zod";
+
+const RoleEnum = z.enum(Role);
 
 const updateProfile = z
     .object({
@@ -10,11 +13,11 @@ const updateProfile = z
             .max(30)
             .regex(
                 /^[a-zA-Z0-9_]+$/,
-                "Username must consist of alphanumeric characters and underscores"
+                "Username must consist of alphanumeric characters and underscores",
             )
             .optional(),
     })
-    .refine(data => Object.keys(data).length > 0, {
+    .refine((data) => Object.keys(data).length > 0, {
         message: "At least one field must be provided",
     });
 
@@ -29,8 +32,16 @@ const updatePassword = z.object({
         .regex(/[0-9]/, "Password must contain at least one number")
         .regex(
             /[@$!%*?&]/,
-            "Password must contain at least one special character"
+            "Password must contain at least one special character",
         ),
+});
+
+const updateUserRole = z.object({
+    role: RoleEnum,
+});
+
+const updateUserSuspension = z.object({
+    isSuspended: z.boolean(),
 });
 
 export type UpdateProfile = z.infer<typeof updateProfile>;
@@ -39,4 +50,6 @@ export type UpdatePassword = z.infer<typeof updatePassword>;
 export default {
     updateProfile,
     updatePassword,
+    updateUserRole,
+    updateUserSuspension,
 };

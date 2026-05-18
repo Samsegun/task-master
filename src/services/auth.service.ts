@@ -3,9 +3,9 @@ import { authConfig } from "../config/auth.config";
 import { ForbiddenError, ValidationError } from "../errors";
 import { comparePassword, hashPassword } from "../utils/passwordUtils";
 import prisma from "../utils/prisma";
+import { generateUniqueUsername } from "../utils/username";
 import EmailService from "./email.service";
 import TokenService from "./token.service";
-import { generateUniqueUsername } from "../utils/username";
 
 class AuthService {
     static createUser = async (
@@ -73,17 +73,17 @@ class AuthService {
                 username: true,
                 firstName: true,
                 lastName: true,
+                isSuspended: true,
             },
         });
         if (!user) throw new ValidationError("Invalid credentials");
+        if (user.isSuspended) throw new ForbiddenError("Account suspended");
+        if (!user.isVerified)
+            throw new ValidationError("please verify email before signing in");
 
         // compare passwords
         const passwordIsEqual = await comparePassword(password, user.password!);
         if (!passwordIsEqual) throw new ValidationError("Invalid credentials");
-
-        // check if email is verified
-        if (!user.isVerified)
-            throw new ValidationError("please verify email before signing in");
 
         const authTokensArgs = {
             userId: user.id,
