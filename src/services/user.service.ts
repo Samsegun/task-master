@@ -210,6 +210,11 @@ class UserService {
         });
         if (!user) throw new EntityNotFound("User not found");
 
+        if (isSuspended) {
+            await prisma.refreshToken.deleteMany({
+                where: { userId },
+            });
+        }
         return user;
     }
 }

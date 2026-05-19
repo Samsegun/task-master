@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { authConfig } from "../config/auth.config";
-import { ForbiddenError, ValidationError } from "../errors";
+import { ForbiddenError, UnauthorizedError, ValidationError } from "../errors";
 import { comparePassword, hashPassword } from "../utils/passwordUtils";
 import prisma from "../utils/prisma";
 import { generateUniqueUsername } from "../utils/username";
@@ -76,8 +76,13 @@ class AuthService {
                 isSuspended: true,
             },
         });
+
         if (!user) throw new ValidationError("Invalid credentials");
-        if (user.isSuspended) throw new ForbiddenError("Account suspended");
+        if (user.isSuspended)
+            throw new UnauthorizedError(
+                "Account suspended",
+                "ACCOUNT_SUSPENDED",
+            );
         if (!user.isVerified)
             throw new ValidationError("please verify email before signing in");
 
@@ -130,6 +135,7 @@ class AuthService {
                         id: true,
                         role: true,
                         isVerified: true,
+                        isSuspended: true,
                     },
                 },
             },
@@ -144,8 +150,11 @@ class AuthService {
 
         // generate new access and refresh tokens
         const {
-            user: { id, isVerified, role },
+            user: { id, isVerified, role, isSuspended },
         } = storedToken;
+
+        if (isSuspended)
+            throw new ForbiddenError("Account suspended", "ACCOUNT_SUSPENDED");
         const { accessToken, refreshToken } =
             await TokenService.createAuthTokens(id, isVerified);
 
@@ -202,9 +211,19 @@ class AuthService {
     static forgotPassword = async (email: string) => {
         const user = await prisma.user.findUnique({
             where: { email },
-            select: { id: true, email: true, isVerified: true },
+            select: {
+                id: true,
+                email: true,
+                isVerified: true,
+                isSuspended: true,
+            },
         });
         if (!user || !user.isVerified) return { success: false };
+        if (user.isSuspended)
+            throw new UnauthorizedError(
+                "Account suspended",
+                "ACCOUNT_SUSPENDED",
+            );
 
         const resetPasswordToken = randomUUID();
         const resetPasswordTokenExpiry = new Date(
@@ -234,6 +253,11 @@ class AuthService {
             },
         });
         if (!user) throw new ValidationError("Invalid or expired reset token");
+        if (user.isSuspended)
+            throw new UnauthorizedError(
+                "Account suspended",
+                "ACCOUNT_SUSPENDED",
+            );
 
         // hashpassword
         const hashedPassword = await hashPassword(password);

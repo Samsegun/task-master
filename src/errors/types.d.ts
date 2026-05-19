@@ -14,4 +14,5 @@ type ErrorCode =
     | "ERR_FORBIDDEN"
     | "ERR_CONFLICT"
     | "ERR_RATE_LIMIT"
-    | "REFRESH_TOKEN_MISSING";
+    | "REFRESH_TOKEN_MISSING"
+    | "ACCOUNT_SUSPENDED";
