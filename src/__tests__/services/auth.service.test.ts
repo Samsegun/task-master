@@ -10,14 +10,14 @@ describe("AuthService", () => {
     const validUserData = {
         email: "test@example.com",
         password: "Password123!",
-        username: "tester",
+        // username: crypto.randomUUID().slice(0, 8),
     };
 
     const createTestUser = async () => {
         return await AuthService.createUser(
             validUserData.email,
             validUserData.password,
-            validUserData.username
+            // validUserData.username,
         );
     };
     const userInDB = async () => {
@@ -37,7 +37,7 @@ describe("AuthService", () => {
             expect(result.isVerified).toBe(false);
 
             // user should be in database
-            const user = userInDB();
+            const user = await userInDB();
 
             expect(user).toBeDefined();
         });
@@ -55,7 +55,7 @@ describe("AuthService", () => {
 
             const isPasswordHashed = await comparePassword(
                 validUserData.password,
-                user!.password
+                user!.password,
             );
 
             expect(isPasswordHashed).toBe(true);
@@ -66,7 +66,8 @@ describe("AuthService", () => {
 
             expect(EmailService.sendVerificationEmail).toHaveBeenCalledWith(
                 validUserData.email,
-                expect.any(String)
+                expect.any(String),
+                undefined,
             );
         });
     });
@@ -88,7 +89,7 @@ describe("AuthService", () => {
         it("should login successfully with correct credentials", async () => {
             const result = await AuthService.loginUser(
                 validUserData.email,
-                validUserData.password
+                validUserData.password,
             );
 
             expect(result).toHaveProperty("accessToken");
@@ -98,7 +99,7 @@ describe("AuthService", () => {
 
         it("should throw error if user does not exist", async () => {
             await expect(
-                AuthService.loginUser("nonuser@example.com", "password123")
+                AuthService.loginUser("nonuser@example.com", "password123"),
             ).rejects.toThrow(/invalid/i);
         });
 
@@ -117,8 +118,8 @@ describe("AuthService", () => {
             await expect(
                 AuthService.loginUser(
                     "unverified@example.com",
-                    validUserData.password
-                )
+                    validUserData.password,
+                ),
             ).rejects.toThrow(/verify email/i);
         });
     });
@@ -139,7 +140,7 @@ describe("AuthService", () => {
                     username: "tester",
                     verificationToken,
                     verificationTokenExpiry: new Date(
-                        Date.now() + 24 * 60 * 60 * 1000
+                        Date.now() + 24 * 60 * 60 * 1000,
                     ),
                 },
             });
@@ -162,7 +163,7 @@ describe("AuthService", () => {
 
         it("should throw error if token is invalid", async () => {
             await expect(
-                AuthService.verifyUserMail("invalid-token")
+                AuthService.verifyUserMail("invalid-token"),
             ).rejects.toThrow(/invalid or expired/i);
         });
 
@@ -176,7 +177,7 @@ describe("AuthService", () => {
             });
 
             await expect(
-                AuthService.verifyUserMail(verificationToken)
+                AuthService.verifyUserMail(verificationToken),
             ).rejects.toThrow(/invalid or expired/i);
         });
     });
@@ -204,7 +205,7 @@ describe("AuthService", () => {
             expect(user?.passwordResetToken).toBeDefined();
             expect(user?.passwordResetExpiry).toBeDefined();
             expect(user?.passwordResetExpiry!.getTime()).toBeGreaterThan(
-                Date.now()
+                Date.now(),
             );
         });
 
@@ -213,7 +214,7 @@ describe("AuthService", () => {
 
             expect(EmailService.sendPasswordResetEmail).toHaveBeenCalledWith(
                 validUserData.email,
-                expect.any(String)
+                expect.any(String),
             );
         });
     });
@@ -234,7 +235,7 @@ describe("AuthService", () => {
                     isVerified: true,
                     passwordResetToken: resetToken,
                     passwordResetExpiry: new Date(
-                        Date.now() + 24 * 60 * 60 * 1000
+                        Date.now() + 24 * 60 * 60 * 1000,
                     ),
                 },
             });
@@ -252,7 +253,7 @@ describe("AuthService", () => {
 
             const isNewPassword = await comparePassword(
                 newPassword,
-                user!.password
+                user!.password,
             );
             expect(isNewPassword).toBe(true);
 
@@ -262,7 +263,7 @@ describe("AuthService", () => {
 
         it("should throw error if token is invalid", async () => {
             await expect(
-                AuthService.resetPassword("invalid-token", "NewPassword123!")
+                AuthService.resetPassword("invalid-token", "NewPassword123!"),
             ).rejects.toThrow(/invalid or expired/i);
         });
 

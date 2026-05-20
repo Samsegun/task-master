@@ -16,7 +16,7 @@ describe("TaskService", () => {
             data: {
                 email: "owner@example.com",
                 password: hashedPassword,
-                username: "testuser",
+                username: crypto.randomUUID().slice(0, 8),
                 isVerified: true,
             },
         });
@@ -75,7 +75,7 @@ describe("TaskService", () => {
                 TaskService.createTask(projectId, outsider.id, {
                     title: "Unauthorized Task",
                     priority: "LOW",
-                })
+                }),
             ).rejects.toThrow(/not the owner/i);
         });
 
@@ -94,7 +94,7 @@ describe("TaskService", () => {
                     title: "Test Task",
                     assigneeId: outsider.id,
                     priority: "MEDIUM",
-                })
+                }),
             ).rejects.toThrow(/not a member/i);
         });
     });
@@ -115,7 +115,7 @@ describe("TaskService", () => {
                 projectId,
                 taskId,
                 ownerId,
-                { title: "Updated Task", status: "IN_PROGRESS" }
+                { title: "Updated Task", status: "IN_PROGRESS" },
             );
 
             expect(updated.title).toBe("Updated Task");
@@ -127,7 +127,7 @@ describe("TaskService", () => {
                 projectId,
                 taskId,
                 ownerId,
-                { status: "DONE" }
+                { status: "DONE" },
             );
 
             expect(updated.completedAt).toBeDefined();
@@ -145,7 +145,7 @@ describe("TaskService", () => {
             await expect(
                 TaskService.updateTask(projectId, taskId, outsider.id, {
                     title: "Hacked",
-                })
+                }),
             ).rejects.toThrow("You are not a member of this project");
         });
     });
@@ -195,7 +195,7 @@ describe("TaskService", () => {
             const tasks = await TaskService.getMyTasks(memberId, { limit: 2 });
 
             expect(tasks).toHaveLength(2);
-            tasks.forEach(task => {
+            tasks.forEach((task) => {
                 expect(task.assignee?.id).toBe(memberId);
             });
         });

@@ -47,6 +47,7 @@ class ProjectService {
                     projectId: newProject.id,
                     userId: ownerId,
                     role: "OWNER",
+                    status: "ACTIVE",
                 },
             });
 

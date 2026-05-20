@@ -35,9 +35,8 @@ class UserController {
     // not same as reset password
     // this action can only be performed by an authenticated user
     static updateUserPassword = asyncHandler(
-        async (req: Request<{ userId: string }>, res: Response) => {
-            // const userId = (req as any).userId;
-            const { userId } = req.params;
+        async (req: Request, res: Response) => {
+            const userId = (req as any).userId;
             const userPasswordToUpdate = req.body as UpdatePassword;
 
             const passwordUpdated = await UserService.updateUserPassword(

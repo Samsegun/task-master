@@ -12,7 +12,7 @@ describe("ProjectService", () => {
             data: {
                 email: "test@example.com",
                 password: hashedPassword,
-                username: "testuser",
+                username: crypto.randomUUID().slice(0, 8),
                 isVerified: true,
             },
         });
@@ -50,7 +50,7 @@ describe("ProjectService", () => {
             await ProjectService.createProject(userId, { name: "Duplicate" });
 
             await expect(
-                ProjectService.createProject(userId, { name: "Duplicate" })
+                ProjectService.createProject(userId, { name: "Duplicate" }),
             ).rejects.toThrow(/already have a project/i);
         });
     });
@@ -76,7 +76,7 @@ describe("ProjectService", () => {
 
             const project = await ProjectService.getProjectById(
                 created.id,
-                userId
+                userId,
             );
 
             expect(project.id).toBe(created.id);
@@ -97,7 +97,7 @@ describe("ProjectService", () => {
             });
 
             await expect(
-                ProjectService.getProjectById(project.id, otherUser.id)
+                ProjectService.getProjectById(project.id, otherUser.id),
             ).rejects.toThrow(/do not have access/i);
         });
     });
@@ -113,7 +113,7 @@ describe("ProjectService", () => {
                 userId,
                 {
                     name: "New name",
-                }
+                },
             );
 
             expect(updated.name).toBe("New name");
@@ -142,7 +142,7 @@ describe("ProjectService", () => {
             await expect(
                 ProjectService.updateProject(project.id, member.id, {
                     name: "Hacked",
-                })
+                }),
             ).rejects.toThrow(/only project owner/i);
         });
     });
@@ -167,7 +167,7 @@ describe("ProjectService", () => {
             });
 
             await expect(
-                ProjectService.deleteProject("xxxxxxxx", userId)
+                ProjectService.deleteProject("xxxxxxxx", userId),
             ).rejects.toThrow(/not found/i);
         });
 
@@ -185,7 +185,7 @@ describe("ProjectService", () => {
             });
 
             await expect(
-                ProjectService.deleteProject(project.id, otherUser.id)
+                ProjectService.deleteProject(project.id, otherUser.id),
             ).rejects.toThrow(/only project owner/i);
         });
     });

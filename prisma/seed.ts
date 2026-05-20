@@ -1,4 +1,3 @@
-
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
 
@@ -14,6 +13,7 @@ async function main() {
     await prisma.task.deleteMany();
     await prisma.projectMember.deleteMany();
     await prisma.project.deleteMany();
+    await prisma.projectInvitation.deleteMany();
     await prisma.refreshToken.deleteMany();
     await prisma.user.deleteMany();
 
@@ -94,20 +94,51 @@ async function main() {
     await prisma.projectMember.createMany({
         data: [
             // E-Commerce project members
-            { projectId: webProject.id, userId: alice.id, role: "OWNER" },
-            { projectId: webProject.id, userId: bob.id, role: "MEMBER" },
-            { projectId: webProject.id, userId: charlie.id, role: "MEMBER" },
+            {
+                projectId: webProject.id,
+                userId: alice.id,
+                role: "OWNER",
+                status: "ACTIVE",
+            },
+            {
+                projectId: webProject.id,
+                userId: bob.id,
+                role: "MEMBER",
+                status: "ACTIVE",
+            },
+            {
+                projectId: webProject.id,
+                userId: charlie.id,
+                role: "MEMBER",
+                status: "ACTIVE",
+            },
 
             // Mobile App project members
-            { projectId: mobileProject.id, userId: bob.id, role: "OWNER" },
-            { projectId: mobileProject.id, userId: alice.id, role: "MEMBER" },
+            {
+                projectId: mobileProject.id,
+                userId: bob.id,
+                role: "OWNER",
+                status: "ACTIVE",
+            },
+            {
+                projectId: mobileProject.id,
+                userId: alice.id,
+                role: "MEMBER",
+                status: "ACTIVE",
+            },
 
             // Marketing project members
-            { projectId: marketingProject.id, userId: alice.id, role: "OWNER" },
+            {
+                projectId: marketingProject.id,
+                userId: alice.id,
+                role: "OWNER",
+                status: "ACTIVE",
+            },
             {
                 projectId: marketingProject.id,
                 userId: charlie.id,
                 role: "MEMBER",
+                status: "ACTIVE",
             },
         ],
     });
@@ -236,7 +267,7 @@ async function main() {
     });
 
     console.log(
-        " Created tasks with various statuses, priorities, and due dates"
+        " Created tasks with various statuses, priorities, and due dates",
     );
 
     console.log("\n Seed completed successfully!\n");
@@ -252,7 +283,7 @@ async function main() {
 }
 
 main()
-    .catch(e => {
+    .catch((e) => {
         console.error("Seed failed: ", e);
         process.exit(1);
     })
