@@ -1,5 +1,6 @@
 import ProjectService from "../../services/project.service";
 import { hashPassword } from "../../utils/passwordUtils";
+import { generateUniqueUsername } from "../../utils/username";
 import { prisma } from "../setup";
 
 describe("ProjectService", () => {
@@ -8,11 +9,13 @@ describe("ProjectService", () => {
     beforeEach(async () => {
         // create a verified user
         const hashedPassword = await hashPassword("Password123!");
+        const username = await generateUniqueUsername();
+
         const user = await prisma.user.create({
             data: {
                 email: "test@example.com",
                 password: hashedPassword,
-                username: crypto.randomUUID().slice(0, 8),
+                username,
                 isVerified: true,
             },
         });

@@ -1,6 +1,7 @@
 import ProjectService from "../../services/project.service";
 import ProjectMemberService from "../../services/projectMember.service";
 import { hashPassword } from "../../utils/passwordUtils";
+import { generateUniqueUsername } from "../../utils/username";
 import { prisma } from "../setup";
 
 describe("ProjectMemberService", () => {
@@ -12,22 +13,24 @@ describe("ProjectMemberService", () => {
         const hashedPassword = await hashPassword("Password123!");
 
         // create project owner
+        const ownerUsername = await generateUniqueUsername();
         const owner = await prisma.user.create({
             data: {
                 email: "test@example.com",
                 password: hashedPassword,
-                username: "testuser",
+                username: ownerUsername,
                 isVerified: true,
             },
         });
         ownerId = owner.id;
 
         // create project member
+        const memberUsername = await generateUniqueUsername();
         const member = await prisma.user.create({
             data: {
                 email: "member@example.com",
                 password: hashedPassword,
-                username: "memberuser",
+                username: memberUsername,
                 isVerified: true,
             },
         });
@@ -45,7 +48,7 @@ describe("ProjectMemberService", () => {
             const newMember = await ProjectMemberService.addMember(
                 projectId,
                 ownerId,
-                { email: "member@example.com" }
+                { email: "member@example.com" },
             );
 
             expect(newMember?.user.id).toBe(memberId);
@@ -56,7 +59,7 @@ describe("ProjectMemberService", () => {
             await expect(
                 ProjectMemberService.addMember(projectId, ownerId, {
                     email: "notfound@example.com",
-                })
+                }),
             ).rejects.toThrow(/invalid/i);
         });
 
@@ -68,7 +71,7 @@ describe("ProjectMemberService", () => {
             await expect(
                 ProjectMemberService.addMember(projectId, ownerId, {
                     email: "member@example.com",
-                })
+                }),
             ).rejects.toThrow(/already a member/i);
         });
 
@@ -76,7 +79,7 @@ describe("ProjectMemberService", () => {
             await expect(
                 ProjectMemberService.addMember(projectId, memberId, {
                     email: "member@example.com",
-                })
+                }),
             ).rejects.toThrow(/only project owner/i);
         });
     });
@@ -94,7 +97,7 @@ describe("ProjectMemberService", () => {
                 projectId,
                 memberId,
                 ownerId,
-                "OWNER"
+                "OWNER",
             );
 
             // check new owner
@@ -126,8 +129,8 @@ describe("ProjectMemberService", () => {
                     projectId,
                     memberId,
                     memberId,
-                    "OWNER"
-                )
+                    "OWNER",
+                ),
             ).rejects.toThrow(/only project owner/i);
         });
     });
@@ -143,7 +146,7 @@ describe("ProjectMemberService", () => {
             await ProjectMemberService.removeMember(
                 projectId,
                 memberId,
-                ownerId
+                ownerId,
             );
 
             const removed = await prisma.projectMember.findUnique({
@@ -156,7 +159,7 @@ describe("ProjectMemberService", () => {
 
         it("should throw error if trying to remove owner", async () => {
             await expect(
-                ProjectMemberService.removeMember(projectId, ownerId, ownerId)
+                ProjectMemberService.removeMember(projectId, ownerId, ownerId),
             ).rejects.toThrow(/cannot remove project owner/i);
         });
     });
@@ -181,7 +184,7 @@ describe("ProjectMemberService", () => {
 
         it("should throw error if owner tries to leave without another owner", async () => {
             await expect(
-                ProjectMemberService.leaveProject(projectId, ownerId)
+                ProjectMemberService.leaveProject(projectId, ownerId),
             ).rejects.toThrow(/promote another member to owner first/i);
         });
 
@@ -191,7 +194,7 @@ describe("ProjectMemberService", () => {
                 projectId,
                 memberId,
                 ownerId,
-                "OWNER"
+                "OWNER",
             );
 
             // old owner (now member) should be able to leave

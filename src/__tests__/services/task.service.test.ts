@@ -1,6 +1,7 @@
 import ProjectService from "../../services/project.service";
 import TaskService from "../../services/task.service";
 import { hashPassword } from "../../utils/passwordUtils";
+import { generateUniqueUsername } from "../../utils/username";
 import { prisma } from "../setup";
 
 describe("TaskService", () => {
@@ -12,22 +13,26 @@ describe("TaskService", () => {
         const hashedPassword = await hashPassword("Password123!");
 
         // create project owner
+        const ownerUsername = await generateUniqueUsername();
+
         const owner = await prisma.user.create({
             data: {
                 email: "owner@example.com",
                 password: hashedPassword,
-                username: crypto.randomUUID().slice(0, 8),
+                username: ownerUsername,
                 isVerified: true,
             },
         });
         ownerId = owner.id;
 
         // create project member
+        const memberUsername = await generateUniqueUsername();
+
         const member = await prisma.user.create({
             data: {
                 email: "member@example.com",
                 password: hashedPassword,
-                username: "memberuser",
+                username: memberUsername,
                 isVerified: true,
             },
         });

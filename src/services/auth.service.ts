@@ -31,7 +31,6 @@ class AuthService {
         );
 
         // generate unique username based on email prefix
-        // const emailPrefix = email.split("@")[0];
         const username = await generateUniqueUsername();
 
         // create user

@@ -1,6 +1,7 @@
 import AuthService from "../../services/auth.service";
 import EmailService from "../../services/email.service";
 import { comparePassword, hashPassword } from "../../utils/passwordUtils";
+import { generateUniqueUsername } from "../../utils/username";
 import { prisma } from "../setup";
 
 // mock external services
@@ -106,11 +107,13 @@ describe("AuthService", () => {
         it("should throw error if user is not verified", async () => {
             // create unverified user
             const hashedPassword = await hashPassword(validUserData.password);
+            const username = await generateUniqueUsername();
+
             await prisma.user.create({
                 data: {
                     email: "unverified@example.com",
                     password: hashedPassword,
-                    username: "tester",
+                    username,
                     isVerified: false,
                 },
             });

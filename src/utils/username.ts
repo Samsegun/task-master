@@ -1,8 +1,14 @@
-import { customAlphabet } from "nanoid";
+import { randomInt } from "node:crypto";
 import prisma from "../utils/prisma";
 
-// long nanoid reduces collision
-const nano = customAlphabet("0123456789abcdefghijklmnopqrstuvwxyz", 6);
+function generateRandomString(length: number): string {
+    const chars = "0123456789abcdefghijklmnopqrstuvwxyz";
+    let result = "";
+    for (let i = 0; i < length; i++) {
+        result += chars[randomInt(0, chars.length)];
+    }
+    return result;
+}
 
 function sanitizeBase(str: string) {
     const sanitized = str
@@ -17,17 +23,17 @@ export async function generateUniqueUsername(
 ): Promise<string> {
     const base = sanitizeBase(preferred || "user");
 
-    // try the base name first (no suffix)
+    // 1. Try the base name first
     const firstCheck = await prisma.user.findUnique({
         where: { username: base },
         select: { id: true },
     });
     if (!firstCheck) return base;
 
-    // loop with random suffixes
+    // 2. Loop with random suffixes
     const MAX_ATTEMPTS = 5;
     for (let i = 0; i < MAX_ATTEMPTS; i++) {
-        const candidate = `${base}-${nano()}`;
+        const candidate = `${base}-${generateRandomString(6)}`;
         const exists = await prisma.user.findUnique({
             where: { username: candidate },
             select: { id: true },
@@ -36,7 +42,6 @@ export async function generateUniqueUsername(
         if (!exists) return candidate;
     }
 
-    // final Fallback: if we are still hitting collisions,
-    // use a longer ID to guarantee uniqueness.
-    return `${base}-${customAlphabet("0123456789abcdefghijklmnopqrstuvwxyz", 10)()}`;
+    // 3. Fallback
+    return `${base}-${generateRandomString(10)}`;
 }
