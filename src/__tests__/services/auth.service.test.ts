@@ -1,7 +1,9 @@
 import AuthService from "../../services/auth.service";
 import EmailService from "../../services/email.service";
+import TokenService from "../../services/token.service";
 import { comparePassword, hashPassword } from "../../utils/passwordUtils";
 import prisma from "../../utils/prisma";
+import { verifyRefreshToken } from "../../utils/tokenManagement";
 import { generateUniqueUsername } from "../../utils/username";
 
 // mock external services
@@ -123,6 +125,113 @@ describe("AuthService", () => {
                 ),
             ).rejects.toThrow(/verify email/i);
         });
+
+        it.each(["MODERATOR", "ADMIN", "SUPER_ADMIN"] as const)(
+            "should login %s successfully and include role in response",
+            async (role) => {
+                const hashedPassword = await hashPassword(
+                    validUserData.password,
+                );
+
+                await prisma.user.create({
+                    data: {
+                        email: `${role.toLowerCase()}@example.com`,
+                        password: hashedPassword,
+                        username: `${role.toLowerCase()}-tester`,
+                        isVerified: true,
+                        role,
+                    },
+                });
+
+                const result = await AuthService.loginUser(
+                    `${role.toLowerCase()}@example.com`,
+                    validUserData.password,
+                );
+
+                expect(result.user.role).toBe(role);
+                expect(result).toHaveProperty("accessToken");
+                expect(result).toHaveProperty("refreshToken");
+            },
+        );
+
+        it("should throw error if user account is suspended", async () => {
+            const hashedPassword = await hashPassword(validUserData.password);
+
+            await prisma.user.create({
+                data: {
+                    email: "suspended@example.com",
+                    password: hashedPassword,
+                    username: "suspended-user",
+                    isVerified: true,
+                    isSuspended: true,
+                },
+            });
+
+            await expect(
+                AuthService.loginUser(
+                    "suspended@example.com",
+                    validUserData.password,
+                ),
+            ).rejects.toThrow(/account suspended/i);
+        });
+    });
+
+    describe("refreshToken", () => {
+        it.each(["MODERATOR", "ADMIN", "SUPER_ADMIN"] as const)(
+            "should refresh token successfully for %s",
+            async (role) => {
+                const hashedPassword = await hashPassword(
+                    validUserData.password,
+                );
+
+                const user = await prisma.user.create({
+                    data: {
+                        email: `${role.toLowerCase()}-refresh@example.com`,
+                        password: hashedPassword,
+                        username: `${role.toLowerCase()}-refresh`,
+                        isVerified: true,
+                        role,
+                    },
+                });
+
+                const { refreshToken } = await TokenService.createAuthTokens(
+                    user.id,
+                    user.isVerified,
+                );
+
+                const decoded = verifyRefreshToken(refreshToken);
+
+                const result = await AuthService.refreshToken(decoded);
+
+                expect(result).toHaveProperty("accessToken");
+                expect(result).toHaveProperty("refreshToken");
+                expect(result.refreshToken).not.toBe(refreshToken);
+            },
+        );
+
+        it("should throw error when refreshing token for suspended user", async () => {
+            const hashedPassword = await hashPassword(validUserData.password);
+
+            const user = await prisma.user.create({
+                data: {
+                    email: "suspended-refresh@example.com",
+                    password: hashedPassword,
+                    username: "suspended-refresh-user",
+                    isVerified: true,
+                    isSuspended: true,
+                },
+            });
+
+            const { refreshToken } = await TokenService.createAuthTokens(
+                user.id,
+                user.isVerified,
+            );
+            const decoded = verifyRefreshToken(refreshToken);
+
+            await expect(AuthService.refreshToken(decoded)).rejects.toThrow(
+                /account suspended/i,
+            );
+        });
     });
 
     describe("verifyUserMail", () => {
@@ -218,6 +327,24 @@ describe("AuthService", () => {
                 expect.any(String),
             );
         });
+
+        it("should throw error if user account is suspended", async () => {
+            const hashedPassword = await hashPassword(validUserData.password);
+
+            await prisma.user.create({
+                data: {
+                    email: "suspended-forgot@example.com",
+                    password: hashedPassword,
+                    username: "suspended-forgot-user",
+                    isVerified: true,
+                    isSuspended: true,
+                },
+            });
+
+            await expect(
+                AuthService.forgotPassword("suspended-forgot@example.com"),
+            ).rejects.toThrow(/account suspended/i);
+        });
     });
 
     describe("resetPassword", () => {
@@ -281,6 +408,27 @@ describe("AuthService", () => {
 
             const isMatch = await comparePassword(newPassword, user!.password);
             expect(isMatch).toBe(true);
+        });
+
+        it("should throw error if user account is suspended", async () => {
+            const suspendedToken = "suspended-reset-token";
+            const hashedPassword = await hashPassword(validUserData.password);
+
+            await prisma.user.create({
+                data: {
+                    email: "suspended-reset@example.com",
+                    password: hashedPassword,
+                    username: "suspended-reset-user",
+                    isVerified: true,
+                    isSuspended: true,
+                    passwordResetToken: suspendedToken,
+                    passwordResetExpiry: new Date(Date.now() + 10 * 60 * 1000),
+                },
+            });
+
+            await expect(
+                AuthService.resetPassword(suspendedToken, "NewPassword123!"),
+            ).rejects.toThrow(/account suspended/i);
         });
     });
 });

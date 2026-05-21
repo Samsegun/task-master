@@ -154,6 +154,7 @@ class AuthService {
 
         if (isSuspended)
             throw new ForbiddenError("Account suspended", "ACCOUNT_SUSPENDED");
+
         const { accessToken, refreshToken } =
             await TokenService.createAuthTokens(id, isVerified);
 

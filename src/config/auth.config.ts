@@ -7,7 +7,7 @@ import {
 } from "../utils/tokenManagement";
 
 const REFRESH_PASSWORD_EXPIRATION_TIME: any = getEnvVariable(
-    "REFRESH_PASSWORD_EXPIRATION"
+    "REFRESH_PASSWORD_EXPIRATION",
 );
 
 const ACCESS_TOKEN_EXPIRY_TIME = parseInt(ms(ACCESS_TOKEN_EXPIRY));
@@ -24,10 +24,11 @@ export const baseCookieOptions: CookieOptions = {
 };
 
 /**
- * Here, the accessToken cookie maxAge is same as the refreshToken.
- * If accessToken cookie maxAge is short-lived(e.g 5mins),
- * the browser deletes the cookie once it expires and will not be sent to the server.
- *  This prevents the auth-middleware from handling valid or invalid tokens.
+ * The accessToken cookie maxAge is intentionally set to match the refreshToken's.
+ * The cookie is just a transport vehicle — the JWT's own expiry (`exp` claim) is
+ * what auth middleware validates. Setting a short cookie maxAge would cause the
+ * browser to drop the cookie before the refresh flow gets a chance to replace it,
+ * breaking silent token rotation for still-active sessions.
  */
 export const accessTokenCookieOptions = {
     ...baseCookieOptions,
