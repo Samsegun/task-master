@@ -1,10 +1,4 @@
-// import { createDefaultPreset } from "ts-jest";
-const { createDefaultPreset } = require("ts-jest");
-
-const tsJestTransformCfg = createDefaultPreset().transform;
-
-/** @type {import("jest").Config} */
-module.exports = {
+export default {
     preset: "ts-jest",
     testEnvironment: "node",
     roots: ["<rootDir>/src"],
@@ -28,4 +22,5 @@ module.exports = {
     ],
     setupFilesAfterEnv: ["<rootDir>/src/__tests__/setup.ts"],
     testTimeout: 10000,
+    maxWorkers: 1,
 };

@@ -2,7 +2,8 @@ import ProjectService from "../../services/project.service";
 import ProjectMemberService from "../../services/projectMember.service";
 import { hashPassword } from "../../utils/passwordUtils";
 import { generateUniqueUsername } from "../../utils/username";
-import { prisma } from "../setup";
+// import { prisma } from "../setup";
+import prisma from "../../utils/prisma";
 
 describe("ProjectMemberService", () => {
     let ownerId: string;

@@ -1,6 +1,4 @@
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import prisma from "../utils/prisma";
 
 beforeAll(async () => {
     console.log("connecting to db...");
@@ -8,19 +6,16 @@ beforeAll(async () => {
 });
 
 afterEach(async () => {
-    const deleteRefreshTokens = prisma.refreshToken.deleteMany();
-    const deleteTasks = prisma.task.deleteMany();
-    const deleteProjectMembers = prisma.projectMember.deleteMany();
-    const deleteProjects = prisma.project.deleteMany();
-    const deleteUsers = prisma.user.deleteMany();
-
     await prisma.$transaction([
-        deleteRefreshTokens,
-        deleteTasks,
-        deleteProjectMembers,
-        deleteProjects,
-        deleteUsers,
+        prisma.refreshToken.deleteMany(),
+        prisma.task.deleteMany(),
+        prisma.projectInvitation.deleteMany(),
+        prisma.projectMember.deleteMany(),
+        prisma.project.deleteMany(),
+        prisma.user.deleteMany(),
     ]);
+
+    jest.clearAllMocks();
 });
 
 afterAll(async () => {

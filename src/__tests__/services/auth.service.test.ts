@@ -2,7 +2,8 @@ import AuthService from "../../services/auth.service";
 import EmailService from "../../services/email.service";
 import { comparePassword, hashPassword } from "../../utils/passwordUtils";
 import { generateUniqueUsername } from "../../utils/username";
-import { prisma } from "../setup";
+// import { prisma } from "../setup";
+import prisma from "../../utils/prisma";
 
 // mock external services
 jest.mock("../../services/email.service");
