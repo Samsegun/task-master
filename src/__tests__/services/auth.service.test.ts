@@ -1,9 +1,8 @@
 import AuthService from "../../services/auth.service";
 import EmailService from "../../services/email.service";
 import { comparePassword, hashPassword } from "../../utils/passwordUtils";
-import { generateUniqueUsername } from "../../utils/username";
-// import { prisma } from "../setup";
 import prisma from "../../utils/prisma";
+import { generateUniqueUsername } from "../../utils/username";
 
 // mock external services
 jest.mock("../../services/email.service");
@@ -12,14 +11,12 @@ describe("AuthService", () => {
     const validUserData = {
         email: "test@example.com",
         password: "Password123!",
-        // username: crypto.randomUUID().slice(0, 8),
     };
 
     const createTestUser = async () => {
         return await AuthService.createUser(
             validUserData.email,
             validUserData.password,
-            // validUserData.username,
         );
     };
     const userInDB = async () => {
