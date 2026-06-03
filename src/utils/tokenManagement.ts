@@ -55,12 +55,11 @@ function verifyInvitationToken(token: string) {
 export {
     ACCESS_TOKEN_EXPIRY,
     generateAccessToken,
-    generateRefreshToken,
     generateInvitationToken,
+    generateRefreshToken,
     getEnvVariable,
     REFRESH_TOKEN_EXPIRY,
     verifyAccessToken,
-    verifyRefreshToken,
     verifyInvitationToken,
-    // verifyDecliInvitationToken
+    verifyRefreshToken,
 };

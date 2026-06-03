@@ -111,6 +111,7 @@ class UserService {
         return { message: "Password updated successfully" };
     }
 
+    /***  Admin related services ***/
     static async getAllUsers() {
         return prisma.user.findMany({
             select: {

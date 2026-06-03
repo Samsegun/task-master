@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
-import { UnauthorizedError } from "../errors";
-import prisma from "../utils/prisma";
+import { EntityNotFound, ForbiddenError } from "../errors";
+import UserService from "../services/user.service";
 
 class AdminMiddleware {
     static authorizeNonUser = async (
@@ -10,20 +10,14 @@ class AdminMiddleware {
     ) => {
         const requesterId = (req as any).userId;
 
-        const user = await prisma.user.findUnique({
-            where: { id: requesterId },
-            select: { role: true, id: true },
-        });
+        const user = await UserService.getAuthStatus(requesterId);
 
-        if (!user) throw new UnauthorizedError("No user found");
+        if (!user) throw new EntityNotFound("No user found");
 
         const allowedRoles = ["MODERATOR", "ADMIN", "SUPER_ADMIN"];
 
-        if (!allowedRoles.includes(user.role)) {
-            throw new UnauthorizedError(
-                "Access denied: elevated role required",
-            );
-        }
+        if (!allowedRoles.includes(user.role))
+            throw new ForbiddenError("Access denied: elevated role required");
 
         (req as any).superUserInfo = user;
         next();
