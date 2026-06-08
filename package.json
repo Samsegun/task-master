@@ -6,7 +6,7 @@
     "scripts": {
         "build": "tsc",
         "start": "cross-env NODE_ENV=production node dist/src/server.js",
-        "dev": "cross-env NODE_ENV=development nodemon --watch src --exec ts-node src/server.ts",
+        "dev": "cross-env NODE_ENV=development nodemon -L --watch src --exec ts-node src/server.ts",
         "test": "npx dotenv -e .env.test jest --runInBand --detectOpenHandles",
         "test:watch": "npx dotenv -e .env.test jest --watch",
         "test:coverage": "npx dotenv -e .env.test jest --coverage",

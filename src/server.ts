@@ -1,10 +1,16 @@
 import dotenv from "dotenv";
 const environment = process.env.NODE_ENV || "development";
+let envPath: string;
+
 if (environment === "production") {
-    dotenv.config();
+    envPath = ".env";
+} else if (environment === "docker") {
+    envPath = ".env.docker";
 } else {
-    dotenv.config({ path: `.env.${environment}` });
+    envPath = `.env.${environment}`;
 }
+
+dotenv.config({ path: envPath });
 
 import http from "http";
 import app from "./app";

@@ -1,0 +1,43 @@
+services:
+    # ─── PostgreSQL Database ───────────────────────────
+    database:
+        image: postgres:17 # pulled from Docker Hub, no Dockerfile needed
+        container_name: taskmaster-db
+        env_file:
+            - .env.docker
+        ports:
+            - "5432:5432"
+        volumes:
+            - postgres_data:/var/lib/postgresql/data # keeps your data safe
+        healthcheck:
+            test:
+                [
+                    "CMD-SHELL",
+                    "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}",
+                ]
+            interval: 10s
+            retries: 5
+
+    # ─── Express Backend ───────────────────────────────
+    backend:
+        build:
+            context: .
+            target: development # uses the development stage in the Dockerfile
+        container_name: taskmaster-backend
+        ports:
+            - "7000:7000"
+        env_file:
+            - .env.docker
+        environment:
+            NODE_ENV: docker # overrides .env.docker for clarity
+        depends_on:
+            database:
+                condition: service_healthy # waits for postgres to be ready before starting
+        volumes:
+            - .:/app
+            - /app/node_modules # protects node_modules inside container
+
+# ─── Named Volume ──────────────────────────────────
+volumes:
+    postgres_data: # persists DB data even when container stops
+
