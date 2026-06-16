@@ -49,8 +49,18 @@ paths:
                                 properties:
                                     success:
                                         type: boolean
+                                        message:
+                                            type: string
+                                            example: Task created successfully
                                     task:
-                                        $ref: "#/components/schemas/Task"
+                                        type: object
+                                        properties:
+                                            id:
+                                                type: string
+                                            title:
+                                                type: string
+                                            projectId:
+                                                type: string
                 400:
                     description: You already have a task with this name in this project
                 401:
@@ -103,6 +113,8 @@ paths:
                                         type: array
                                         items:
                                             $ref: "#/components/schemas/Task"
+                                    userId:
+                                        type: string
 
                 403:
                     description: You do not have access to this project
@@ -136,7 +148,7 @@ paths:
                                 properties:
                                     success:
                                         type: boolean
-                                    tasks:
+                                    task:
                                         $ref: "#/components/schemas/Task"
 
                 403:
@@ -205,8 +217,18 @@ paths:
                                 properties:
                                     success:
                                         type: boolean
+                                    message:
+                                        type: string
+                                        example: Task updated successfully
                                     task:
-                                        $ref: "#/components/schemas/Task"
+                                        type: object
+                                        properties:
+                                            id:
+                                                type: string
+                                            title:
+                                                type: string
+                                            projectId:
+                                                type: string
 
                 400:
                     description: Assignee is not a member of this project

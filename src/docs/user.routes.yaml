@@ -1,9 +1,123 @@
-# this file documents all routes under the /v1/users/me/tasks tag
+# this file documents all routes under the /v1/users/me/tasks tag and /v1/admin tags
 paths:
+    /v1/users/me:
+        get:
+            summary: Get authenticated user's profile
+            tags: [Users]
+            responses:
+                200:
+                    description: Authenticated user profile
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    success:
+                                        type: boolean
+                                    data:
+                                        $ref: "#/components/schemas/User"
+                500:
+                    description: Internal server error
+
+        patch:
+            summary: Update authenticated user's profile
+            tags: [Users]
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                username:
+                                    type: string
+                                firstName:
+                                    type: string
+                                lastName:
+                                    type: string
+            responses:
+                200:
+                    description: Updated authenticated user profile
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    success:
+                                        type: boolean
+                                    data:
+                                        $ref: "#/components/schemas/User"
+                400:
+                    description: Validation error
+                500:
+                    description: Internal server error
+
+    /v1/users/me/password:
+        patch:
+            summary: Update authenticated user's password
+            tags: [Users]
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            required:
+                                - oldPassword
+                                - newPassword
+                            properties:
+                                oldPassword:
+                                    type: string
+                                    format: password
+                                newPassword:
+                                    type: string
+                                    format: password
+            responses:
+                200:
+                    description: Password updated successfully
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    success:
+                                        type: boolean
+                                    message:
+                                        type: string
+                400:
+                    description: Validation error or invalid password
+                500:
+                    description: Internal server error
+
     /v1/users/me/tasks:
         get:
             summary: User tasks across all projects
             tags: [Users]
+            parameters:
+                - in: query
+                  name: limit
+                  schema:
+                      type: integer
+                      minimum: 1
+                  description: Maximum number of tasks to return
+                - in: query
+                  name: sort
+                  schema:
+                      type: string
+                      example: createdAt:desc
+                  description: Sort field and order in the format field:asc or field:desc
+                - in: query
+                  name: status
+                  schema:
+                      type: string
+                      enum: [TODO, IN_PROGRESS, DONE]
+                  description: Filter by status
+                - in: query
+                  name: priority
+                  schema:
+                      type: string
+                      enum: [LOW, MEDIUM, HIGH]
+                  description: Filter by priority
             responses:
                 200:
                     description: List of all tasks assigned to a user
@@ -18,6 +132,8 @@ paths:
                                         type: array
                                         items:
                                             $ref: "#/components/schemas/Task"
+                                    userId:
+                                        type: string
                 404:
                     description: No tasks found
                 500:
@@ -37,11 +153,144 @@ paths:
                                 properties:
                                     success:
                                         type: boolean
-                                    tasks:
+                                    data:
                                         type: array
                                         items:
                                             $ref: "#/components/schemas/Task"
                 404:
                     description: No tasks found
+                500:
+                    description: Internal server error
+
+    /v1/admin/users:
+        get:
+            summary: Get all users
+            tags: [Users]
+            responses:
+                200:
+                    description: List of users
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    success:
+                                        type: boolean
+                                    data:
+                                        type: array
+                                        items:
+                                            $ref: "#/components/schemas/User"
+                403:
+                    description: Admin access required
+                500:
+                    description: Internal server error
+
+    /v1/admin/users/:userId:
+        get:
+            summary: Get user by ID
+            tags: [Users]
+            parameters:
+                - in: path
+                  name: userId
+                  required: true
+                  schema:
+                      type: string
+            responses:
+                200:
+                    description: User details
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    success:
+                                        type: boolean
+                                    data:
+                                        $ref: "#/components/schemas/User"
+                403:
+                    description: Admin access required
+                404:
+                    description: User not found
+                500:
+                    description: Internal server error
+
+    /v1/admin/users/:userId/role:
+        patch:
+            summary: Update user role
+            tags: [Users]
+            parameters:
+                - in: path
+                  name: userId
+                  required: true
+                  schema:
+                      type: string
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            required:
+                                - role
+                            properties:
+                                role:
+                                    type: string
+                                    enum: [USER, ADMIN, MODERATOR, SUPER_ADMIN]
+            responses:
+                200:
+                    description: User role updated
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    success:
+                                        type: boolean
+                                    data:
+                                        $ref: "#/components/schemas/User"
+                403:
+                    description: Admin access required
+                404:
+                    description: User not found
+                500:
+                    description: Internal server error
+
+    /v1/admin/users/:userId/suspension:
+        patch:
+            summary: Update user suspension status
+            tags: [Users]
+            parameters:
+                - in: path
+                  name: userId
+                  required: true
+                  schema:
+                      type: string
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            required:
+                                - isSuspended
+                            properties:
+                                isSuspended:
+                                    type: boolean
+            responses:
+                200:
+                    description: User suspension updated
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    success:
+                                        type: boolean
+                                    data:
+                                        $ref: "#/components/schemas/User"
+                403:
+                    description: Admin access required
+                404:
+                    description: User not found
                 500:
                     description: Internal server error

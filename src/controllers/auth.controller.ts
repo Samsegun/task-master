@@ -91,10 +91,6 @@ class AuthController {
                 success: true,
                 message: "Email verified successfully. You are now signned in.",
                 user,
-                // invitationToken:
-                //     typeof invitationToken === "string"
-                //         ? invitationToken
-                //         : null,
             });
         },
     );

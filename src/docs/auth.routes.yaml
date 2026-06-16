@@ -121,19 +121,8 @@ paths:
             summary: Logout user
             tags: [Auth]
             responses:
-                200:
+                204:
                     description: Logged out successfully
-                    content:
-                        application/json:
-                            schema:
-                                type: object
-                                properties:
-                                    success:
-                                        type: boolean
-                                        example: true
-                                    message:
-                                        type: string
-                                        example: Logged out successfully
 
     /auth/refresh-token:
         post:
@@ -161,12 +150,12 @@ paths:
                     description: Internal server error
 
     /auth/verify-email:
-        post:
+        get:
             summary: Verify Email
             tags: [Auth]
             responses:
                 200:
-                    description: User can successfully log in.
+                    description: User email verified and auth cookies set.
                     content:
                         application/json:
                             schema:
@@ -177,7 +166,7 @@ paths:
                                         example: true
                                     message:
                                         type: string
-                                        example: Email verified successfully. You can now sign in.
+                                        example: Email verified successfully. You are now signned in.
                 400:
                     description: Invalid or expired verification token
                 500:
@@ -208,12 +197,27 @@ paths:
                     content:
                         application/json:
                             schema:
-                            $ref: "#/components/schemas/Error"
+                                $ref: "#/components/schemas/Error"
 
     /auth/reset-password:
         post:
             summary: Reset user password
             tags: [Auth]
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            required:
+                                - token
+                                - password
+                            properties:
+                                token:
+                                    type: string
+                                password:
+                                    type: string
+                                    format: password
             responses:
                 200:
                     description: Reset user password.

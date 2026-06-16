@@ -1,5 +1,97 @@
 # this file documents all routes under the /v1/projects/projectId/members tag
 paths:
+    /v1/projects/:projectId/members/invite:
+        post:
+            summary: Invite a project member by email
+            tags: [Project Members]
+            parameters:
+                - in: path
+                  name: projectId
+                  required: true
+                  schema:
+                      type: string
+                  description: Project ID
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            required:
+                                - email
+                                - role
+                            properties:
+                                email:
+                                    type: string
+                                    format: email
+                                role:
+                                    type: string
+                                    enum: [OWNER, MEMBER]
+            responses:
+                200:
+                    description: Project invitation created
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    success:
+                                        type: boolean
+                                    message:
+                                        type: string
+                                    data:
+                                        type: object
+                400:
+                    description: Invalid invitation details or user is already a member
+                403:
+                    description: Only project owner can invite members
+                500:
+                    description: Internal server error
+
+    /v1/projects/invitations/accept:
+        post:
+            summary: Accept a project invitation
+            tags: [Project Members]
+            responses:
+                200:
+                    description: Project invitation accepted
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    success:
+                                        type: boolean
+                                    message:
+                                        type: string
+                                    data:
+                                        $ref: "#/components/schemas/ProjectMember"
+                400:
+                    description: Invalid invitation token
+                500:
+                    description: Internal server error
+
+    /v1/projects/invitations/decline:
+        post:
+            summary: Decline a project invitation
+            tags: [Project Members]
+            responses:
+                200:
+                    description: Project invitation declined
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    success:
+                                        type: boolean
+                                    message:
+                                        type: string
+                400:
+                    description: Invalid invitation token
+                500:
+                    description: Internal server error
+
     /v1/projects/:projectId/members:
         post:
             summary: Add a new project member
@@ -37,7 +129,13 @@ paths:
                                     success:
                                         type: boolean
                                     newMember:
-                                        $ref: "#/components/schemas/ProjectMember"
+                                        type: object
+                                        properties:
+                                            id:
+                                                type: string
+                                            email:
+                                                type: string
+                                                format: email
                 400:
                     description: User is already a member of this project
                 403:

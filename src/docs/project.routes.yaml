@@ -36,7 +36,12 @@ paths:
                                         type: string
                                         example: Project created successfully
                                     project:
-                                        $ref: "#/components/schemas/Project"
+                                        type: object
+                                        properties:
+                                            id:
+                                                type: string
+                                            name:
+                                                type: string
                 400:
                     description: Validation error or You already have a project with this name
                 404:
@@ -47,6 +52,19 @@ paths:
         get:
             summary: Get all user's projects
             tags: [Projects]
+            parameters:
+                - in: query
+                  name: limit
+                  schema:
+                      type: integer
+                      minimum: 1
+                  description: Maximum number of projects to return
+                - in: query
+                  name: sort
+                  schema:
+                      type: string
+                      example: updatedAt:desc
+                  description: Sort field and order in the format field:asc or field:desc
             responses:
                 200:
                     description: List of user projects
