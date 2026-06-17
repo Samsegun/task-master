@@ -33,6 +33,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(morgan("combined"));
 app.use(cookieParser());
 
+app.set("trust proxy", 1);
 app.use("/api", appRouter);
 
 setupSwagger(app);

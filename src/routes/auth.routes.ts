@@ -1,6 +1,12 @@
 import { Router } from "express";
 import AuthController from "../controllers/auth.controller";
 import AuthMiddleware from "../middleware/AuthMiddleware";
+
+import {
+    loginLimiter,
+    passwordResetLimiter,
+    registerLimiter,
+} from "../middleware/RateLimiter";
 import ValidationMiddleware from "../middleware/ValidationMiddleware";
 import AuthValidator from "../validators/auth.validator";
 
@@ -19,16 +25,21 @@ const {
 } = AuthController;
 const { validateBodyData } = ValidationMiddleware;
 
-authRouter.post("/register", validateBodyData(create), createUser);
+authRouter.post(
+    "/register",
+    validateBodyData(create),
+    registerLimiter,
+    createUser,
+);
 
-authRouter.post("/login", validateBodyData(login), loginUser);
+authRouter.post("/login", validateBodyData(login), loginLimiter, loginUser);
 
 authRouter.post("/logout", logoutUser);
 
 authRouter.post(
     "/refresh-token",
     AuthMiddleware.refreshTokenValidation,
-    refreshAccessToken
+    refreshAccessToken,
 );
 
 authRouter.get("/verify-email", verifyUserMail);
@@ -36,13 +47,14 @@ authRouter.get("/verify-email", verifyUserMail);
 authRouter.post(
     "/forgot-password",
     validateBodyData(validateForgotPassword),
-    forgotPassword
+    forgotPassword,
 );
 
 authRouter.post(
     "/reset-password",
     validateBodyData(validateResetPassword),
-    resetPassword
+    passwordResetLimiter,
+    resetPassword,
 );
 
 export default authRouter;
