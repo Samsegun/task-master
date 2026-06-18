@@ -5,17 +5,17 @@
     "main": "server.js",
     "scripts": {
         "build": "tsc",
-        "start": "cross-env NODE_ENV=production node dist/src/server.js",
+        "start": "node dist/src/server.js",
         "dev": "cross-env NODE_ENV=development nodemon -L --watch src --exec ts-node src/server.ts",
         "test": "npx dotenv -e .env.test jest --runInBand --detectOpenHandles",
         "test:watch": "npx dotenv -e .env.test jest --watch",
         "test:coverage": "npx dotenv -e .env.test jest --coverage",
         "lint": "pnpm exec eslint \"src/**/*.{ts,tsx}\"",
         "lint:fix": "pnpm exec eslint \"src/**/*.{ts,tsx}\" --fix",
-        "migrate": "npx prisma migrate deploy",
+        "migrate": "prisma migrate deploy",
         "migrate:dev": "npx dotenv -e .env.development -- npx prisma migrate dev",
         "migrate:test": "npx dotenv -e .env.test -- npx prisma migrate deploy",
-        "generate": "npx prisma generate",
+        "generate": "prisma generate",
         "seed:dev": "npx dotenv -e .env.development -- npx prisma db seed",
         "seed:test": "npx dotenv -e .env.test -- npx prisma db seed"
     },
@@ -40,7 +40,8 @@
         "nodemailer": "^7.0.9",
         "swagger-jsdoc": "^6.2.8",
         "swagger-ui-express": "^5.0.1",
-        "zod": "^4.1.12"
+        "zod": "^4.1.12",
+        "prisma": "^6.17.1"
     },
     "devDependencies": {
         "@eslint/js": "^10.0.1",
@@ -61,7 +62,6 @@
         "eslint": "^10.3.0",
         "jest": "^30.2.0",
         "nodemon": "^3.1.10",
-        "prisma": "^6.17.1",
         "supertest": "^7.1.4",
         "ts-jest": "^29.4.5",
         "ts-node": "^10.9.2",

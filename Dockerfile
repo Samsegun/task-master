@@ -1,52 +1,48 @@
 # syntax=docker/dockerfile:1
-FROM node:22-alpine3.23 AS builder
+FROM node:22-alpine3.23 AS base
 
 WORKDIR /app
-ENV PNPM_HOME="/pnpm" PATH="$PNPM_HOME:$PATH"
+ENV PNPM_HOME="/pnpm" \
+    PATH="$PNPM_HOME:$PATH" \
+    PRISMA_ENGINES_CHECKSUM_IGNORE_MISSING=1
 
-RUN npm install -g pnpm@10.12.4
+RUN corepack enable && corepack prepare pnpm@10.12.4 --activate
 
-COPY package.json pnpm-lock.yaml tsconfig.json ./
-COPY prisma ./prisma
-COPY src ./src
-COPY entrypoint.sh ./
-
-RUN pnpm install --frozen-lockfile
-RUN pnpm run generate
-RUN pnpm run build
-
-FROM node:22-alpine3.23 AS production
-
-WORKDIR /app
-ENV NODE_ENV=production
-ENV PNPM_HOME="/pnpm" PATH="$PNPM_HOME:$PATH"
-
-RUN npm install -g pnpm@10.12.4
+FROM base AS deps
 
 COPY package.json pnpm-lock.yaml ./
+RUN --mount=type=cache,id=pnpm-store,target=/pnpm/store \
+    pnpm install --frozen-lockfile
 
-# THE FIX: Chain the install and the cache-clearing in a single RUN command.
-# If you don't chain them with `&&`, Docker will still save the 400MB cache in the install layer!
-RUN pnpm install --prod --frozen-lockfile \
-    && pnpm store prune \
-    && rm -rf /pnpm/store
+FROM deps AS builder
 
-RUN pnpm add prisma@6.17.1
+COPY tsconfig.json ./
+COPY prisma ./prisma
+COPY src ./src
 
-# Copy compiled dist from builder stage
+RUN pnpm run generate && pnpm run build
+
+FROM base AS production
+
+COPY package.json pnpm-lock.yaml ./
+RUN --mount=type=cache,id=pnpm-prod-store,target=/pnpm/store \
+    pnpm install --prod --frozen-lockfile && \
+    pnpm store prune && \
+    rm -rf /pnpm/store /root/.cache /root/.npm
+
+
 COPY --from=builder /app/dist ./dist
 
 # THE FIX: Copy ONLY the schema and migrations. Do NOT copy the whole folder.
 COPY --from=builder /app/prisma/schema.prisma ./prisma/schema.prisma
 COPY --from=builder /app/prisma/migrations ./prisma/migrations
+COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
+COPY entrypoint.sh ./entrypoint.sh
 
-# Regenerate client to match this stage
-RUN pnpm run generate
-
-COPY entrypoint.sh .
-RUN chmod +x /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh && \
+    rm -rf /root/.cache /root/.npm /tmp/*
 
 EXPOSE 3001
 
 ENTRYPOINT ["/app/entrypoint.sh"]
-CMD ["pnpm", "run", "start"]
+CMD ["node", "dist/src/server.js"]

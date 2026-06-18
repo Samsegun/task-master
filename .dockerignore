@@ -1,0 +1,51 @@
+# Dependencies (reinstalled inside container via pnpm install)
+node_modules
+
+# TypeScript build output (rebuilt inside container)
+dist
+build
+ 
+# Local environment and generated artifacts.
+.env
+.env.*
+!.env.sample
+!.env.docker.sample
+*.log
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.pnpm-debug.log*
+.pnpm-store
+
+# Git
+.git
+.gitignore
+ 
+# Docker files themselves
+Dockerfile
+.dockerignore
+docker-compose*.yml
+ 
+# OS
+.DS_Store
+Thumbs.db
+ 
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+ 
+# Test files (no tests in container)
+**/*.test.ts
+**/*.spec.ts
+jest.config*
+coverage/
+ 
+# Prisma generated client (regenerated during build via prisma generate)
+/src/generated
+/generated

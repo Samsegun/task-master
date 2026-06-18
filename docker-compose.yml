@@ -3,7 +3,7 @@ services:
     backend:
         build:
             context: .
-            # target: development # uses the development stage in the Dockerfile
+            target: production
         container_name: taskmaster-backend
         ports:
             - "3001:3001"
