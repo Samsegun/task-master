@@ -1,7 +1,8 @@
 #!/bin/sh
+set -e
 
 echo "Running Prisma migrations..."
-pnpm run migrate        # ← your existing migration script
+npx prisma migrate deploy        # ← your existing migration script
 
 echo "Starting server..."
 exec "$@"               # ← runs whatever CMD is passed (dev or prod)

@@ -1,4 +1,3 @@
-# syntax=docker/dockerfile:1
 FROM node:22-alpine3.23 AS base
 
 WORKDIR /app
@@ -25,23 +24,25 @@ RUN pnpm run generate && pnpm run build
 FROM base AS production
 
 ENV NODE_ENV=production
+
 COPY package.json pnpm-lock.yaml ./
 RUN --mount=type=cache,id=pnpm-prod-store,target=/pnpm/store \
     pnpm install --prod --frozen-lockfile && \
     pnpm store prune && \
-    rm -rf /pnpm/store /root/.cache /root/.npm
-
+    rm -rf /root/.cache /root/.npm
 
 COPY --from=builder /app/dist ./dist
-
-# THE FIX: Copy ONLY the schema and migrations. Do NOT copy the whole folder.
 COPY --from=builder /app/prisma/schema.prisma ./prisma/schema.prisma
 COPY --from=builder /app/prisma/migrations ./prisma/migrations
-COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
-COPY entrypoint.sh ./entrypoint.sh
 
-RUN chmod +x /app/entrypoint.sh && \
-    rm -rf /root/.cache /root/.npm /tmp/*
+COPY entrypoint.sh ./entrypoint.sh
+RUN chmod +x ./entrypoint.sh
+
+# Generate Prisma client in final image
+RUN pnpm run generate
+
+# Cleanup
+RUN rm -rf /root/.cache /root/.npm /tmp/*
 
 EXPOSE 3001
 
