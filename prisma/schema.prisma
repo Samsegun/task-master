@@ -1,6 +1,10 @@
 
 generator client {
   provider = "prisma-client-js"
+  /** docker specific config */
+  // "native" keeps it working locally on your PC
+  // "linux-musl-openssl-3.0.x" is the specific ultra-light engine for Alpine Linux 3.23
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
 }
 
 datasource db {

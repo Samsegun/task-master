@@ -26,6 +26,7 @@ FROM base AS production
 ENV NODE_ENV=production
 
 COPY package.json pnpm-lock.yaml ./
+
 RUN --mount=type=cache,id=pnpm-prod-store,target=/pnpm/store \
     pnpm install --prod --frozen-lockfile && \
     pnpm store prune && \

@@ -2,6 +2,10 @@ import { Express } from "express";
 import swaggerJsdoc from "swagger-jsdoc";
 import swaggerUi from "swagger-ui-express";
 
+const swaggerBaseUrl =
+    process.env.SWAGGER_BASE_URL ||
+    `http://localhost:${process.env.PORT || 3001}/api`;
+
 const options = {
     definition: {
         openapi: "3.0.0",
@@ -13,12 +17,8 @@ const options = {
         },
         servers: [
             {
-                url: "http://localhost:7000/api",
-                description: "Development server",
-            },
-            {
-                url: "/api",
-                description: "Production server",
+                url: swaggerBaseUrl,
+                description: "API server",
             },
         ],
         components: {
@@ -149,7 +149,7 @@ export const setupSwagger = (app: Express) => {
     app.use(
         "/api/docs",
         swaggerUi.serve,
-        swaggerUi.setup(specs, { explorer: true })
+        swaggerUi.setup(specs, { explorer: true }),
     );
-    console.log("Swagger docs available at /api/docs");
+    console.log(`Swagger docs available at ${swaggerBaseUrl}/docs`);
 };
