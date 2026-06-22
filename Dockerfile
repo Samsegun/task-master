@@ -3,8 +3,7 @@ FROM node:22-alpine3.23 AS base
 
 WORKDIR /app
 ENV PNPM_HOME="/pnpm" \
-    PATH="$PNPM_HOME:$PATH" \
-    PRISMA_ENGINES_CHECKSUM_IGNORE_MISSING=1
+    PATH="$PNPM_HOME:$PATH"
 
 RUN corepack enable && corepack prepare pnpm@10.12.4 --activate
 
@@ -44,8 +43,7 @@ RUN --mount=type=cache,id=pnpm-prod-store,target=/pnpm/store \
 FROM node:22-alpine3.23 AS production
 
 WORKDIR /app
-ENV NODE_ENV=production \
-    PRISMA_ENGINES_CHECKSUM_IGNORE_MISSING=1
+ENV NODE_ENV=production
 
 # 1. Copy over your built code & essential runtime assets
 COPY --from=builder /app/dist ./dist
