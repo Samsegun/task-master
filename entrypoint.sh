@@ -2,7 +2,7 @@
 set -e
 
 echo "Running Prisma migrations..."
-npx prisma migrate deploy        # ← your existing migration script
+npx prisma migrate deploy        
 
 echo "Starting server..."
-exec "$@"               # ← runs whatever CMD is passed (dev or prod)
+exec "$@"               # runs whatever CMD is passed (dev or prod)
