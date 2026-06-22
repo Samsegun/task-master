@@ -33,14 +33,12 @@ RUN --mount=type=cache,id=pnpm-prod-store,target=/pnpm/store \
     rm -rf /root/.cache /root/.npm
 
 COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/src/docs ./src/docs
 COPY --from=builder /app/prisma/schema.prisma ./prisma/schema.prisma
 COPY --from=builder /app/prisma/migrations ./prisma/migrations
 
 COPY entrypoint.sh ./entrypoint.sh
 RUN chmod +x ./entrypoint.sh
-
-# Generate Prisma client in final image
-RUN pnpm run generate
 
 # Cleanup
 RUN rm -rf /root/.cache /root/.npm /tmp/*
