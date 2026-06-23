@@ -7,11 +7,12 @@ const smtpPort = getEnvVariable("SMTP_PORT");
 const smtpUser = getEnvVariable("SMTP_USER");
 const smtpPassword = getEnvVariable("SMTP_PASSWORD");
 const fromEmail = getEnvVariable("FROM_EMAIL");
+const nodeEnv = getEnvVariable("NODE_ENV");
 
 let transportOptions: any;
 
 if (smtpService === "gmail") {
-    // gmail config
+    // gmail config for prod
     transportOptions = {
         service: "gmail",
         auth: {
@@ -20,7 +21,7 @@ if (smtpService === "gmail") {
         },
     };
 } else {
-    // generic SMTP config
+    // generic SMTP config for dev/tests
     transportOptions = {
         host: smtpHost,
         port: parseInt(smtpPort || "587", 10),
@@ -36,6 +37,7 @@ export const emailConfig = {
     SMTP_USER: smtpUser,
     FROM_EMAIL: fromEmail,
     transportOptions,
+    nodeEnv,
 };
 
 // const emailConfig = {

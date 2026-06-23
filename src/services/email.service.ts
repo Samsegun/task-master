@@ -19,7 +19,7 @@ class EmailService {
         const mailOptions = {
             from: emailConfig.FROM_EMAIL,
             to: email,
-            subject: "Verify Your Email Address - Task-Master",
+            subject: "Task-Master - Verify Your Email Address",
             html: `
         <section>
         <h1>Email Verification</h1>
@@ -37,10 +37,17 @@ class EmailService {
                 await this.#transporter.sendMail(mailOptions);
 
             console.log("Email sent");
-            console.log(
-                "Ethereal message sent! Preview URL: ",
-                nodemailer.getTestMessageUrl(info),
-            );
+
+            // only log preview URLs if explicitly using Ethereal in development
+            if (emailConfig.nodeEnv === "development") {
+                const previewUrl = nodemailer.getTestMessageUrl(info);
+                if (previewUrl) {
+                    console.log(
+                        "Ethereal message sent! Preview URL: ",
+                        previewUrl,
+                    );
+                }
+            }
         } catch (error) {
             console.error("Error sending email:", error);
             throw error;
@@ -64,9 +71,9 @@ class EmailService {
         )}`;
 
         const mailOptions = {
-            from: process.env.FROM_EMAIL!,
+            from: emailConfig.FROM_EMAIL,
             to: email,
-            subject: "Reset Your Password - Task-Master",
+            subject: "Task-Master - Reset Your Password ",
             html: `
             <section>
             <h1>Reset Password</h1>
@@ -83,10 +90,16 @@ class EmailService {
                 await this.#transporter.sendMail(mailOptions);
 
             console.log("Email sent");
-            console.log(
-                "Ethereal message sent! Preview URL: ",
-                nodemailer.getTestMessageUrl(info),
-            );
+
+            if (emailConfig.nodeEnv === "development") {
+                const previewUrl = nodemailer.getTestMessageUrl(info);
+                if (previewUrl) {
+                    console.log(
+                        "Ethereal message sent! Preview URL: ",
+                        previewUrl,
+                    );
+                }
+            }
         } catch (error) {
             console.error("Error sending email:", error);
             throw error;
@@ -145,10 +158,16 @@ class EmailService {
                 await this.#transporter.sendMail(mailOptions);
 
             console.log("Email sent");
-            console.log(
-                "Ethereal message sent! Preview URL: ",
-                nodemailer.getTestMessageUrl(info),
-            );
+
+            if (emailConfig.nodeEnv === "development") {
+                const previewUrl = nodemailer.getTestMessageUrl(info);
+                if (previewUrl) {
+                    console.log(
+                        "Ethereal message sent! Preview URL: ",
+                        previewUrl,
+                    );
+                }
+            }
         } catch (error) {
             console.error("Error sending email:", error);
             throw error;
