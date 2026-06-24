@@ -33,32 +33,27 @@ class AuthService {
         // generate unique username
         const username = await generateUniqueUsername();
 
-        // create user and email delivery
-        const newUser = await prisma.$transaction(async (tx) => {
-            const user = await tx.user.create({
-                data: {
-                    email,
-                    password: hashedPassword,
-                    username,
-                    verificationToken,
-                    verificationTokenExpiry,
-                },
-                select: {
-                    id: true,
-                    email: true,
-                    isVerified: true,
-                },
-            });
-
-            // if this fails, user creation rolls back
-            await EmailService.sendVerificationEmail(
+        // create user
+        const newUser = await prisma.user.create({
+            data: {
                 email,
+                password: hashedPassword,
+                username,
                 verificationToken,
-                invitationToken,
-            );
-
-            return user;
+                verificationTokenExpiry,
+            },
+            select: {
+                id: true,
+                email: true,
+                isVerified: true,
+            },
         });
+
+        await EmailService.sendVerificationEmail(
+            email,
+            verificationToken,
+            invitationToken,
+        );
 
         return newUser;
     };
@@ -235,22 +230,17 @@ class AuthService {
             Date.now() + authConfig.refreshPasswordTokenTime,
         );
 
-        // update user with reset token and send mail
-        await prisma.$transaction(async (tx) => {
-            await tx.user.update({
-                where: { id: user.id },
-                data: {
-                    passwordResetToken: resetPasswordToken,
-                    passwordResetExpiry: resetPasswordTokenExpiry,
-                },
-            });
-
-            // if this fails, token update rolls back
-            await EmailService.sendPasswordResetEmail(
-                email,
-                resetPasswordToken,
-            );
+        // update user with reset token
+        await prisma.user.update({
+            where: { id: user.id },
+            data: {
+                passwordResetToken: resetPasswordToken,
+                passwordResetExpiry: resetPasswordTokenExpiry,
+            },
         });
+
+        await EmailService.sendPasswordResetEmail(email, resetPasswordToken);
+
         return { success: true };
     };
 

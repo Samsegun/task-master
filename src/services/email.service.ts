@@ -16,40 +16,50 @@ class EmailService {
             ? `${process.env.FRONTEND_URL}/verify-email?token=${verificationToken}&invitationToken=${invitationToken}`
             : `${process.env.FRONTEND_URL}/verify-email?token=${verificationToken}`;
 
-        const mailOptions = {
-            from: emailConfig.FROM_EMAIL,
-            to: email,
-            subject: "Task-Master - Verify Your Email Address",
-            html: `
-        <section>
+        const html = `
+      <section>
         <h1>Email Verification</h1>
         <p>Please click the link below to verify your email address:</p>
         <a href="${verificationUrl}">Verify Email</a>
         <p>This link will expire in 24 hours.</p>
-        </section>
-      `,
+      </section>
+    `;
+
+        // for dev and tests - we use terminal logging instead of sending real emails
+        if (
+            emailConfig.nodeEnv === "development" ||
+            emailConfig.nodeEnv === "test"
+        ) {
+            console.log(
+                "---------------- DEVELOPMENT EMAIL MOCK ----------------",
+            );
+            console.log(`To: ${email}`);
+            console.log(`Subject: Verify your email address`);
+            console.log(`Verification Link: ${verificationUrl}`);
+            console.log(
+                "--------------------------------------------------------",
+            );
+
+            // we return a mock success response so app backend doesn't crash
+            return { id: "mock_id_dev_mode", dev: true };
+        }
+
+        const mailOptions = {
+            from: emailConfig.FROM_EMAIL,
+            to: email,
+            subject: "Task-Master - Verify Your Email Address",
+            html,
         };
 
         try {
-            console.log("Sending email...");
+            console.log("Sending verification email...");
 
             const info: SentMessageInfo =
                 await this.#transporter.sendMail(mailOptions);
 
             console.log("Email sent");
-
-            // only log preview URLs if explicitly using Ethereal in development
-            if (emailConfig.nodeEnv === "development") {
-                const previewUrl = nodemailer.getTestMessageUrl(info);
-                if (previewUrl) {
-                    console.log(
-                        "Ethereal message sent! Preview URL: ",
-                        previewUrl,
-                    );
-                }
-            }
         } catch (error) {
-            console.error("Error sending email:", error);
+            console.error("Error sending verification email:", error);
             throw error;
         }
     };
@@ -84,24 +94,33 @@ class EmailService {
           `,
         };
 
+        if (
+            emailConfig.nodeEnv === "development" ||
+            emailConfig.nodeEnv === "test"
+        ) {
+            console.log(
+                "---------------- DEVELOPMENT EMAIL MOCK ----------------",
+            );
+            console.log(`To: ${email}`);
+            console.log(`Subject: Task-Master - Reset Your Password`);
+            console.log(`Reset Password Link: ${resetPasswordUrl}`);
+            console.log(
+                "--------------------------------------------------------",
+            );
+
+            // we return a mock success response so app backend doesn't crash
+            return { id: "mock_id_dev_mode", dev: true };
+        }
+
         try {
-            console.log("Sending email...");
+            console.log("Sending reset password email...");
+
             const info: SentMessageInfo =
                 await this.#transporter.sendMail(mailOptions);
 
             console.log("Email sent");
-
-            if (emailConfig.nodeEnv === "development") {
-                const previewUrl = nodemailer.getTestMessageUrl(info);
-                if (previewUrl) {
-                    console.log(
-                        "Ethereal message sent! Preview URL: ",
-                        previewUrl,
-                    );
-                }
-            }
         } catch (error) {
-            console.error("Error sending email:", error);
+            console.error("Error sending reset password email:", error);
             throw error;
         }
     };
@@ -134,7 +153,7 @@ class EmailService {
         `;
 
         const mailOptions = {
-            from: process.env.FROM_EMAIL,
+            from: emailConfig.FROM_EMAIL,
             to: email,
             subject: `You've been invited to join ${projectName}`,
             html: `
@@ -152,24 +171,35 @@ class EmailService {
         `,
         };
 
+        if (
+            emailConfig.nodeEnv === "development" ||
+            emailConfig.nodeEnv === "test"
+        ) {
+            console.log(
+                "---------------- DEVELOPMENT EMAIL MOCK ----------------",
+            );
+            console.log(`To: ${email}`);
+            console.log(
+                `Subject: Task-Master - You've been invited to join ${projectName}`,
+            );
+            console.log(htmlContent);
+            console.log(
+                "--------------------------------------------------------",
+            );
+
+            // we return a mock success response so app backend doesn't crash
+            return { id: "mock_id_dev_mode", dev: true };
+        }
+
         try {
             console.log("Sending invitation email...");
+
             const info: SentMessageInfo =
                 await this.#transporter.sendMail(mailOptions);
 
-            console.log("Email sent");
-
-            if (emailConfig.nodeEnv === "development") {
-                const previewUrl = nodemailer.getTestMessageUrl(info);
-                if (previewUrl) {
-                    console.log(
-                        "Ethereal message sent! Preview URL: ",
-                        previewUrl,
-                    );
-                }
-            }
+            console.log("Invitation Email sent");
         } catch (error) {
-            console.error("Error sending email:", error);
+            console.error("Error sending invitation email:", error);
             throw error;
         }
     };

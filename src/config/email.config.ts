@@ -8,6 +8,7 @@ const smtpUser = getEnvVariable("SMTP_USER");
 const smtpPassword = getEnvVariable("SMTP_PASSWORD");
 const fromEmail = getEnvVariable("FROM_EMAIL");
 const nodeEnv = getEnvVariable("NODE_ENV");
+const resendApiKey = getEnvVariable("RESEND_API_KEY");
 
 let transportOptions: any;
 
@@ -15,6 +16,9 @@ if (smtpService === "gmail") {
     // gmail config for prod
     transportOptions = {
         service: "gmail",
+        secure: true,
+        host: smtpHost,
+        port: smtpPort,
         auth: {
             user: smtpUser,
             pass: smtpPassword,
@@ -38,12 +42,7 @@ export const emailConfig = {
     FROM_EMAIL: fromEmail,
     transportOptions,
     nodeEnv,
+    resendApiKey,
 };
-
-// const emailConfig = {
-//     SMTP_USER: process.env.SMTP_USER!,
-//     GOOGLE_APP_PASSWORD: process.env.GOOGLE_APP_PASSWORD!,
-//     FROM_EMAIL: process.env.FROM_EMAIL!,
-// };
 
 export default emailConfig;

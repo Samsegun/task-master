@@ -14,8 +14,12 @@ describe("Auth route rate limiting", () => {
     };
 
     beforeEach(() => {
-        jest.mocked(EmailService.sendVerificationEmail).mockResolvedValue();
-        jest.mocked(EmailService.sendPasswordResetEmail).mockResolvedValue();
+        jest.mocked(EmailService.sendVerificationEmail).mockResolvedValue(
+            undefined,
+        );
+        jest.mocked(EmailService.sendPasswordResetEmail).mockResolvedValue(
+            undefined,
+        );
     });
 
     it("rate limits /register after 10 requests from the same IP", async () => {
