@@ -1,10 +1,6 @@
 import { ProjectStatus } from "@prisma/client";
 import { EntityNotFound, ForbiddenError, ValidationError } from "../errors";
-import {
-    numOfcompletedTasks,
-    progressNumber,
-    projectTasksLength,
-} from "../utils/computeProjectMetrics";
+import { progressNumber } from "../utils/computeProjectMetrics";
 import prisma from "../utils/prisma";
 import { GetDataOptions } from "../utils/types";
 import { CreateProject } from "../validators/project.validator";
@@ -73,18 +69,18 @@ class ProjectService {
                     },
                 },
             },
-            include: {
+            select: {
+                id: true,
+                name: true,
+                description: true,
+                status: true,
+                ownerId: true,
+                createdAt: true,
+                updatedAt: true,
                 owner: {
                     select: {
                         id: true,
                         email: true,
-                    },
-                },
-                tasks: {
-                    select: {
-                        id: true,
-                        status: true,
-                        dueDate: true,
                     },
                 },
                 _count: {
@@ -100,36 +96,69 @@ class ProjectService {
         });
 
         // computed progress and due date for each project
-        const projectsWithMetrics = projects.map((project) => {
-            const totalTasks = projectTasksLength(project.tasks);
-            const completedTasks = numOfcompletedTasks(project.tasks);
+        const projectIds = projects.map((project) => project.id);
+
+        /** get latest dueDates from tasks
+         * project due date is same as due date for last created task
+         *
+         * */
+        const [totalTaskCounts, completedTaskCounts, dueDateAggregates] =
+            projectIds.length > 0
+                ? await Promise.all([
+                      prisma.task.groupBy({
+                          by: ["projectId"],
+                          where: { projectId: { in: projectIds } },
+                          _count: { _all: true },
+                      }),
+                      prisma.task.groupBy({
+                          by: ["projectId"],
+                          where: {
+                              projectId: { in: projectIds },
+                              status: "DONE",
+                          },
+                          _count: { _all: true },
+                      }),
+                      prisma.task.groupBy({
+                          by: ["projectId"],
+                          where: { projectId: { in: projectIds } },
+                          _max: { dueDate: true },
+                      }),
+                  ])
+                : [[], [], []];
+
+        const totalTasksByProjectId = new Map(
+            totalTaskCounts.map((count) => [
+                count.projectId,
+                count._count._all,
+            ]),
+        );
+        const completedTasksByProjectId = new Map(
+            completedTaskCounts.map((count) => [
+                count.projectId,
+                count._count._all,
+            ]),
+        );
+        const dueDateByProjectId = new Map(
+            dueDateAggregates.map((aggregate) => [
+                aggregate.projectId,
+                aggregate._max.dueDate,
+            ]),
+        );
+
+        return projects.map((project) => {
+            const totalTasks = totalTasksByProjectId.get(project.id) ?? 0;
+            const completedTasks =
+                completedTasksByProjectId.get(project.id) ?? 0;
             const progress = progressNumber(totalTasks, completedTasks);
 
-            /** get latest dueDates from tasks
-             * project due date is same as due date for last created task
-             *
-             * */
-            const dueDates = project.tasks
-                .map((t) => t.dueDate)
-                .filter((date): date is Date => date != null);
-
-            const dueDate =
-                dueDates.length > 0
-                    ? new Date(Math.max(...dueDates.map((d) => d.getTime())))
-                    : null;
-
-            const { tasks, ...projectData } = project;
-
             return {
-                ...projectData,
+                ...project,
                 completedTasks,
                 totalTasks,
                 progress,
-                dueDate,
+                dueDate: dueDateByProjectId.get(project.id) ?? null,
             };
         });
-
-        return projectsWithMetrics;
     }
 
     static async getProjectById(projectId: string, userId: string) {
@@ -152,12 +181,6 @@ class ProjectService {
                 name: true,
                 description: true,
                 status: true,
-                tasks: {
-                    select: {
-                        dueDate: true,
-                        status: true,
-                    },
-                },
                 members: {
                     select: {
                         joinedAt: true,
@@ -186,18 +209,17 @@ class ProjectService {
         /*** project metrics ***/
         const totalMembers = project._count.members;
 
-        const totalTasks = projectTasksLength(project.tasks);
-        const completedTasks = numOfcompletedTasks(project.tasks);
+        const [totalTasks, completedTasks, dueDateAggregate] =
+            await Promise.all([
+                prisma.task.count({ where: { projectId } }),
+                prisma.task.count({ where: { projectId, status: "DONE" } }),
+                prisma.task.aggregate({
+                    where: { projectId },
+                    _max: { dueDate: true },
+                }),
+            ]);
         const progress = progressNumber(totalTasks, completedTasks);
-
-        // get latest dueDates from tasks
-        const dueDates = project.tasks
-            .map((t) => t.dueDate)
-            .filter((date): date is Date => date != null);
-        const dueDate =
-            dueDates.length > 0
-                ? new Date(Math.max(...dueDates.map((d) => d.getTime())))
-                : null;
+        const dueDate = dueDateAggregate._max.dueDate;
 
         const projectData = {
             id: project.id,

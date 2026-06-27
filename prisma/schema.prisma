@@ -55,6 +55,7 @@ model RefreshToken {
     createdAt DateTime @default(now())
 
     user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+    @@index([userId])
     @@map("refresh_tokens")
 }
 
@@ -74,6 +75,7 @@ model Project {
   tasks Task[]
 
   @@unique([name, ownerId])
+  @@index([ownerId])
   @@map("projects")
 }
 
@@ -92,6 +94,8 @@ model ProjectMember {
 
 
   @@unique([projectId, userId])
+  @@index([userId])
+  @@index([invitedBy])
   @@map("project_members")
 }
 
@@ -111,6 +115,8 @@ model ProjectInvitation {
   inviter User @relation("ProjectInviter", fields: [invitedBy], references: [id], onDelete: Cascade)
 
   @@unique([email, projectId])
+  @@index([projectId])
+  @@index([invitedBy])
   @@map("project_invitations")
 }
 
@@ -137,6 +143,13 @@ model Task {
   creator User @relation("TaskCreator", fields: [creatorId], references: [id], onDelete: Cascade)
 
   @@unique([title, projectId])
+  @@index([projectId])
+  @@index([assigneeId])
+  @@index([creatorId])
+  @@index([projectId, status])
+  @@index([projectId, assigneeId])
+  @@index([projectId, priority])
+  @@index([assigneeId, status, dueDate])
   @@map("tasks")
 }
 
