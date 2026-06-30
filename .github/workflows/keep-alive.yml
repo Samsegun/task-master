@@ -1,0 +1,20 @@
+name: Keep Render Instance Awake
+
+on:
+    schedule:
+        # runs every 13 minutes — must be under Render's 15-minute spin-down window
+        - cron: "*/13 * * * *"
+    workflow_dispatch: # allows manual trigger from GitHub Actions tab for testing
+
+jobs:
+    ping:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Ping health endpoint
+              run: |
+                  response=$(curl -s -o /dev/null -w "%{http_code}" https://task-master-f3ot.onrender.com/api/health)
+                  echo "Health check responded with status: $response"
+                  if [ "$response" -ne 200 ]; then
+                    echo "Health check failed with status $response"
+                    exit 1
+                  fi

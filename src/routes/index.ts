@@ -7,8 +7,12 @@ const appRouter = Router();
 appRouter.use("/auth", authRouter);
 appRouter.use("/v1", v1Router);
 
-appRouter.get("/", (req, res) => {
+appRouter.get("/", (_req, res) => {
     res.send("welcome to task-master API");
+});
+
+appRouter.get("/health", (_req, res) => {
+    res.status(200).json({ status: "ok", timestamp: new Date().toISOString() });
 });
 
 export default appRouter;
