@@ -19,7 +19,13 @@ import config from "./config/appConfig";
 const server = http.createServer(app);
 
 server.listen(config.port, () => {
-    console.log(
-        `Server running in ${environment} mode on http://localhost:${config.port}/api`,
-    );
+    if (environment === "production") {
+        console.log(
+            `Server running in ${environment} mode on ${config.serverUrl}/api`,
+        );
+    } else {
+        console.log(
+            `Server running in ${environment} mode on http://localhost:${config.port}/api`,
+        );
+    }
 });
