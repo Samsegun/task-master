@@ -14,10 +14,8 @@ let transportOptions: any;
 if (smtpService === "gmail") {
     // gmail config for prod
     transportOptions = {
-        service: "gmail",
-        host: smtpHost,
-        port: parseInt(smtpPort, 10),
-        secure: parseInt(smtpPort, 10) === 465,
+        service: "gmail", // nodemailer knows Gmail's settings automatically
+        secure: true,
         auth: {
             user: smtpUser,
             pass: smtpPassword,
