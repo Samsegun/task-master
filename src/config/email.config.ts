@@ -15,13 +15,14 @@ if (smtpService === "gmail") {
     // gmail config for prod
     transportOptions = {
         service: "gmail",
-        secure: true,
+        secure: false,
         host: smtpHost,
         port: smtpPort,
         auth: {
             user: smtpUser,
             pass: smtpPassword,
         },
+        timeout: 20000, // 20 seconds timeout
     };
 } else {
     // generic SMTP config for dev/tests
@@ -33,6 +34,7 @@ if (smtpService === "gmail") {
             user: smtpUser,
             pass: smtpPassword,
         },
+        timeout: 20000, // 20 seconds timeout
     };
 }
 
