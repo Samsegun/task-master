@@ -8,19 +8,33 @@ const smtpUser = getEnvVariable("SMTP_USER");
 const smtpPassword = getEnvVariable("SMTP_PASSWORD");
 const fromEmail = getEnvVariable("FROM_EMAIL");
 const nodeEnv = getEnvVariable("NODE_ENV");
+const emailUser = getEnvVariable("EMAIL_USER");
+const clientId = getEnvVariable("CLIENT_ID");
+const clientSecret = getEnvVariable("CLIENT_SECRET");
+const refreshToken = getEnvVariable("REFRESH_TOKEN");
 
 let transportOptions: any;
 
 if (smtpService === "gmail") {
     // gmail config for prod
+    // transportOptions = {
+    //     host: "smtp.gmail.com",
+    //     port: 465,
+    //     secure: true,
+    //     auth: {
+    //         user: smtpUser,
+    //         pass: smtpPassword,
+    //     },
+    // };
     transportOptions = {
-        service: "gmail", // nodemailer knows Gmail's settings automatically
-        secure: true,
+        service: "gmail",
         auth: {
-            user: smtpUser,
-            pass: smtpPassword,
+            type: "OAuth2",
+            user: emailUser,
+            clientId,
+            clientSecret,
+            refreshToken,
         },
-        timeout: 20000,
     };
 } else {
     // generic SMTP config for dev/tests
@@ -32,7 +46,6 @@ if (smtpService === "gmail") {
             user: smtpUser,
             pass: smtpPassword,
         },
-        timeout: 20000,
     };
 }
 
