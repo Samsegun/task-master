@@ -105,7 +105,6 @@ class EmailService {
                 await this.#transporter.sendMail(mailOptions);
 
             console.log("Email sent");
-            return info;
         } catch (error) {
             console.error("Error sending verification email:", error);
             throw error;
@@ -167,7 +166,6 @@ class EmailService {
                 await this.#transporter.sendMail(mailOptions);
 
             console.log("Email sent");
-            return info;
         } catch (error) {
             console.error("Error sending reset password email:", error);
             throw error;
@@ -247,7 +245,6 @@ class EmailService {
                 await this.#transporter.sendMail(mailOptions);
 
             console.log("Invitation Email sent");
-            return info;
         } catch (error) {
             console.error("Error sending invitation email:", error);
             throw error;
