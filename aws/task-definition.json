@@ -1,0 +1,138 @@
+{
+    "family": "taskmaster-backend",
+    "networkMode": "awsvpc",
+    "requiresCompatibilities": ["FARGATE"],
+    "cpu": "256",
+    "memory": "512",
+    "executionRoleArn": "arn:aws:iam::390259467362:role/taskmasterExecutionRole",
+    "containerDefinitions": [
+        {
+            "name": "taskmaster-backend",
+            "image": "390259467362.dkr.ecr.us-east-1.amazonaws.com/taskmaster-backend:latest",
+            "portMappings": [
+                {
+                    "containerPort": 3001,
+                    "protocol": "tcp"
+                }
+            ],
+            "essential": true,
+            "secrets": [
+                {
+                    "name": "DATABASE_URL",
+                    "valueFrom": "arn:aws:secretsmanager:us-east-1:390259467362:secret:taskmaster/backend-secrets-FWStgU:DATABASE_URL::"
+                },
+                {
+                    "name": "DIRECT_URL",
+                    "valueFrom": "arn:aws:secretsmanager:us-east-1:390259467362:secret:taskmaster/backend-secrets-FWStgU:DIRECT_URL::"
+                },
+                {
+                    "name": "JWT_ACCESS_SECRET",
+                    "valueFrom": "arn:aws:secretsmanager:us-east-1:390259467362:secret:taskmaster/backend-secrets-FWStgU:JWT_ACCESS_SECRET::"
+                },
+                {
+                    "name": "JWT_REFRESH_SECRET",
+                    "valueFrom": "arn:aws:secretsmanager:us-east-1:390259467362:secret:taskmaster/backend-secrets-FWStgU:JWT_REFRESH_SECRET::"
+                },
+                {
+                    "name": "JWT_INVITATION_SECRET",
+                    "valueFrom": "arn:aws:secretsmanager:us-east-1:390259467362:secret:taskmaster/backend-secrets-FWStgU:JWT_INVITATION_SECRET::"
+                },
+                {
+                    "name": "SMTP_USER",
+                    "valueFrom": "arn:aws:secretsmanager:us-east-1:390259467362:secret:taskmaster/backend-secrets-FWStgU:SMTP_USER::"
+                },
+                {
+                    "name": "SMTP_PASSWORD",
+                    "valueFrom": "arn:aws:secretsmanager:us-east-1:390259467362:secret:taskmaster/backend-secrets-FWStgU:SMTP_PASSWORD::"
+                },
+                {
+                    "name": "CLIENT_ID",
+                    "valueFrom": "arn:aws:secretsmanager:us-east-1:390259467362:secret:taskmaster/backend-secrets-FWStgU:CLIENT_ID::"
+                },
+                {
+                    "name": "CLIENT_SECRET",
+                    "valueFrom": "arn:aws:secretsmanager:us-east-1:390259467362:secret:taskmaster/backend-secrets-FWStgU:CLIENT_SECRET::"
+                },
+                {
+                    "name": "REFRESH_TOKEN",
+                    "valueFrom": "arn:aws:secretsmanager:us-east-1:390259467362:secret:taskmaster/backend-secrets-FWStgU:REFRESH_TOKEN::"
+                },
+                {
+                    "name": "EMAIL_USER",
+                    "valueFrom": "arn:aws:secretsmanager:us-east-1:390259467362:secret:taskmaster/backend-secrets-FWStgU:EMAIL_USER::"
+                }
+            ],
+            "environment": [
+                {
+                    "name": "NODE_ENV",
+                    "value": "production"
+                },
+                {
+                    "name": "PORT",
+                    "value": "3001"
+                },
+                {
+                    "name": "ALLOWED_ORIGINS",
+                    "value": "http://localhost:5173,https://taskmaster-samsegun.vercel.app"
+                },
+                {
+                    "name": "FRONTEND_URL",
+                    "value": "https://taskmaster-samsegun.vercel.app"
+                },
+                {
+                    "name": "JWT_ACCESS_EXPIRATION",
+                    "value": "1h"
+                },
+                {
+                    "name": "JWT_REFRESH_EXPIRATION",
+                    "value": "7d"
+                },
+                {
+                    "name": "JWT_INVITATION_EXPIRATION",
+                    "value": "7d"
+                },
+                {
+                    "name": "REFRESH_PASSWORD_EXPIRATION",
+                    "value": "10m"
+                },
+                {
+                    "name": "APP_DEBUG",
+                    "value": "false"
+                },
+                {
+                    "name": "SWAGGER_BASE_URL",
+                    "value": "https://d1c11g1umbdqj0.cloudfront.net/api"
+                },
+                {
+                    "name": "PRODUCTION_URL",
+                    "value": "https://d1c11g1umbdqj0.cloudfront.net"
+                },
+                {
+                    "name": "SMTP_SERVICE",
+                    "value": "gmail"
+                },
+                {
+                    "name": "SMTP_HOST",
+                    "value": "smtp.gmail.com"
+                },
+                {
+                    "name": "SMTP_PORT",
+                    "value": "465"
+                },
+                {
+                    "name": "FROM_EMAIL",
+                    "value": "oyebadesegunsam@gmail.com"
+                }
+            ],
+            "logConfiguration": {
+                "logDriver": "awslogs",
+                "options": {
+                    "awslogs-group": "/ecs/taskmaster-backend",
+                    "awslogs-region": "us-east-1",
+                    "awslogs-stream-prefix": "ecs",
+                    "awslogs-create-group": "true"
+                }
+            }
+        }
+    ]
+}
