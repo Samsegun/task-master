@@ -6,53 +6,6 @@ class EmailService {
         emailConfig.transportOptions,
     );
 
-    // private static async verifyTransporter() {
-    //     try {
-    //         await this.#transporter.verify();
-    //         console.log("SMTP transporter verified successfully.");
-    //     } catch (error) {
-    //         console.error("SMTP transporter verification failed:", error);
-    //         throw error;
-    //     }
-    // }
-
-    // private static async sendMailWithRetry(
-    //     mailOptions: SendMailOptions,
-    //     retries = 3,
-    //     delayMs = 1000,
-    // ): Promise<SentMessageInfo> {
-    //     for (let attempt = 1; attempt <= retries; attempt += 1) {
-    //         try {
-    //             if (attempt === 1) {
-    //                 await this.verifyTransporter();
-    //             }
-
-    //             return await this.#transporter.sendMail(mailOptions);
-    //         } catch (error: any) {
-    //             const isTimeout =
-    //                 error?.code === "ETIMEDOUT" ||
-    //                 error?.message?.includes("Connection timeout");
-
-    //             if (attempt === retries || !isTimeout) {
-    //                 console.error(
-    //                     `Email send failed on attempt ${attempt}:`,
-    //                     error,
-    //                 );
-    //                 throw error;
-    //             }
-
-    //             console.warn(
-    //                 `Email send attempt ${attempt} failed with timeout. Retrying in ${delayMs}ms...`,
-    //             );
-
-    //             await new Promise((resolve) => setTimeout(resolve, delayMs));
-    //             delayMs *= 2;
-    //         }
-    //     }
-
-    //     throw new Error("Failed to send email after retries.");
-    // }
-
     static sendVerificationEmail = async (
         email: string,
         verificationToken: string,
@@ -72,7 +25,7 @@ class EmailService {
       </section>
     `;
 
-        // for dev and tests - we use terminal logging instead of sending real emails
+        // for dev and tests - i use terminal logging instead of sending real emails
         if (
             emailConfig.nodeEnv === "development" ||
             emailConfig.nodeEnv === "test"

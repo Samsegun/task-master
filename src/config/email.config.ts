@@ -17,15 +17,6 @@ let transportOptions: any;
 
 if (smtpService === "gmail") {
     // gmail config for prod
-    // transportOptions = {
-    //     host: "smtp.gmail.com",
-    //     port: 465,
-    //     secure: true,
-    //     auth: {
-    //         user: smtpUser,
-    //         pass: smtpPassword,
-    //     },
-    // };
     transportOptions = {
         service: "gmail",
         auth: {
