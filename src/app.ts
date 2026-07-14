@@ -1,6 +1,7 @@
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import express from "express";
+import helmet from "helmet";
 import morgan from "morgan";
 import { setupSwagger } from "./config/swagger";
 import errorHandler from "./middleware/errorHandler";
@@ -34,6 +35,7 @@ app.use(morgan("combined"));
 app.use(cookieParser());
 
 app.set("trust proxy", 1);
+app.use(helmet());
 app.use("/api", appRouter);
 
 setupSwagger(app);
