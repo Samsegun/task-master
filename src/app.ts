@@ -11,8 +11,8 @@ const app = express();
 
 const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(",") || [];
 
-app.disable("x-powered-by");
 app.use(helmet());
+app.disable("x-powered-by");
 app.use(
     cors({
         origin: (origin, callback) => {
