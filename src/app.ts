@@ -11,6 +11,7 @@ const app = express();
 
 const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(",") || [];
 
+app.use(helmet());
 app.disable("x-powered-by");
 app.use(
     cors({
@@ -35,7 +36,6 @@ app.use(morgan("combined"));
 app.use(cookieParser());
 
 app.set("trust proxy", 1);
-app.use(helmet());
 app.use("/api", appRouter);
 
 setupSwagger(app);
