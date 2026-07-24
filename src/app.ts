@@ -3,13 +3,12 @@ import cors from "cors";
 import express from "express";
 import helmet from "helmet";
 import morgan from "morgan";
+import config from "./config/appConfig";
 import { setupSwagger } from "./config/swagger";
 import errorHandler from "./middleware/errorHandler";
 import appRouter from "./routes";
 
 const app = express();
-
-const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(",") || [];
 
 app.use(helmet());
 app.disable("x-powered-by");
@@ -19,7 +18,7 @@ app.use(
             // requests with no origin (like mobile apps or curl requests)
             if (!origin) return callback(null, true);
 
-            if (allowedOrigins.indexOf(origin) === -1) {
+            if (config.allowedOrigins.indexOf(origin) === -1) {
                 const msg =
                     "The CORS policy for this site does not allow access from the specified Origin.";
                 return callback(new Error(msg), false);

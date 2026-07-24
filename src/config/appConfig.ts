@@ -4,6 +4,7 @@ const config = {
     debug: process.env.APP_DEBUG === "true",
     serverUrl:
         process.env.PRODUCTION_URL || `http://localhost:${process.env.PORT}`,
+    allowedOrigins: process.env.ALLOWED_ORIGINS?.split(",") || [],
 };
 
 export default config;
