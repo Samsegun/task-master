@@ -30,6 +30,9 @@ Thumbs.db
 /src/generated/prisma
 /src/generated
 
+# aws
+taskmaster-rebuild-config.env
+
  
 # Editor
 .vscode/
