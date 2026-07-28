@@ -1,10 +1,40 @@
-import nodemailer, { SentMessageInfo } from "nodemailer";
+import { Resend } from "resend";
 import emailConfig from "../config/email.config";
 
 class EmailService {
-    static #transporter = nodemailer.createTransport(
-        emailConfig.transportOptions,
-    );
+    // static #transporter = nodemailer.createTransport(
+    //     emailConfig.transportOptions,
+    // );
+    static #resend = emailConfig.RESEND_API_KEY
+        ? new Resend(emailConfig.RESEND_API_KEY)
+        : null;
+
+    static async sendWithProvider({
+        to,
+        subject,
+        html,
+    }: {
+        to: string;
+        subject: string;
+        html: string;
+    }) {
+        if (!this.#resend) {
+            throw new Error("Resend API key is not configured.");
+        }
+
+        const { data, error } = await this.#resend.emails.send({
+            from: emailConfig.FROM_EMAIL,
+            to: [to],
+            subject,
+            html,
+        });
+
+        if (error) {
+            throw new Error(error.message);
+        }
+
+        return data;
+    }
 
     static sendVerificationEmail = async (
         email: string,
@@ -44,24 +74,32 @@ class EmailService {
             return { id: "mock_id_dev_mode", dev: true };
         }
 
-        const mailOptions = {
-            from: emailConfig.FROM_EMAIL,
+        const result = await this.sendWithProvider({
             to: email,
             subject: "Task-Master - Verify Your Email Address",
             html,
-        };
+        });
 
-        try {
-            console.log("Sending verification email...");
+        return result;
 
-            const info: SentMessageInfo =
-                await this.#transporter.sendMail(mailOptions);
+        // const mailOptions = {
+        //     from: emailConfig.FROM_EMAIL,
+        //     to: email,
+        //     subject: "Task-Master - Verify Your Email Address",
+        //     html,
+        // };
 
-            console.log("Email sent");
-        } catch (error) {
-            console.error("Error sending verification email:", error);
-            throw error;
-        }
+        // try {
+        //     console.log("Sending verification email...");
+
+        //     const info: SentMessageInfo =
+        //         await this.#transporter.sendMail(mailOptions);
+
+        //     console.log("Email sent");
+        // } catch (error) {
+        //     console.error("Error sending verification email:", error);
+        //     throw error;
+        // }
     };
 
     static sendPasswordResetEmail = async (
@@ -80,19 +118,14 @@ class EmailService {
             email,
         )}`;
 
-        const mailOptions = {
-            from: emailConfig.FROM_EMAIL,
-            to: email,
-            subject: "Task-Master - Reset Your Password ",
-            html: `
-            <section>
+        const html = `
+      <section>
             <h1>Reset Password</h1>
             <p>Please click the link below to reset your password:</p>
             <a href="${resetPasswordUrl}">Reset Password</a>
             <p>This link will expire in 10 minutes.</p>
             </section>
-          `,
-        };
+    `;
 
         if (
             emailConfig.nodeEnv === "development" ||
@@ -112,17 +145,25 @@ class EmailService {
             return { id: "mock_id_dev_mode", dev: true };
         }
 
-        try {
-            console.log("Sending reset password email...");
+        const result = await this.sendWithProvider({
+            to: email,
+            subject: "Task-Master - Reset Your Password",
+            html,
+        });
 
-            const info: SentMessageInfo =
-                await this.#transporter.sendMail(mailOptions);
+        return result;
 
-            console.log("Email sent");
-        } catch (error) {
-            console.error("Error sending reset password email:", error);
-            throw error;
-        }
+        // try {
+        //     console.log("Sending reset password email...");
+
+        //     const info: SentMessageInfo =
+        //         await this.#transporter.sendMail(mailOptions);
+
+        //     console.log("Email sent");
+        // } catch (error) {
+        //     console.error("Error sending reset password email:", error);
+        //     throw error;
+        // }
     };
 
     static sendProjectInvitationEmail = async (
@@ -152,12 +193,26 @@ class EmailService {
             <a href="${invitationUrl}">Accept Invitation</a>
         `;
 
-        const mailOptions = {
-            from: emailConfig.FROM_EMAIL,
-            to: email,
-            subject: `You've been invited to join ${projectName}`,
-            html: `
-            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        // const mailOptions = {
+        //     from: emailConfig.FROM_EMAIL,
+        //     to: email,
+        //     subject: `You've been invited to join ${projectName}`,
+        //     html: `
+        //     <section style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        //         <h2>Project Invitation</h2>
+        //         <p>Hi there,</p>
+
+        //         ${htmlContent}
+
+        //         <p style="color: #666; font-size: 14px;">
+        //             This invitation will expire in 7 days.
+        //         </p>
+
+        //     </section>
+        // `,
+        // };
+
+        const html = `  <section style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
                 <h2>Project Invitation</h2>
                 <p>Hi there,</p>
 
@@ -167,9 +222,7 @@ class EmailService {
                     This invitation will expire in 7 days.
                 </p>
                
-            </div>
-        `,
-        };
+            </section>`;
 
         if (
             emailConfig.nodeEnv === "development" ||
@@ -191,17 +244,25 @@ class EmailService {
             return { id: "mock_id_dev_mode", dev: true };
         }
 
-        try {
-            console.log("Sending invitation email...");
+        const result = await this.sendWithProvider({
+            to: email,
+            subject: `You've been invited to join ${projectName} on TaskMaster`,
+            html,
+        });
 
-            const info: SentMessageInfo =
-                await this.#transporter.sendMail(mailOptions);
+        return result;
 
-            console.log("Invitation Email sent");
-        } catch (error) {
-            console.error("Error sending invitation email:", error);
-            throw error;
-        }
+        // try {
+        //     console.log("Sending invitation email...");
+
+        //     const info: SentMessageInfo =
+        //         await this.#transporter.sendMail(mailOptions);
+
+        //     console.log("Invitation Email sent");
+        // } catch (error) {
+        //     console.error("Error sending invitation email:", error);
+        //     throw error;
+        // }
     };
 }
 
