@@ -1,11 +1,11 @@
+import "./instrument";
+
 import dotenv from "dotenv";
 const environment = process.env.NODE_ENV || "development";
 let envPath: string;
 
 if (environment === "production") {
     envPath = ".env";
-} else if (environment === "docker") {
-    envPath = ".env.docker";
 } else {
     envPath = `.env.${environment}`;
 }
