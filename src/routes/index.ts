@@ -15,9 +15,4 @@ appRouter.get("/health", (_req, res) => {
     res.status(200).json({ status: "ok", timestamp: new Date().toISOString() });
 });
 
-// temporary test route — remove after confirming Sentry works
-appRouter.get("/debug-sentry", () => {
-    throw new Error("Sentry test error from Taskmaster 🚀");
-});
-
 export default appRouter;
