@@ -26,16 +26,16 @@ Layer Technology
 
 ---
 
-Runtime Node.js, Express, TypeScript  
- Database PostgreSQL via Supabase  
- ORM Prisma  
- Auth JWT (access + refresh tokens, HTTP-only cookies)
-Email Resend (via custom domain)  
- Validation Zod  
- Testing Jest, Supertest  
- Containerization Docker  
- Hosting Render (Frankfurt region)  
- Error Monitoring Sentry
+Runtime: Node.js, Express, TypeScript  
+ Database: PostgreSQL via Supabase  
+ ORM: Prisma  
+ Auth: JWT (access + refresh tokens, HTTP-only cookies)
+Email: Resend (via custom domain)  
+ Validation: Zod  
+ Testing: Jest, Supertest  
+ Containerization: Docker  
+ Hosting: Render (Frankfurt region)  
+ Error Monitoring: Sentry
 
 ---
 
