@@ -1,6 +1,6 @@
 import rateLimit from "express-rate-limit";
 
-// ─── Login limiter ──────────────────────────────────
+// Login limiter
 // Strict — prevents brute-force password guessing
 export const loginLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
@@ -14,7 +14,7 @@ export const loginLimiter = rateLimit({
     skipSuccessfulRequests: true, // only counts FAILED login attempts
 });
 
-// ─── Register limiter ──────────────────────────────
+// Register limiter
 // Looser — prevents mass account creation/spam
 export const registerLimiter = rateLimit({
     windowMs: 60 * 60 * 1000, // 1 hour
@@ -28,7 +28,7 @@ export const registerLimiter = rateLimit({
     legacyHeaders: false,
 });
 
-// ─── Password reset limiter ────────────────────────
+// Password reset limiter
 // Strict — prevents email-bombing a user with reset requests
 export const passwordResetLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes

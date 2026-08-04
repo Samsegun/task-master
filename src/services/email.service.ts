@@ -2,9 +2,6 @@ import { Resend } from "resend";
 import emailConfig from "../config/email.config";
 
 class EmailService {
-    // static #transporter = nodemailer.createTransport(
-    //     emailConfig.transportOptions,
-    // );
     static #resend = emailConfig.RESEND_API_KEY
         ? new Resend(emailConfig.RESEND_API_KEY)
         : null;
@@ -55,7 +52,7 @@ class EmailService {
       </section>
     `;
 
-        // for dev and tests - i use terminal logging instead of sending real emails
+        // for dev and tests - use terminal logging instead of sending real emails
         if (
             emailConfig.nodeEnv === "development" ||
             emailConfig.nodeEnv === "test"
@@ -81,25 +78,6 @@ class EmailService {
         });
 
         return result;
-
-        // const mailOptions = {
-        //     from: emailConfig.FROM_EMAIL,
-        //     to: email,
-        //     subject: "Task-Master - Verify Your Email Address",
-        //     html,
-        // };
-
-        // try {
-        //     console.log("Sending verification email...");
-
-        //     const info: SentMessageInfo =
-        //         await this.#transporter.sendMail(mailOptions);
-
-        //     console.log("Email sent");
-        // } catch (error) {
-        //     console.error("Error sending verification email:", error);
-        //     throw error;
-        // }
     };
 
     static sendPasswordResetEmail = async (
@@ -152,18 +130,6 @@ class EmailService {
         });
 
         return result;
-
-        // try {
-        //     console.log("Sending reset password email...");
-
-        //     const info: SentMessageInfo =
-        //         await this.#transporter.sendMail(mailOptions);
-
-        //     console.log("Email sent");
-        // } catch (error) {
-        //     console.error("Error sending reset password email:", error);
-        //     throw error;
-        // }
     };
 
     static sendProjectInvitationEmail = async (
@@ -192,25 +158,6 @@ class EmailService {
             <p><strong>${inviterName}</strong> has invited you to join <strong>${projectName}</strong>.</p>
             <a href="${invitationUrl}">Accept Invitation</a>
         `;
-
-        // const mailOptions = {
-        //     from: emailConfig.FROM_EMAIL,
-        //     to: email,
-        //     subject: `You've been invited to join ${projectName}`,
-        //     html: `
-        //     <section style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        //         <h2>Project Invitation</h2>
-        //         <p>Hi there,</p>
-
-        //         ${htmlContent}
-
-        //         <p style="color: #666; font-size: 14px;">
-        //             This invitation will expire in 7 days.
-        //         </p>
-
-        //     </section>
-        // `,
-        // };
 
         const html = `  <section style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
                 <h2>Project Invitation</h2>
@@ -251,18 +198,6 @@ class EmailService {
         });
 
         return result;
-
-        // try {
-        //     console.log("Sending invitation email...");
-
-        //     const info: SentMessageInfo =
-        //         await this.#transporter.sendMail(mailOptions);
-
-        //     console.log("Invitation Email sent");
-        // } catch (error) {
-        //     console.error("Error sending invitation email:", error);
-        //     throw error;
-        // }
     };
 }
 
